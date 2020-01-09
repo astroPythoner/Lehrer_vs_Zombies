@@ -1,8 +1,15 @@
 # Anleitung zum erstellen neuer Karten
-Zu jedem Kartenthema gibt es eine große und eine kleine Karte. Die Große wird im Zombiemap-Modus verwendet, die Kleine im Arenamodus. Du musst also immer zwei Karten erstellen. Die Namen der Mapdatei, die im Ornder 'maps' liegen, ist als *name*_big.tmx und *name*_small.tmx
+Zu jedem Kartenthema gibt es eine große und eine kleine Karte. Die Große wird im Zombiemap-Modus verwendet, die Kleine im Arenamodus. Du musst also immer zwei Karten erstellen.
+Die Namen der Mapdatei, die im Ornder 'maps' liegen, ist festgelegt als <name>_big.tmx und <name>_small.tmx
 
-Lade dir den Karteneditor Tiled herunter ([Link hier](https://www.mapeditor.org)). Erstelle eine neue Karte. Wähle als Orientierung Orthogonal, als Kachelebenenformat CSV und als KachelZeichenreihenfolge Rechts Runter. Die Größe kannst du beliebig groß machen (aber nicht unbegrenzt). Ich habe für die kleinen Karten eine Größe von 40 auf 40 Kacheln Feldern, für die Großen 80 auf 80. Als Kachelgröße musst du 64 auf 64 Pixel nehmen. Wähle dann im Menü Karte -> externes Tilset hinzufügen. Wähle die Datei spritesheet_tiles.png (with thanks to [Kenney](http://https://opengameart.org/content/topdown-shooter) from opengameart.org). Das Tileset hat eine Kachelgröße von 64 auf 64 Pixel. Der Abstand zwischen den Bildern sind 10 Pixel. Orientierung ist 0,0, Hintergrundfarbe gibt es keine. Die Orientierung ist auch Orthogonal.
-Du kannst jetzt ein neue Karte erstellen. Um Hindernisse, Zombies, Spieler, Endgegner oder Sammelobjekte zu erstellen füge eine Itemebene hinzu. Auf dem Bild sind alle zusätzlichen Objekte zu sehen und hier nochmal aufgelistet:
+Lade dir den Karteneditor Tiled herunter (https://www.mapeditor.org).
+Erstelle eine neue Karte. Wähle als Orientierung Orthogonal, als Kachelebenenformat CSV und als KachelZeichenreihenfolge Rechts Runter.
+Die Größe kannst du beliebig groß machen (aber nicht unbegrenzt). Ich habe für die kleinen Karten eine Größe von 40 auf 40 Kacheln Feldern, für die Großen 80 auf 80.
+Als Kachelgröße musst du 64 auf 64 Pixel nehmen. Wähle dann im Menü Karte -> externes Tilset hinzufügen.
+Wähle die Datei spritesheet_tiles.png (with thanks to Kenney from https://opengameart.org/content/topdown-shooter and opengameart.org).
+Das Tileset hat eine Kachelgröße von 64 auf 64 Pixel. Der Abstand zwischen den Bildern sind 10 Pixel. Orientierung ist 0,0, Hintergrundfarbe gibt es keine. Die Orientierung ist auch Orthogonal.
+Du kannst jetzt ein neue Karte erstellen. Um Hindernisse, Zombies, Spieler, Endgegner oder Sammelobjekte zu erstellen füge eine Itemebene hinzu.
+Auf dem Bild in diesem Ordner sind alle zusätzlichen Objekte zu sehen und hier nochmal aufgelistet:
 
 * obstacle: Hindernisse wie Wände, Stühle, Tische, ...
 * health: Healthpacks
@@ -13,6 +20,6 @@ Du kannst jetzt ein neue Karte erstellen. Um Hindernisse, Zombies, Spieler, Endg
 * Personen obstacle: Hindernis, das für jeden Spielcharakter anders ist
 * Personen objekt: Objekte die die Spieler sammeln können
 
-![https://raw.githubusercontent.com/astroPythoner/Lehrer_vs_Zombies/master/Wie%20erstellt%20man%20eine%20neue%20Karte/Beispiel%20Tiled.png?token=AIE42JHVCLSBYO5WQZNASZ26C6DNG](http://)
+!! Im Code musst du in der Datei constants.py das Array MAP_NAMES um den Namen deiner Karte erweitern !!
 
-Video von [KidsCanCode](http://kidscancode.org/lessons/) [hier](http://https://www.youtube.com/watch?v=Mr5l4U9S4kI&list=PLsk-HSGFjnaH5yghzu7PcOzm9NhsW0Urw&index=47)
+Video von KidsCanCode (http://kidscancode.org/lessons/) gibt es unter http://https://www.youtube.com/watch?v=Mr5l4U9S4kI&list=PLsk-HSGFjnaH5yghzu7PcOzm9NhsW0Urw&index=47

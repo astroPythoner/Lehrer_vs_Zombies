@@ -1,8 +1,15 @@
 # Anleitung um ein neuen Spielcharakter zu erstellen
-Um ein neuen Spielchrakter zu erstellen sind einige Werte wie Geschwindigkeiten, Schaden, Leben, ... einzustellen. Es müssen Unterprogramme geschrieben werden um Aktionen wie PowerUps, Hindernisse berühren, ... zu ermöglichen. Und es müssen einige Bilder und Sound Dateien erstellt werden.
+
+Um ein neuen Spielchrakter zu erstellen sind einige Werte wie Geschwindigkeiten, Schaden, Leben, ... einzustellen.
+Es müssen Unterprogramme geschrieben werden um Aktionen wie PowerUps, Hindernisse berühren, ... zu ermöglichen.
+Und es müssen einige Bilder und Sound Dateien erstellt werden.
+
 
 ## Spielerwerte:
-Öffne die Datei players.json. Kopiere entweder einen bereits in der Datei liegenden Spieler oder kopiere aus der Datei player_example.json im Ordner 'Wie erstellt man einen neuen Spielercharakter' einen Spieler in players.json.
+
+Öffne die Datei players.json.
+Kopiere entweder einen bereits in der Datei liegenden Spieler oder kopiere aus der
+Datei player_example.json im Ordner 'Wie erstellt man einen neuen Spielercharakter' einen Spieler in players.json.
 Du kannst jetzt alle Namen, Parameter und Werte verändern:
 
 * anrede: In der Regel "Herr" oder "Frau", kann auch leer bleiben
@@ -13,17 +20,20 @@ Du kannst jetzt alle Namen, Parameter und Werte verändern:
 * player_health: Wie viel Leben der Spieler hat
 * player_speed: Wie schnell der Spieler läuft
 * player_rot_speed: Wie schnell sich der Spieler dreht
-* player_hit_rect: Größe des Spielers. Entscheidet zum Beispiel wie nahe du an Wände laufen kannst oder wie breit du bistt. Aufbau: In einem Array erst zwiemal 0 dann x, dann Breite
+* player_hit_rect: Größe des Spielers. Entscheidet zum Beispiel wie nahe du an Wände laufen kannst oder wie breit du bistt.
+  Aufbau: In einem Array erst zwiemal 0 dann x, dann Breite
 * power_up_time: Zeit wie lange das PowerUp zum nachladen braucht
 * weapon_name: Name deiner Waffe
-* weapon_barrel_offset: Der Schuß kommt oft nicht aus der Mitte des Spielers sondern z.B. aus seiner rechten Hande stelle mit den Zahlen ein aus welchem Pixel im Spielerbild der Schuß kommen soll
+* weapon_barrel_offset: Der Schuß kommt oft nicht aus der Mitte des Spielers
+  sondern z.B. aus seiner rechten Hande stelle mit den Zahlen ein aus welchem Pixel im Spielerbild der Schuß kommen soll
 * weapon_bullet_speed: Wie schnell ein Schuß fliegt
 * weapon_life_time: Wie lange ein Schuß braucht bis er verschwindet
 * weapon_rate: Wie schnell hintereinander geschossen werden kann
 * weapon_spread: Ungenauigkeit der Waffe (empfohlen 0-10)
 * weapon_damage: Wie viel Schaden die Waffe macht (empfohlen 15-30)
 * bullet_count: Wie viel Monition bei einem Schuß aus der Waffe fliegt
-* weapon_bullets: Bild des Schusses ("automatisch" für Standart benannte Datei oder Array an Dateinamen aus dem Ordner 'Waffen', von denen bei jedem Schuß zufällig eine gewählt wird)
+* weapon_bullets: Bild des Schusses ("automatisch" für Standart benannte Datei oder Array an Dateinamen aus dem Ordner 'Waffen',
+  von denen bei jedem Schuß zufällig eine gewählt wird)
 * bullet_upgrade: Es kann im laufe des Spiels eine verbesserte Waffe freigeschalten werden
     * upgraded_weapon_name: Name der verbesserten Waffe
     * upgrade_bedingungen: Was passieren muss damit eine neue Waffe freigeschaltet wird. Tipps siehe unten
@@ -34,15 +44,20 @@ Du kannst jetzt alle Namen, Parameter und Werte verändern:
 * health_pack_amount: Anzahl der Leben, die durch Sammeln eines Health-Packs erlangt werden
 * obstacle_damage: Anzahl des Schadens, wenn amn auf einem Hinderniss steht
 * obstacle_rotation: True, wenn Bilder in beliebiger Rotation angezeigt werden dürfen. False, wenn sie in ihrer ursprünglichen Rotation bleiben sollen
-* obstacle_richtungsabhängig: Extrabild für NS und OW Richtung (Dateinamen dann obstacle_*name*_NS und obstacle_*name*_OW)
+* obstacle_richtungsabhängig: Extrabild für NS und OW Richtung (Dateinamen dann obstacle_<name>_NS und obstacle_<name>_OW)
 * obstacle_kill: True, wenn Hindernis nach Berühren verschwinden soll
 * object_rotation: Wir obstacle_rotation nur für Objekte zum Einsammeln
 * object_kill: Wie obstacle_kill für Sammelobjekte (empfohlen True)
-* bedingungen_für_unlock: Was passieren muss damit dieser Spieler freigeschalten wird (ähnlich wie upgrade_bedingungen bei verbesserter Waffe, null wenn er schon ganz am Anfang freigeschaltet seien soll) Bei mindestens einem Spieler muss null stehen
-* other_files: Lege hier den Pfad anderer Bilddateien rein, die dann einamal am Anfang des Spiels geladen werden und dann in Unterprogrammen zur verfügung stehen (später mehr) Aufbau: {"name_zum_wiederfinden":[Array der Ordner die zum Bild führen ('img' muss nicht geschreiben werden, eigentlicher Dateiname am Ende)],"nächster_name":[...]}
+* bedingungen_für_unlock: Was passieren muss damit dieser Spieler freigeschalten wird
+  (ähnlich wie upgrade_bedingungen bei verbesserter Waffe, null wenn er schon ganz am Anfang freigeschaltet seien soll) Bei mindestens einem Spieler muss null stehen
+* other_files: Lege hier den Pfad anderer Bilddateien rein, die dann einamal am Anfang des Spiels geladen werden und dann in Unterprogrammen zur verfügung stehen (später mehr)
+  Aufbau: {"name_zum_wiederfinden":[Array der Ordner die zum Bild führen ('img' muss nicht geschreiben werden, eigentlicher Dateiname am Ende)],"nächster_name":[...]}
 
 So machst du Unlock Bedingungen (upgrade_bedingungen/bedingungen_für_unlock):
-Du kannst als Variablen für eine Bedingung alle variablen der Game Klasse verwenden, wie Runde, anzahl Gegner auf der Karte, ... Häufig werden dabei die in einem extra Dictionary gespeicherten Werte benutzt, die jedesmal wenn ein neuer Lehrer ausgewählt wird auch zurückgesetzt werden. Du greifst auf die Game Klasse zum mit self. Auf das genannte Dictionary mit self.werte_since_last_lehrer_change[player]. Du kannst Operatoren wie ==, <, >, >=, <= verwenden. Ein einfaches =  geht nicht, das ist ein ==.
+Du kannst als Variablen für eine Bedingung alle variablen der Game Klasse verwenden, wie Runde, anzahl Gegner auf der Karte, ...
+Häufig werden dabei die in einem extra Dictionary gespeicherten Werte benutzt, die jedesmal wenn ein neuer Lehrer ausgewählt wird auch zurückgesetzt werden.
+Du greifst auf die Game Klasse zum mit self. Auf das genannte Dictionary mit self.werte_since_last_lehrer_change[player]. Du kannst Operatoren wie ==, <, >, >=, <= verwenden.
+Ein einfaches =  geht nicht, das ist ein ==.
 
 Werte in werte_since_last_lehrer_change:
 * "shoots": Wie oft geschossen wurde
@@ -54,78 +69,106 @@ Werte in werte_since_last_lehrer_change:
 * "collected_health_packs": Anzahl gesammleter Health Packs
 
 Beispiele für Bedingungen:
-```
+
 self.werte_since_last_lehrer_change[player]['zombies_killed'] > 10 and self.werte_since_last_lehrer_change[player]['collected_health_packs'] == 0
-# Nachdem zehn Zombies getötet wurden ohne ein Healthpach zu sammeln
+(Nachdem zehn Zombies getötet wurden ohne ein Healthpach zu sammeln)
 
 self.spielmodus == ARENA_MODUS and self.num_zombie_wave >= 2
-# Wenn man Arenamodus in mindestens der zweiten Runde ist
+(Wenn man Arenamodus in mindestens der zweiten Runde ist)
 
 self.werte_since_last_lehrer_change[player]['shoots'] >= 20 and self.werte_since_last_lehrer_change[player]['treffer'] / self.werte_since_last_lehrer_change[player]['shoots'] > 0.8
-# Wenn man schon mindestens 20 mal geschossen hat und die Trefferquote bei über 80 Prozent liegt
+(Wenn man schon mindestens 20 mal geschossen hat und die Trefferquote bei über 80 Prozent liegt)
 
 self.werte_since_last_lehrer_change[player]['collected_objects'] >= 10
-# Nachdem man zehn Objekte eingesammelt hat
-```
+(Nachdem man zehn Objekte eingesammelt hat)
+
+
 
 ## Bilder:
+
 Für ein neuen Charakter brauchst du mindestens 7 Bilder. Es können beliebig viele weitere Bilder hinzugefügt werden, umd sie zum Beispiel bei PowerUps oder ähnlichem zu verwnden. Ein Beispiel aller benötigten Bilder für ein neuen Spieler findest du im Ordner 'Wie erstellt man einen neuen Spielercharakter'. Hier die Liste:
 
-* player_*name*: Bild des Spielers; 49x43 (beim Zeichnen dieses Bildes können die einzelnen Datei für Schatten, Shirt und Kopf verändert und aufeinander gelegt werden) Pfad:img/player/lehrer
-* bullet_*name*: Bild der Waffe; Größe beliebig (Schussrichtung rechts) Pfad:img/player/Waffen
-* powerup_icon_*name*: Symbol für PowerUp; 122x122 (Achtung wird im Spiel rund ausgeschnitten, also nicht in die Excken zeichnen) Pfad:img/Objects/PowerUp Icons
-* obstacle_*name*: Bild des Hindernisses auf das der Spieler treten kann; 64x64 Pfad:img/Objects/Obstacles
-* obstacle_icon_*name*: Kleines Symbol des Hindernisses; 49x49 (Achtung wird auch rund ausgeschnitten) Pfad:img/Objects/Obstacles
-* object_*name*: Bild des Objektes, das der Spieler einsammeln kann; 64x64 Pfad:img/Objects/Objects
-* object_icon_*name* Kleines Symbol für Objekt; 49x49 (Achtung wird auch rund ausgeschnitten) Pfad:img/Objects/Objects
+* player_<name>: Bild des Spielers; 49x43 (beim Zeichnen dieses Bildes können die einzelnen Datei für
+  Schatten, Shirt und Kopf verändert und aufeinander gelegt werden) Pfad:img/player/lehrer
+* bullet_<name>: Bild der Waffe; Größe beliebig (Schussrichtung rechts) Pfad:img/player/Waffen
+* powerup_icon_<name>: Symbol für PowerUp; 122x122 (Achtung wird im Spiel rund ausgeschnitten, also nicht in die Excken zeichnen) Pfad:img/Objects/PowerUp Icons
+* obstacle_<name>: Bild des Hindernisses auf das der Spieler treten kann; 64x64 Pfad:img/Objects/Obstacles
+* obstacle_icon_<name>: Kleines Symbol des Hindernisses; 49x49 (Achtung wird auch rund ausgeschnitten) Pfad:img/Objects/Obstacles
+* object_<name>: Bild des Objektes, das der Spieler einsammeln kann; 64x64 Pfad:img/Objects/Objects
+* object_icon_<name> Kleines Symbol für Objekt; 49x49 (Achtung wird auch rund ausgeschnitten) Pfad:img/Objects/Objects
 
-Wenn du weitere Bilder erstellt lege entweder in den passenden Ordner z.B zu den Schüssen,Spielern, ... oder lege sie zur Übersicht in den 'Sonstiges' Ordner, wenn es eine Sprechblase ist, was oft benutzt wird lege sie in den 'Sprechblasen' Ordner
+Wenn du weitere Bilder erstellt lege entweder in den passenden Ordner z.B zu den Schüssen,Spielern, ... oder
+lege sie zur Übersicht in den 'Sonstiges' Ordner, wenn es eine Sprechblase ist, was oft benutzt wird lege sie in den 'Sprechblasen' Ordner
+
 
 ## Sounds:
-Für jeden Spieler muss eine Sound Datei vorhanden sein, die beim schießen abgespielt wird. Sie sollte nicht zu lang sein. Du kannst entweder die im Ordner 'Wie erstellt man einen neuen Spielercharakter' leigende Datei kopieren oder eine neue erstellen. Die Sounddatei muss im Ordner 'snd/Waffen' liegen und nach dem Schema shoot_*name*.wav benannt sein. Dabei kann das Programm Bfxr helfen, mit welchem man Schuß oder Explosionsounds erstellen kann. [Link hier](http://https://www.bfxr.net)
+
+Für jeden Spieler muss eine Sound Datei vorhanden sein, die beim schießen abgespielt wird.
+Sie sollte nicht zu lang sein. Du kannst entweder die im Ordner 'Wie erstellt man einen neuen Spielercharakter' leigende Datei kopieren oder eine neue erstellen.
+Die Sounddatei muss im Ordner 'snd/Waffen' liegen und nach dem Schema shoot_<name>.wav benannt sein.
+Dabei kann das Programm Bfxr helfen, mit welchem man Schuß oder Explosionsounds erstellen kann. Link: https://www.bfxr.net
+
 
 ## Unterprogramme:
-Lasse einmal das Hauptprogramm main.py laufen. Es wird zwar in einem Fehler enden aber wird automatisch die fehlenden Unterprogramme in lehrer_funktionen.py hinzufügen. Öffne jetzt die Datei und Suche nach den Unterprogrammen mit dem neuen Lehrername (normalerweise gazn unten). Diese Unterprogramme werden aufgerufen wenn eines der Ereignisse PowerUp asuführen, Objekt einsammeln, Auf Hinderniss treten oder Healthpack einsammeln passiert. **Lasse die Zeile 'if not test:' unbedingt stehen** und verädere nur das pass. Du kannst in dem Unterprogramm auf die Game Klasse zugreifen (mit game.) und auf den Spieler selber (mit player.) Ein praktisches Unterprogramm, welches du verwenden kannst ist is_zombie_close_to_player(zombie,player_pos,radius). Es prüft ob der mitgegebene Zombie in der Nahe der Position ist. Der Integer Wert Radius bestimmt dabei wie groß die Fläche sein soll. Verwendung ist oft so:
-```
+
+Lasse einmal das Hauptprogramm main.py laufen. Es wird zwar in einem Fehler enden aber wird automatisch die
+fehlenden Unterprogramme in lehrer_funktionen.py hinzufügen. Öffne jetzt die Datei und Suche nach den Unterprogrammen mit dem neuen Lehrername (normalerweise gazn unten).
+Diese Unterprogramme werden aufgerufen wenn eines der Ereignisse PowerUp asuführen, Objekt einsammeln, Auf Hinderniss treten oder Healthpack einsammeln passiert.
+Lasse die Zeile 'if not test:' unbedingt stehen und verädere nur das pass. Du kannst in dem Unterprogramm auf die Game Klasse zugreifen (mit game.) und auf den Spieler selber (mit player.)
+Ein praktisches Unterprogramm, welches du verwenden kannst ist is_zombie_close_to_player(zombie,player_pos,radius). Es prüft ob der mitgegebene Zombie in der Nahe der Position ist.
+Der Integer Wert Radius bestimmt dabei wie groß die Fläche sein soll. Verwendung ist oft so:
+
 for zombie in game.zombies:
     if is_zombie_close_to_player(zombie, player.pos):
-        *hier kannst du etwas mit dem Zombie machen*
-```
+         hier kannst du etwas mit dem Zombie machen, der in der Nähe des Spielers ist
+
+
 Weitere häufig benutzte Unterprogramme die sowohl Spielern als Auch Zombies zur Verfügung stehen sind
 * player.change_img_for_given_time(image, time_in_millis)
-* *zombie*.change_img_for_given_time(image=None,time_in_millis=0,stand_still_during_time=False,damage_during_time=0)
+* <zombie>.change_img_for_given_time(image=None,time_in_millis=0,stand_still_during_time=False,damage_during_time=0)
 
-welche das Bild von Spieler oder des Zombies für die time_in_millis verändert. Es wird empfohlen, dass du die Bilder in die other_files legst und dann über LEHRER[*lehrer_name*]["other_files"][*name*] darauf zugreifst. Beim Zombie kann zudem stand_still_during_time auf True gesetzt werden, dann bewegt sich der Zombie in dieser Zeit nichtmehr und damage_during_time auf eine ganze Zahl gesetzt werden, dann wird dem Zombie in der Zeit dieses Leben abgezogen. Das Leben eines Zombies ist in MOB_HEALTH gespeichert. Setzt das image beim Zombie auf None bleibt das Bild unverändert, beim Spieler geht das nicht.
+welche das Bild von Spieler oder des Zombies für die time_in_millis verändert. Es wird empfohlen, dass du die Bilder in die other_files legst und
+dann über LEHRER[*lehrer_name*]["other_files"][<name>] darauf zugreifst. Beim Zombie kann zudem stand_still_during_time auf True gesetzt werden,
+dann bewegt sich der Zombie in dieser Zeit nichtmehr und damage_during_time auf eine ganze Zahl gesetzt werden, dann wird dem Zombie in der Zeit dieses Leben abgezogen.
+Das Leben eines Zombies ist in MOB_HEALTH gespeichert. Setzt das image beim Zombie auf None bleibt das Bild unverändert, beim Spieler geht das nicht.
 
 und
 
 * player.place_img_on_player_for_given_time(self,img,time_in_mills,x_verschiebung=0,y_verschiebung=0)
-* *zombie*.place_img_on_zombie_for_given_time(img,time_in_millis,x_verschiebung=0,y_verschiebung=0)
+* <zombie>.place_img_on_zombie_for_given_time(img,time_in_millis,x_verschiebung=0,y_verschiebung=0)
 
-welche für die Zeit time_in_mills in Bild auf den Spieler/Zombie legt, dass sich nicht mitdreht. Das hilft zum Beispiel bei Sprechblasen, bei denen dann der Text in jeder Richtung des Zombies/Spielers lesbar ist. mit Verschiebung in x und y Richtung kannst du das Bild noch positionieren. Damit zum Beilspiel die Sprechblase nicht einfach mittig auf dem Zombie ist sondern wirklich aus dem Mund kommt.
+welche für die Zeit time_in_mills in Bild auf den Spieler/Zombie legt, dass sich nicht mitdreht.
+Das hilft zum Beispiel bei Sprechblasen, bei denen dann der Text in jeder Richtung des Zombies/Spielers lesbar ist.
+Mit Verschiebung in x und y Richtung kannst du das Bild noch positionieren. Damit zum Beilspiel die Sprechblase
+nicht einfach mittig auf dem Zombie ist sondern wirklich aus dem Mund kommt.
 
-**Du kannst die Unterprogramme auch leer lassen (das pass stehen lassen), dann passiert zwar beim PowerUp und dem einsammeln von Objekten nicht, aber das Spiel läuft.**
+! Du kannst die Unterprogramme auch leer lassen (das pass stehen lassen), dann passiert zwar beim PowerUp und dem einsammeln von Objekten nicht, aber das Spiel läuft. !
 
-Du musst übrigens nicht den Zähler für das Sammeln von Objekten hochzählen oder Leben abziehen beim stehen auf ein Hindernis, das passiert schon im eingentlichen Code.
+Du musst übrigens nicht den Zähler für das Sammeln von Objekten hochzählen oder Leben abziehen beim stehen auf ein Hindernis,
+das passiert schon im eingentlichen Code.
 
 Beispiele für Unterprogramme:
-```
-for zombie in game.zombies:
-    if is_zombie_close_to_player(zombie, player.pos):
-        zombie.change_img_for_given_time(LEHRER[*Name*]["other_files"][*Bildname*],3000,stand_still_during_time=True)
-# Ändert das Bild aller nahestehenden Zombies für 3 Sekunden und lässt die Zombies still stehen
 
 for zombie in game.zombies:
     if is_zombie_close_to_player(zombie, player.pos):
-        zombie.change_img_for_given_time(LEHRER[*Name*]["other_files"][*Bildname*],3000,damge_during_time=MOB_HEALTH*3/4)
-        zombie.place_img_on_zombie_for_given_time(LEHRER[*Name*]["other_files"][**], 3000, 20, -5)
-player.place_img_on_player_for_given_time(LEHRER[*Name*]["other_files"][*Bildname*],3000,20,-10)
-# Zieht allen nahestehenden Zombie 3/4 ihres Lebens ab, verändert ihre Bilder und platziert zudem eine Sprechblase auf ihnen. Auf den Spieler wird auch eine Sprechblase gesetzt
-```
+        zombie.change_img_for_given_time(LEHRER[<name>]["other_files"][*Bildname*],3000,stand_still_during_time=True)
+(Ändert das Bild aller nahestehenden Zombies für 3 Sekunden und lässt die Zombies still stehen)
+
+for zombie in game.zombies:
+    if is_zombie_close_to_player(zombie, player.pos):
+        zombie.change_img_for_given_time(LEHRER[<name>]["other_files"][*Bildname*],3000,damge_during_time=MOB_HEALTH*3/4)
+        zombie.place_img_on_zombie_for_given_time(LEHRER[<name>]["other_files"][**], 3000, 20, -5)
+player.place_img_on_player_for_given_time(LEHRER[<name>]["other_files"][*Bildname*],3000,20,-10)
+(Zieht allen nahestehenden Zombie 3/4 ihres Lebens ab, verändert ihre Bilder und platziert zudem eine Sprechblase auf ihnen. Auf den Spieler wird auch eine Sprechblase gesetzt)
+
 
 ### Unterprogramme für Fortgeschrittene
-Wenn du dich ein wenig mit pygame und Objektorientiertem Programmieren auskennst kannst du in die Datei 'sprites.py' auch neue Klasses unten zu dem Spielhack, dem Shaking_object und der Gas_Wolke hinzufügen. Dann sind der Kreativtät keine Grenzen mehr gesetzt. Vergess nicht das du auch hier auf die nur einmal geladenen Datei in den 'other_files' zugreifen kannst. Wichtig ist beim Erstellen einer solchen Klasse, dass es ein Unterprogramm update(self) gibt, welches in der Hauptschleife des Spiels aufgerufen wird, welches also für jeden Frame einmal aufgerufen wird. Auch mit enthalten sein müssen:
-```
+Wenn du dich ein wenig mit pygame und Objektorientiertem Programmieren auskennst kannst du in die Datei 'sprites.py' auch neue Klasses
+unten zu dem Spielhack, dem Shaking_object und der Gas_Wolke hinzufügen. Dann sind der Kreativtät keine Grenzen mehr gesetzt.
+Vergess nicht das du auch hier auf die nur einmal geladenen Datei in den 'other_files' zugreifen kannst. Wichtig ist beim Erstellen einer solchen Klasse,
+dass es ein Unterprogramm update(self) gibt, welches in der Hauptschleife des Spiels aufgerufen wird, welches also für jeden Frame einmal aufgerufen wird.
+Auch mit enthalten sein müssen:
+
 def __init__(self):
     self.groups = game.all_sprites
     self._layer = EFFECTS_LAYER
@@ -135,8 +178,12 @@ def __init__(self):
     self.rect = self.image.get_rect()
     self.rect.center = <irgendeine position z.B. player.pos>
 
-# und hier die updatefunktion (ohne mitgabewerte)
+(und hier die updatefunktion (ohne mitgabewerte))
 def update(self):
     pass
-```
-self.groups ist wichtig zur Ausführung der updatedatei und damit das Spiel weiß, dass ein neues Objekt erstellt wird, der layer sagt in welcher Tiefe das Objekt ist. So sind Sprechblasen z.B. in einem Layer über dem Spieler aber die Map unter den Spieler. Die Tiefe EFFECTS_LAYER ist extra für solche Effekte gedacht man kann aber auch andere verwenden. Der Name ist beim Debuggen wichtig wenn jedes Objekt ein Name hat kann man damit einfach rauskriegen welche Objekte Probleme machen (muss also nicht sein). image ist das Bild, dass gezeigt wird. Und rect ist die Position und Größe des Bildes.
+
+self.groups ist wichtig zur Ausführung der updatedatei und damit das Spiel weiß, dass ein neues Objekt erstellt wird, der layer sagt in
+welcher Tiefe das Objekt ist. So sind Sprechblasen z.B. in einem Layer über dem Spieler aber die Map unter den Spieler.
+Die Tiefe EFFECTS_LAYER ist extra für solche Effekte gedacht man kann aber auch andere verwenden.
+Der Name ist beim Debuggen wichtig wenn jedes Objekt ein Name hat kann man damit einfach rauskriegen welche Objekte Probleme machen (muss also nicht sein).
+image ist das Bild, dass gezeigt wird. Und rect ist die Position und Größe des Bildes.
