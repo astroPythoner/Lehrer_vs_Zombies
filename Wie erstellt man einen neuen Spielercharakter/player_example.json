@@ -1,0 +1,84 @@
+{
+
+
+
+
+  "No Magic": {
+    "anrede": "Herr",
+    "is_lehrer": true,
+    "name_in_file_names": "nomagic",
+    "personen_item_text": "Trainierte Augen",
+    "personen_beschreibung": "Läuft barfuß rum und trainiert seine Augen. Kennt die 3 Lösungsverfahren.",
+    "player_health": 120,
+    "player_speed": 280,
+    "player_rot_speed": 200,
+    "player_hit_rect": [
+      0,
+      0,
+      35,
+      35
+    ],
+    "power_up_time": 20000,
+    "weapon_name": "Pistole",
+    "weapon_barrel_offset": [
+      30,
+      10
+    ],
+    "weapon_bullet_speed": 900,
+    "weapon_lifetime": 4000,
+    "weapon_rate": 250,
+    "weapon_spread": 5,
+    "weapon_damage": 23,
+    "bullet_count": 1,
+    "weapon_bullets": "automatisch",
+    "weapon_upgrade": {
+      "upgraded_weapon_name": "Intelligenter Schwamm",
+      "upgrade_bedingungen": "self.werte_since_last_lehrer_change[player]['collected_objects'] >= 10",
+      "unlock_text": "Trainiere deine Augen 10 mal um blöd genug  zu sein ein Schwamm für intelligent zu halten",
+      "weapon_image": [
+        "bullet_nomagic_Schwamm.png"
+      ],
+      "player_image": [
+        "player_nomagic_Schwamm.png"
+      ],
+      "weapon_bullet_speed": 700,
+      "weapon_lifetime": 3800,
+      "weapon_rate": 200,
+      "weapon_spread": 5,
+      "weapon_damage": 18,
+      "bullet_count": 1
+    },
+    "health_pack_amount": 20,
+    "obstacle_damage": 2,
+    "obstacle_rotation": true,
+    "obstacle_richtungsabhängig": false,
+    "obstacle_kill": false,
+    "object_rotation": false,
+    "object_kill": true,
+    "bedingungen_für_unlock": null,
+    "other_files": {
+      "frozen_zombie": [
+        "Zombie",
+        "zombie_frozen.png"
+      ],
+      "big_eyes": [
+        "Player",
+        "Lehrer",
+        "player_nomagic_große_Augen.png"
+      ],
+      "big_eyes_schwamm": [
+        "Player",
+        "Lehrer",
+        "player_nomagic_große_Augen_Schwamm.png"
+      ],
+      "aua": [
+        "Sprechblasen",
+        "Aua Sprechblase.png"
+      ]
+    }
+  }
+
+
+
+
+}
