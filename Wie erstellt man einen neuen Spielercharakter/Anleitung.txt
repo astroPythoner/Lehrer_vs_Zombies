@@ -56,13 +56,13 @@ Werte in werte_since_last_lehrer_change:
 Beispiele für Bedingungen:
 ```
 self.werte_since_last_lehrer_change[player]['zombies_killed'] > 10 and self.werte_since_last_lehrer_change[player]['collected_health_packs'] == 0
-# Nachdem zehn Zombies getötet wurden ohne ein healthpach zu sammeln
+# Nachdem zehn Zombies getötet wurden ohne ein Healthpach zu sammeln
 
 self.spielmodus == ARENA_MODUS and self.num_zombie_wave >= 2
 # Wenn man Arenamodus in mindestens der zweiten Runde ist
 
 self.werte_since_last_lehrer_change[player]['shoots'] >= 20 and self.werte_since_last_lehrer_change[player]['treffer'] / self.werte_since_last_lehrer_change[player]['shoots'] > 0.8
-# Wenn man schon 20 mindestens mal geschossen hat und die trefferquote bei über 80 Prozent liegt
+# Wenn man schon mindestens 20 mal geschossen hat und die Trefferquote bei über 80 Prozent liegt
 
 self.werte_since_last_lehrer_change[player]['collected_objects'] >= 10
 # Nachdem man zehn Objekte eingesammelt hat
@@ -120,7 +120,7 @@ for zombie in game.zombies:
         zombie.change_img_for_given_time(LEHRER[*Name*]["other_files"][*Bildname*],3000,damge_during_time=MOB_HEALTH*3/4)
         zombie.place_img_on_zombie_for_given_time(LEHRER[*Name*]["other_files"][**], 3000, 20, -5)
 player.place_img_on_player_for_given_time(LEHRER[*Name*]["other_files"][*Bildname*],3000,20,-10)
-# Zieht allen nahestehenden Zombie 3/4 ihres Lebens ab, verändert ihr Bilde und platziert zudem eine Sprechblase auf ihnen. Auf den Spieler wird auch eine Sprechblase gesetzt
+# Zieht allen nahestehenden Zombie 3/4 ihres Lebens ab, verändert ihre Bilder und platziert zudem eine Sprechblase auf ihnen. Auf den Spieler wird auch eine Sprechblase gesetzt
 ```
 
 ### Unterprogramme für Fortgeschrittene
