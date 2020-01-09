@@ -1,3 +1,24 @@
-"topdown shooter" art by Kenny.nl
-Weapon pickup by: Guns by Gary <http://fossilrecords.net/> licensed under CC-BY-SA 3.0 <http://creativecommons.org/licenses/by-sa/3.0/>
-"espionage.ogg" by http://opengameart.org/users/haeldb
+Copyright/Attribution Notice:
+
+This game was developed based on KidCanCode's Tile-based game
+    Webside: http://kidscancode.org/lessons/
+    GitHub: https://github.com/kidscancode/pygame_tutorials/tree/master/tilemap
+    Youtube: https://www.youtube.com/watch?v=VO8rTszcW4s&list=PLsk-HSGFjnaH5yghzu7PcOzm9NhsW0Urw
+
+    Thank you for the great tutorial lesson's even though not much of the original code is left. You really were a great help and I learned a lot.
+    Great videos!
+
+
+Map:
+    Thanks to Kenney from "www.kenney.nl".
+    "topdown shooter" art by Kenney.nl
+    https://opengameart.org/content/topdown-shooter
+
+    made with Tiled (https://www.mapeditor.org)
+
+Weapon pickup:
+    Guns by Gary <http://fossilrecords.net/> licensed under CC-BY-SA 3.0 <http://creativecommons.org/licenses/by-sa/3.0/>
+    "espionage.ogg" by http://opengameart.org/users/haeldb
+
+Some of the sounds:
+    made with bfxr (https://www.bfxr.net)
