@@ -32,7 +32,7 @@ TIME_MAP_LEVEL = 500             # Wie lange man auf der großen Karte überlebe
 TIME_BETWEEN_ZOMBIE_WAVES = 150  # Wie Viel Zeit zwischen 2 Zombiewellen vergeht
 
 # Schwierigkeiten
-SCHWIERIGKEIT_ZOMBIE_KILLS = [0.99,0.15,0.1,0.05,0  ] # Prozentualer Anteil der Zombies, die je nach Schwierigkeit weniger sind
+SCHWIERIGKEIT_ZOMBIE_KILLS = [0.2,0.15,0.1,0.05,0  ] # Prozentualer Anteil der Zombies, die je nach Schwierigkeit weniger sind
 SCHWIERIGKEIT_HEALTH_KILLS = [0  ,0.05,0.1,0.15,0.2] # Prozentualer Anteil der Health Packs, die je nach Schwierigkeit weniger sind
 
 # Dateienpfade herausfinden
@@ -229,6 +229,7 @@ ENDGEGNER_GRUBE = pygame.image.load(join_paths([img_folder, "Endgegner","endgegn
 ENDGEGNER_EXPLOSION_IMAGES = [pygame.image.load(join_paths([img_folder, "Endgegner","Explosion",filename])).convert_alpha() for filename in listdir(join_paths([img_folder,"Endgegner","Explosion"]))]
 
 AT_END_IMG = pygame.image.load(path.join(img_folder, "Butter.png")).convert_alpha()
+TEXT_FIND_AT_END = "Wo ist die Butter?"
 
 ERKLÄRUNG = (pygame.image.load(path.join(img_folder,"erklärung.png")))
 

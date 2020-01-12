@@ -727,11 +727,11 @@ class Personen_Object(pygame.sprite.Sprite):
             if LEHRER[player.lehrer_name]["object_rotation"]:
                 self.image[count] = pygame.transform.rotate(self.image[count], choice([0, 90, 180, 270, 360]))
 
-class Butter(pygame.sprite.Sprite):
+class Find_at_End(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
-        self.name = "Butter"
+        self.name = "Ding, das am Ende gefunden werden muss"
         self.game = game
         self.image = AT_END_IMG
         self.rect = self.image.get_rect()
