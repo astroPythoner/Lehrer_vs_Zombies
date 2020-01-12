@@ -733,7 +733,7 @@ class Butter(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.name = "Butter"
         self.game = game
-        self.image = BUTTER_IMG
+        self.image = AT_END_IMG
         self.rect = self.image.get_rect()
         self.hit_rect = self.rect
         self.x = x
@@ -758,7 +758,7 @@ class Butter(pygame.sprite.Sprite):
             if new_width < self.smallest:
                 new_width = self.smallest
                 self.getting_bigger = True
-        self.image = pygame.transform.scale(BUTTER_IMG, (int(new_width),int(new_width)))
+        self.image = pygame.transform.scale(AT_END_IMG, (int(new_width), int(new_width)))
         self.rect = self.image.get_rect()
         self.rect.centerx = self.x
         self.rect.centery = self.y

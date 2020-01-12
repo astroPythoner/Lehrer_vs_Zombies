@@ -90,22 +90,22 @@ def health_pack_Windmauer(game, player, test = False):
     if not test:
         pass
 
-def power_up_Hoyoung(game, player, test = False):
+def power_up_Honyoung(game, player, test = False):
     if not test:
-        player.place_img_on_player_for_given_time(LEHRER["Hoyoung"]["other_files"]["be quiet"], 2500, 30, 0)
+        player.place_img_on_player_for_given_time(LEHRER["Honyoung"]["other_files"]["be quiet"], 2500, 30, 0)
         for zombie in game.zombies:
             if is_zombie_close_to_player(zombie, player.pos):
                 zombie.change_img_for_given_time(None,4000,stand_still_during_time=True)
 
-def object_collect_Hoyoung(game, player, test = False):
+def object_collect_Honyoung(game, player, test = False):
     if not test:
-        player.place_img_on_player_for_given_time(LEHRER["Hoyoung"]["other_files"]["I love that sentence"], 1500, 30, 0)
+        player.place_img_on_player_for_given_time(LEHRER["Honyoung"]["other_files"]["I love that sentence"], 1500, 30, 0)
 
-def obstacle_Hoyoung(game, player, test = False):
+def obstacle_Honyoung(game, player, test = False):
     if not test:
-        player.place_img_on_player_for_given_time(LEHRER["Hoyoung"]["other_files"]["fisch"], 1500, 30, 0)
+        player.place_img_on_player_for_given_time(LEHRER["Honyoung"]["other_files"]["fisch"], 1500, 30, 0)
 
-def health_pack_Hoyoung(game, player, test = False):
+def health_pack_Honyoung(game, player, test = False):
     if not test:
         pass
 

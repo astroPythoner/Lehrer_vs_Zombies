@@ -63,7 +63,7 @@
              "bullet_count" : 1,
              "weapon_upgrade" : {
                  "upgraded_weapon_name" : "Marmeladen Crepe",
-                 "upgrade_bedingungen" : "player.health == LEHRER['Schultes']['player_health'] and self.werte_since_last_lehrer_change[player]['zombies_killed'] > 5",
+                 "upgrade_bedingungen" : "player.health == LEHRER['Écoltes']['player_health'] and self.werte_since_last_lehrer_change[player]['zombies_killed'] > 5",
                  "unlock_text": "Töte fünf Zombies und habe danach immernoch volles Leben",
                  "weapon_image" : ["bullet_ecoltes_Marmelade.png"],
                  "player_image" : ["player_ecoltes_Marmelade.png"],
@@ -171,7 +171,7 @@
              "bedingungen_für_unlock": null,
              "other_files" : {"kommatest":["Sprechblasen","Kommatest Sprechblase.png"],"abikorrektur":["Sprechblasen","Abikorrektur Sprechblase.png"],"bla bla bla":["Sprechblasen","Bla Bla Bla Sprechblase.png"],"zzz":["Sprechblasen","zzz.png"]}
     },
-    "Hoyoung": {
+    "Honyoung": {
              "anrede" : "Herr",
              "is_lehrer" : true,
              "name_in_file_names": "honyoung",

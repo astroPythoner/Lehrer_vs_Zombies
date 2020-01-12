@@ -18,7 +18,7 @@ START_GAME = "start"
 BEFORE_FIRST_GAME = "before first game"
 PLAYING = "playing"
 PLAYER_DIED = "player died"
-COLLECTING_BUTTER = "collecting butter"
+COLLECTING_AT_END = "collecting at end"
 WON_GAME = "won game"
 
 # Spielmodi
@@ -228,7 +228,7 @@ ENDGEGNER_IMGES = {WALK_N_JUMP:ENDGEGNER_WALK_N_JUMP_IMG,WEAPON:ENDGEGNER_SHOOT_
 ENDGEGNER_GRUBE = pygame.image.load(join_paths([img_folder, "Endgegner","endgegner Grube.png"])).convert_alpha()
 ENDGEGNER_EXPLOSION_IMAGES = [pygame.image.load(join_paths([img_folder, "Endgegner","Explosion",filename])).convert_alpha() for filename in listdir(join_paths([img_folder,"Endgegner","Explosion"]))]
 
-BUTTER_IMG = pygame.image.load(path.join(img_folder,"Butter.png")).convert_alpha()
+AT_END_IMG = pygame.image.load(path.join(img_folder, "Butter.png")).convert_alpha()
 
 ERKLÄRUNG = (pygame.image.load(path.join(img_folder,"erklärung.png")))
 

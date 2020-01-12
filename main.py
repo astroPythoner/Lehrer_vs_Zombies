@@ -881,7 +881,7 @@ class Game:
             self.update_forground_text_img()
 
             ######## Hauptschleife des Spiels #######
-            while self.game_status == PLAYING or self.game_status == COLLECTING_BUTTER:
+            while self.game_status == PLAYING or self.game_status == COLLECTING_AT_END:
                 self.dt = self.clock.tick(FPS) / 1000.0
 
                 pressed = self.check_key_or_mouse_pressed([pygame.K_BACKSPACE,pygame.K_RETURN,pygame.K_y,pygame.K_x,pygame.K_c,pygame.K_LEFT,pygame.K_RIGHT,pygame.K_UP,pygame.K_DOWN])
@@ -929,7 +929,7 @@ class Game:
                     self.game_status = BEFORE_FIRST_GAME
                 # Spiel gewonnen?
                 if ((self.spielmodus == MAP_MODUS and (len(self.zombies) == 0 or (self.genauerer_spielmodus==AFTER_TIME and time() - self.level_start_time >= TIME_MAP_LEVEL))) or (self.spielmodus==ARENA_MODUS and self.num_zombie_wave==3 and not self.end_gegner.alive)) and self.game_status == PLAYING:
-                    self.game_status = COLLECTING_BUTTER
+                    self.game_status = COLLECTING_AT_END
                     if self.spielmodus == ARENA_MODUS:
                         self.butter = Butter(self,self.endgegner_kill_pos.x,self.endgegner_kill_pos.y)
                     else:
@@ -1189,7 +1189,7 @@ class Game:
                 self.last_personen_object[count] = None
 
             # Spieler sammelt Butter ein
-            if self.game_status == COLLECTING_BUTTER:
+            if self.game_status == COLLECTING_AT_END:
                 if pygame.sprite.collide_rect(player,self.butter):
                     self.butter.collected = True
                     self.game_status = WON_GAME
@@ -1367,7 +1367,7 @@ class Game:
         else:
             self.level_bar_lenght = self.WIDTH - self.longest_object_name - 15 - 15 - 10
         self.level_bar_height = self.HEIGHT * 0.02
-        if self.game_status == COLLECTING_BUTTER:
+        if self.game_status == COLLECTING_AT_END:
             self.draw_text(surface,"Wo ist die Butter?",self.BIG_TEXT,15,int(self.HEIGHT-17-self.BIG_TEXT),rect_place = "oben_links", color = LEVEL_FORTSCHRITTS_FARBE)
         else:
             if self.spielmodus == ARENA_MODUS:
@@ -1480,7 +1480,7 @@ class Game:
             self.screen.blit(self.live_bar_images[player_num],(int((self.WIDTH/self.num_players_in_multiplayer)*(player_num)),0))
 
     def draw_level_fortschritts_balken(self):
-        if not self.game_status == COLLECTING_BUTTER:
+        if not self.game_status == COLLECTING_AT_END:
         # Prozentualelänge berechnen
             if self.genauerer_spielmodus == AFTER_TIME:
                 if self.spielmodus == MAP_MODUS:
