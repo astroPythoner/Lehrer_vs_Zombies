@@ -371,11 +371,11 @@ class Mob(pygame.sprite.Sprite):
                         collide_with_obstacles(self, self.game.obstacles, 'y')
                         self.rect.center = self.hit_rect.center
                     else:
-                        # target nichtmehr in der Nähe, neues target wird gesucht
+                        # target nichtmehr in der Naehe, neues target wird gesucht
                         if self.game.multiplayer:
                             self.target = None
                     if time() - self.last_traget_change > TARGET_CHANGE_TIME:
-                        # Zeit abgelaufen, neu suchen, wenn anderer Spieler näher dran ist, dieses verfolgen
+                        # Zeit abgelaufen, neu suchen, wenn anderer Spieler naeher dran ist, dieses verfolgen
                         if self.game.multiplayer:
                             self.target = None
                 else:
@@ -412,7 +412,7 @@ class Mob(pygame.sprite.Sprite):
                 self.image[count] = pygame.transform.rotate(self.orig_image[count], self.rot)
             self.rect.center = self.hit_rect.center
             if self.health > self.stand_still_during_time * 0.6:
-                col = LEBENSANZEIGE_GRÜN
+                col = LEBENSANZEIGE_GRUEN
             elif self.health > self.start_health * 0.3:
                 col = LEBENSANZEIGE_GELB
             else:
@@ -567,7 +567,7 @@ class End_Gegner(pygame.sprite.Sprite):
                 vect = (self.pos - target.pos)
                 self.rot = vect.angle_to(vec(-1, 0))
             else:
-                # Grube zum anzeigen wo er als nächstes hinspringt
+                # Grube zum anzeigen wo er als naechstes hinspringt
                 if now - self.last_jump > ENDGEGNER_JUMP_TIME - ENDGEGNER_TIME_NEW_POS_SEEN_BEFORE_JUMP and now + ENDGEGNER_TIME_NEW_POS_SEEN_BEFORE_JUMP < self.last_modus_wechsel + ENDGEGNER_MOUDS_TIMES[
                     WALK_N_JUMP]:
                     gibt_bereits_eine_grube = False
@@ -619,7 +619,7 @@ class End_Gegner_Bullet(pygame.sprite.Sprite):
             self.kill()
 
 class End_Gegner_Explosion(pygame.sprite.Sprite):
-    # Explosionen in unterschiedlichen Größen
+    # Explosionen in unterschiedlichen Groessen
     def __init__(self, game, center):
         self.groups = game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
@@ -636,7 +636,7 @@ class End_Gegner_Explosion(pygame.sprite.Sprite):
     def update(self):
         now = pygame.time.get_ticks()
         if now - self.last_update > self.frame_rate:
-            # nächstes Bild der Explosion anzeigen
+            # naechstes Bild der Explosion anzeigen
             self.last_update = now
             self.frame += 1
             if self.frame == len(ENDGEGNER_EXPLOSION_IMAGES):
@@ -677,13 +677,13 @@ class Personen_Obstacle(pygame.sprite.Sprite):
         self.is_end = is_end
         self.image = []
         for count,player in enumerate(self.game.players):
-            if LEHRER[player.lehrer_name]["obstacle_richtungsabhängig"]:
+            if LEHRER[player.lehrer_name]["obstacle_richtungsabhaengig"]:
                 richtung = orientation
                 if is_begin:
                     richtung += "_begin"
                 if is_end:
                     richtung += "_end"
-                self.image.append(LEHRER[player.lehrer_name]["richtungsabhängige_bilder"][richtung])
+                self.image.append(LEHRER[player.lehrer_name]["richtungsabhaengige_bilder"][richtung])
             else:
                 self.image.append(PERSONEN_OBSTACLE_IMGES[player.lehrer_name]["img"])
             if LEHRER[player.lehrer_name]["obstacle_rotation"]:
@@ -691,13 +691,13 @@ class Personen_Obstacle(pygame.sprite.Sprite):
 
     def update_image(self):
         for count,player in enumerate(self.game.players):
-            if LEHRER[player.lehrer_name]["obstacle_richtungsabhängig"]:
+            if LEHRER[player.lehrer_name]["obstacle_richtungsabhaengig"]:
                 richtung = self.orientation
                 if self.is_begin:
                     richtung += "_begin"
                 if self.is_end:
                     richtung += "_end"
-                self.image[count] = LEHRER[player.lehrer_name]["richtungsabhängige_bilder"][richtung]
+                self.image[count] = LEHRER[player.lehrer_name]["richtungsabhaengige_bilder"][richtung]
             else:
                 self.image[count] = PERSONEN_OBSTACLE_IMGES[player.lehrer_name]["img"]
             if LEHRER[player.lehrer_name]["obstacle_rotation"]:

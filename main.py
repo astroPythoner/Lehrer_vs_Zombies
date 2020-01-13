@@ -11,8 +11,8 @@ halbes_pi = pi/2
 
 class Game:
     def __init__(self):
-        # Lehrer funktionen datei vervollständigen
-        was_lehrerfunktionen_vollständig = True
+        # Lehrer funktionen datei vervollstaendigen
+        was_lehrerfunktionen_vollstaendig = True
         for lehrer in LEHRER:
             for funktionsname in ["power_up_", "object_collect_", "obstacle_", "health_pack_"]:
                 try:
@@ -20,10 +20,10 @@ class Game:
                     eval(name)
                 except AttributeError:
                     with open("lehrer_funktionen.py", "a") as file:
-                        was_lehrerfunktionen_vollständig = False
+                        was_lehrerfunktionen_vollstaendig = False
                         file.write("\ndef " + funktionsname + lehrer.replace(" ","_") + "(game, player, test = False):\n    if not test:\n        pass\n")
-        if not was_lehrerfunktionen_vollständig:
-            raise Exception("lehrer_funktionen.py war nicht vollständig und wurde so weit automatisch vervollständigt, dass das Spiel beim nachsten Durchlauf funktionert. Mehr Infos zu den Lehrerfunktionen findest du in der Anleitung zum Spielercharakter erstellen unter dem Punkt Unterprogramme")
+        if not was_lehrerfunktionen_vollstaendig:
+            raise Exception("lehrer_funktionen.py war nicht vollstaendig und wurde so weit automatisch vervollstaendigt, dass das Spiel beim nachsten Durchlauf funktionert. Mehr Infos zu den Lehrerfunktionen findest du in der Anleitung zum Spielercharakter erstellen unter dem Punkt Unterprogramme")
         pygame.mixer.pre_init(44100, -16, 4, 2048)
         self.WIDTH = start_width
         self.HEIGHT = start_height
@@ -79,7 +79,7 @@ class Game:
             width = self.get_text_rect(str(LEHRER[lehrer]["personen_item_text"]) + ":" + str(99), self.BIG_TEXT).width
             if width > self.longest_object_name:
                 self.longest_object_name = width
-            if LEHRER[lehrer]["bedingungen_für_unlock"] != None:
+            if LEHRER[lehrer]["bedingungen_fuer_unlock"] != None:
                 self.lehrer_to_be_unlocked.append(lehrer)
                 
         self.forground_text_img = pygame.Surface((self.WIDTH, self.HEIGHT), pygame.SRCALPHA)
@@ -98,7 +98,7 @@ class Game:
 
         self.lehrer_selection_surfaces = {}
 
-        self.schöne_grafik = True
+        self.schoene_grafik = True
 
         self.game_status = START_GAME
         self.schwierigkeit = 3
@@ -121,7 +121,7 @@ class Game:
         self.endgegner_jump_points = []
         self.endgegner_after_kill_respawn_point = []
         
-        self.werte_since_last_lehrer_change = {} # mehr Möglichkeiten für Bedingungen
+        self.werte_since_last_lehrer_change = {} # mehr Moeglichkeiten fuer Bedingungen
         
         self.player_pos = (0,0)
 
@@ -203,8 +203,8 @@ class Game:
         # Hintergrund
         self.screen.blit(self.background, self.background_rect)
 
-        # Schöne oder flüssige Grafik
-        if self.schöne_grafik:
+        # Schoene oder fluessige Grafik
+        if self.schoene_grafik:
             return_dict["Grafik"] = self.draw_text(self.screen, "schöne Grafik", self.NORMAL_TEXT, 10, 10, rect_place="oben_links", color=AUSWAHL_TEXT_COLOR)
         else:
             return_dict["Grafik"] = self.draw_text(self.screen, "flüssige Grafik", self.NORMAL_TEXT, 10, 10, rect_place="oben_links", color=AUSWAHL_TEXT_COLOR)
@@ -215,7 +215,7 @@ class Game:
         else:
             return_dict["Maus"] = self.draw_text(self.screen, "Tastatursteuerung", self.NORMAL_TEXT, 10, 15 + self.NORMAL_TEXT, rect_place="oben_links", color=AUSWAHL_TEXT_COLOR)
 
-        # Spielerkärung
+        # Spielerkaerung
         return_dict["Hilfe"] = self.draw_text(self.screen, "Hilfe/Erklärung", self.NORMAL_TEXT, self.WIDTH-10, 10, rect_place="oben_rechts", color=AUSWAHL_TEXT_COLOR)
 
         # Titel
@@ -310,10 +310,10 @@ class Game:
 
             if MAUS_LEFT in pressed:
                 if self.check_maus_pos_on_rect(pressed[MAUS_LEFT],maus_rects["Grafik"]):
-                    if self.schöne_grafik:
-                        self.schöne_grafik = False
+                    if self.schoene_grafik:
+                        self.schoene_grafik = False
                     else:
-                        self.schöne_grafik = True
+                        self.schoene_grafik = True
 
                 if self.check_maus_pos_on_rect(pressed[MAUS_LEFT],maus_rects["Maus"]):
                     if self.with_maussteuerung:
@@ -323,7 +323,7 @@ class Game:
 
 
                 if self.check_maus_pos_on_rect(pressed[MAUS_LEFT],maus_rects["Hilfe"]):
-                    self.make_spielerklärung()
+                    self.make_spielerklaerung()
 
                 for schwierigkeitsstufe in range(1,6):
                     if self.check_maus_pos_on_rect(pressed[MAUS_LEFT], maus_rects["Schwierigkeit_"+str(schwierigkeitsstufe)]):
@@ -391,22 +391,22 @@ class Game:
             surf.blit(PLAYER_IMGES[lehrer], (self.longest_lehrer_name + 30, 15))
 
             # Kleine Bilder: Bei normal size und smaler sind die kleinen Bilder noch rechts neben dem Lehrername, bei tiny darunter
-            # Waffe (Bildgröße passend berechnen)
+            # Waffe (Bildgroesse passend berechnen)
             if isinstance(BULLET_IMGES[lehrer], type(dict)):
-                bild_höhe = BULLET_IMGES[lehrer][list(BULLET_IMGES[lehrer])[0]].get_height()
+                bild_hoehe = BULLET_IMGES[lehrer][list(BULLET_IMGES[lehrer])[0]].get_height()
                 bild_breite = BULLET_IMGES[lehrer][list(BULLET_IMGES[lehrer])[0]].get_width()
             else:
-                bild_höhe = BULLET_IMGES[lehrer].get_height()
+                bild_hoehe = BULLET_IMGES[lehrer].get_height()
                 bild_breite = BULLET_IMGES[lehrer].get_width()
-            if bild_höhe != bild_breite:
-                if bild_breite > bild_höhe:
-                    end_höhe = int((25 / bild_breite) * bild_höhe)
+            if bild_hoehe != bild_breite:
+                if bild_breite > bild_hoehe:
+                    end_hoehe = int((25 / bild_breite) * bild_hoehe)
                     end_breite = 25
                 else:
-                    end_breite = int((25 / bild_höhe) * bild_breite)
-                    end_höhe = 25
+                    end_breite = int((25 / bild_hoehe) * bild_breite)
+                    end_hoehe = 25
             else:
-                end_höhe = 25
+                end_hoehe = 25
                 end_breite = 25
             # Gesamtbreite von den drei kleinen Bilder berechnen (Waffe,Neutral,Schlechtes)
             total_width = 15+49+10+49+20+25+5+self.longest_weapon_name
@@ -419,21 +419,21 @@ class Game:
                     distance_from_right_side = 125
                 # Waffe zeichnen
                 if isinstance(BULLET_IMGES[lehrer], type(dict)):
-                    surf.blit(pygame.transform.scale(BULLET_IMGES[lehrer][list(BULLET_IMGES[lehrer])[0]], (end_breite, end_höhe)), (lehrer_asuwahl_breite-distance_from_right_side-15-49-10-49-20-25,   22))
+                    surf.blit(pygame.transform.scale(BULLET_IMGES[lehrer][list(BULLET_IMGES[lehrer])[0]], (end_breite, end_hoehe)), (lehrer_asuwahl_breite-distance_from_right_side-15-49-10-49-20-25,   22))
                 else:
-                    surf.blit(pygame.transform.scale(BULLET_IMGES[lehrer], (end_breite, end_höhe)), (lehrer_asuwahl_breite-distance_from_right_side-15-49-10-49-20-25,   22))
+                    surf.blit(pygame.transform.scale(BULLET_IMGES[lehrer], (end_breite, end_hoehe)), (lehrer_asuwahl_breite-distance_from_right_side-15-49-10-49-20-25,   22))
                 self.draw_text(surf, "Waffe: " + str(LEHRER[lehrer]["weapon_name"]), self.SMALL_TEXT,         lehrer_asuwahl_breite-distance_from_right_side-15-49-10-49-20-25-5, 22, rect_place="oben_rechts", font_name=ARIAL_FONT, color=AUSWAHL_TEXT_COLOR)
                 # Neutrales Objekt zeichnen
                 surf.blit(PEROSNEN_OBJECT_IMGES[lehrer]["icon"],   (lehrer_asuwahl_breite - distance_from_right_side-15-49,       12))
                 # Schlechtes Objekt zeichnen
                 surf.blit(PERSONEN_OBSTACLE_IMGES[lehrer]["icon"], (lehrer_asuwahl_breite - distance_from_right_side-15-49-10-49, 12))
-            else: # Bilder müssen drunter gezeichnet werden
+            else: # Bilder muessen drunter gezeichnet werden
                 kleine_bilder_tiefer = True
                 # Waffe zeichnen
                 if isinstance(BULLET_IMGES[lehrer], type(dict)):
-                    surf.blit(pygame.transform.scale(BULLET_IMGES[lehrer][list(BULLET_IMGES[lehrer])[0]], (end_breite, end_höhe)), (15, 22 + max([self.HUGE_TEXT + 10, 50])))
+                    surf.blit(pygame.transform.scale(BULLET_IMGES[lehrer][list(BULLET_IMGES[lehrer])[0]], (end_breite, end_hoehe)), (15, 22 + max([self.HUGE_TEXT + 10, 50])))
                 else:
-                    surf.blit(pygame.transform.scale(BULLET_IMGES[lehrer], (end_breite, end_höhe)), (15,      22 + max([self.HUGE_TEXT+10,50])))
+                    surf.blit(pygame.transform.scale(BULLET_IMGES[lehrer], (end_breite, end_hoehe)), (15,      22 + max([self.HUGE_TEXT+10,50])))
                 self.draw_text(surf, "Waffe: " + str(LEHRER[lehrer]["weapon_name"]), self.SMALL_TEXT,         15+25+5, 22 + max([self.HUGE_TEXT+10,50]),rect_place="oben_links", font_name=ARIAL_FONT, color=AUSWAHL_TEXT_COLOR)
                 # Neutrales Objekt zeichnen
                 surf.blit(PEROSNEN_OBJECT_IMGES[lehrer]["icon"],   (15+25+5+self.longest_weapon_name+20,       12 + max([self.HUGE_TEXT+10,50])))
@@ -451,12 +451,12 @@ class Game:
             # Beschreibung
             # herausfinden wie viele Zeichen noch vor das Power-Up Bild passen
             lehrer_beschreibung = LEHRER[lehrer]["personen_beschreibung"]
-            platz_für_beschreibung = lehrer_asuwahl_breite-125
+            platz_fuer_beschreibung = lehrer_asuwahl_breite-125
             # umbrechen
             letzter_umbruch = 0
             einzelne_texte = []
             for letter_count, letter in enumerate(lehrer_beschreibung):
-                if self.get_text_rect(lehrer_beschreibung[letzter_umbruch:letter_count],self.SMALL_TEXT).width > platz_für_beschreibung:
+                if self.get_text_rect(lehrer_beschreibung[letzter_umbruch:letter_count],self.SMALL_TEXT).width > platz_fuer_beschreibung:
                     einzelne_texte.append(lehrer_beschreibung[letzter_umbruch:letter_count])
                     letzter_umbruch = letter_count
             einzelne_texte.append(lehrer_beschreibung[letzter_umbruch:len(lehrer_beschreibung)])
@@ -476,21 +476,21 @@ class Game:
             zeile = 0
             unteres_ende = 0
             for text in infotexte:
-                if rechte_kante_letzter_text + 7 + self.get_text_rect(text, self.SMALL_TEXT, ARIAL_FONT).width > platz_für_beschreibung:
+                if rechte_kante_letzter_text + 7 + self.get_text_rect(text, self.SMALL_TEXT, ARIAL_FONT).width > platz_fuer_beschreibung:
                     zeile += 1
                     rechte_kante_letzter_text = 8
                 rect = self.draw_text(surf, text, self.SMALL_TEXT, rechte_kante_letzter_text+7, unteres_ende_beschreibung+25 + (self.SMALL_TEXT+5)*zeile, rect_place="mitte_links",font_name=ARIAL_FONT, color=AUSWAHL_TEXT_COLOR)
                 rechte_kante_letzter_text = rect.right
                 unteres_ende = rect.bottom
 
-            gesmat_höhe = 122
+            gesmat_hoehe = 122
             if not power_up_img_oben:
-                gesmat_höhe += 50
-            if unteres_ende > gesmat_höhe:
-                gesmat_höhe = unteres_ende
-            gesmat_höhe += 10
+                gesmat_hoehe += 50
+            if unteres_ende > gesmat_hoehe:
+                gesmat_hoehe = unteres_ende
+            gesmat_hoehe += 10
 
-            cropped = pygame.Surface((lehrer_asuwahl_breite,gesmat_höhe),pygame.SRCALPHA)
+            cropped = pygame.Surface((lehrer_asuwahl_breite,gesmat_hoehe),pygame.SRCALPHA)
             cropped.convert_alpha()
             cropped.blit(surf, (0, 0))
             self.lehrer_selection_surfaces[lehrer] = cropped
@@ -533,7 +533,7 @@ class Game:
                 for count, player in enumerate(self.players):
                     if player.lehrer_name == name and count != player_num:
                         anderer_spieler_hat_schon_diese_person = True
-            if LEHRER[name]["bedingungen_für_unlock"] != None:
+            if LEHRER[name]["bedingungen_fuer_unlock"] != None:
                 unlocked = name in self.lehrer_unlocked_sofar
             if such_text != "":
                 if not such_text.lower() in name.lower():
@@ -559,7 +559,7 @@ class Game:
                     for count, player in enumerate(self.players):
                         if player.lehrer_name == lehrer and count != player_num:
                             anderer_spieler_hat_schon_diese_person = True
-                if LEHRER[lehrer]["bedingungen_für_unlock"] != None:
+                if LEHRER[lehrer]["bedingungen_fuer_unlock"] != None:
                     unlocked = lehrer in self.lehrer_unlocked_sofar
                 if such_text != "":
                     if not such_text.lower() in lehrer.lower():
@@ -607,9 +607,9 @@ class Game:
 
             pressed = self.check_key_or_mouse_pressed([pygame.K_RETURN,pygame.K_DOWN,pygame.K_UP,pygame.K_BACKSPACE,"text"])
 
-            # Auswahl ändern
+            # Auswahl aendern
             if (pressed[pygame.K_UP] or MAUS_ROLL_UP in pressed) and time()-last_selection_change > 0.2 and lehrer_y_positions != []:
-                # Lehrer auswahl ändern, dabei darauf achten das Lehrer schon freigeschaltet ist und noch nicht von anderen Spielern ausgewählt wurde
+                # Lehrer auswahl aendern, dabei darauf achten das Lehrer schon freigeschaltet ist und noch nicht von anderen Spielern ausgewaehlt wurde
                 last_selection_change = time()
                 if selected_lehrer_num > 0:
                     selected_lehrer_num -= 1
@@ -623,7 +623,7 @@ class Game:
                         for count, player in enumerate(self.players):
                             if player.lehrer_name == LEHRER_NAMEN[selected_lehrer_num] and count != player_num:
                                 anderer_spieler_hat_schon_diese_person = True
-                    if LEHRER[LEHRER_NAMEN[selected_lehrer_num]]["bedingungen_für_unlock"] != None:
+                    if LEHRER[LEHRER_NAMEN[selected_lehrer_num]]["bedingungen_fuer_unlock"] != None:
                         unlocked = LEHRER_NAMEN[selected_lehrer_num] in self.lehrer_unlocked_sofar
                     if such_text != "":
                         if not such_text.lower() in LEHRER_NAMEN[selected_lehrer_num].lower():
@@ -637,7 +637,7 @@ class Game:
                             selected_lehrer_num = len(LEHRER_NAMEN) - 1
 
             if (pressed[pygame.K_DOWN] or MAUS_ROLL_DOWN in pressed) and time()-last_selection_change > 0.2 and lehrer_y_positions != []:
-                # Lehrer auswahl ändern, dabei darauf chaten das Lehrer schon freigeschaltet ist und noch nicht von anderen Spielern ausgewählt wurde
+                # Lehrer auswahl aendern, dabei darauf chaten das Lehrer schon freigeschaltet ist und noch nicht von anderen Spielern ausgewaehlt wurde
                 last_selection_change = time()
                 if selected_lehrer_num < len(list(LEHRER))-1:
                     selected_lehrer_num += 1
@@ -651,7 +651,7 @@ class Game:
                         for count, player in enumerate(self.players):
                             if player.lehrer_name == LEHRER_NAMEN[selected_lehrer_num] and count != player_num:
                                 anderer_spieler_hat_schon_diese_person = True
-                    if LEHRER[LEHRER_NAMEN[selected_lehrer_num]]["bedingungen_für_unlock"] != None:
+                    if LEHRER[LEHRER_NAMEN[selected_lehrer_num]]["bedingungen_fuer_unlock"] != None:
                         unlocked = LEHRER_NAMEN[selected_lehrer_num] in self.lehrer_unlocked_sofar
                     if such_text != "":
                         if not such_text.lower() in LEHRER_NAMEN[selected_lehrer_num].lower():
@@ -670,7 +670,7 @@ class Game:
             if pressed[pygame.K_BACKSPACE]:
                 such_text = such_text[:-2]
 
-            # Auswählen
+            # Auswaehlen
             if MAUS_LEFT in pressed:
                 for lehrer_y_position in lehrer_y_positions:
                     if pressed[MAUS_LEFT][1] < lehrer_y_position[1] and pressed[MAUS_LEFT][1] > lehrer_y_position[0]:
@@ -678,7 +678,7 @@ class Game:
                         self.paused[player_num] = False
                         return
 
-            # Zurück
+            # Zurueck
             if pressed[pygame.K_RETURN]:
                 self.paused[player_num] = False
                 return
@@ -701,22 +701,22 @@ class Game:
         self.update_live_bar_image(player,self.players.index(player))
         self.update_forground_text_img()
 
-    def make_spielerklärung(self):
+    def make_spielerklaerung(self):
 
         while True:
             self.screen.blit(self.background,(0,0))
-            orig_width = ERKLÄRUNG.get_width()
-            orig_height = ERKLÄRUNG.get_height()
+            orig_width = ERKLAERUNG.get_width()
+            orig_height = ERKLAERUNG.get_height()
             width = int(self.WIDTH)
             if orig_width / width < orig_height / self.HEIGHT:
                 height = int(self.HEIGHT)
                 width = int(orig_width * (self.HEIGHT / orig_height))
                 pos = (int((self.WIDTH - width) / 2), 0)
-                self.screen.blit(pygame.transform.scale(ERKLÄRUNG, (width, height)), pos)
+                self.screen.blit(pygame.transform.scale(ERKLAERUNG, (width, height)), pos)
             else:
                 height = int(orig_height * (width / orig_width))
                 pos = (0, int((self.HEIGHT - height) / 2))
-                self.screen.blit(pygame.transform.scale(ERKLÄRUNG, (width, height)), pos)
+                self.screen.blit(pygame.transform.scale(ERKLAERUNG, (width, height)), pos)
             pygame.display.flip()
 
             self.clock.tick(FPS)
@@ -738,7 +738,7 @@ class Game:
         return int(size)
 
     def update_text_sizes(self):
-        # Textgrößen
+        # Textgroessen
         self.GIANT_TEXT = self.calculate_fit_size(0.0666, 0.1)
         self.HUGE_TEXT = self.calculate_fit_size(0.0416, 0.0625)
         self.BIG_TEXT = self.calculate_fit_size(0.0333, 0.05)
@@ -803,7 +803,7 @@ class Game:
         pygame.mixer.music.play(loops=-1)
 
         if self.multiplayer and self.num_players_in_multiplayer > 2:
-                self.schöne_grafik = False
+                self.schoene_grafik = False
         self.game_status = BEFORE_FIRST_GAME
         self.make_start_game_selection()
 
@@ -821,20 +821,20 @@ class Game:
             if self.players != []:
                 # Die gleichen Lehrer wie im letzen Spiuel solange diese auch direkt freigeschaltet sind
                 if not self.multiplayer:
-                    if LEHRER[self.players[0].lehrer_name]["bedingungen_für_unlock"] == None:
+                    if LEHRER[self.players[0].lehrer_name]["bedingungen_fuer_unlock"] == None:
                         self.new([self.players[0].lehrer_name])
                     else:
                         i = 0
                         namen_gefunden = False
                         while not namen_gefunden and i < len(LEHRER_NAMEN):
-                            if LEHRER[LEHRER_NAMEN[i]]["bedingungen_für_unlock"] == None:
+                            if LEHRER[LEHRER_NAMEN[i]]["bedingungen_fuer_unlock"] == None:
                                 self.new([LEHRER_NAMEN[i]])
                                 namen_gefunden = True
                             i += 1
                 else:
                     lehrer_namen = []
                     for player_num, player in enumerate(self.players):
-                        if LEHRER[player.lehrer_name]["bedingungen_für_unlock"] == None:
+                        if LEHRER[player.lehrer_name]["bedingungen_fuer_unlock"] == None:
                             lehrer_namen.append(player.lehrer_name)
                         else:
                             i = 0
@@ -845,7 +845,7 @@ class Game:
                                 for count, playerrr in enumerate(self.players):
                                     if playerrr.lehrer_name == LEHRER_NAMEN[i] and count != player_num:
                                         anderer_spieler_hat_schon_diese_person = True
-                                if LEHRER[LEHRER_NAMEN[i]]["bedingungen_für_unlock"] == None:
+                                if LEHRER[LEHRER_NAMEN[i]]["bedingungen_fuer_unlock"] == None:
                                     unlocked = True
                                 if anderer_spieler_hat_schon_diese_person == False and unlocked == True:
                                     lehrer_namen.append(LEHRER_NAMEN[i])
@@ -853,13 +853,13 @@ class Game:
                                 i += 1
                     self.new(lehrer_namen)
             else:
-                # Für jeden Spieler Lehrer auswählen, dabei darauf achten, dass Lehrer freigeschaltet sind und nicht mehrer Spieler den gleichen Spieler bekommen
+                # Fuer jeden Spieler Lehrer auswaehlen, dabei darauf achten, dass Lehrer freigeschaltet sind und nicht mehrer Spieler den gleichen Spieler bekommen
                 lehrer_namen = []
                 if self.multiplayer:
                     i = 0
                     num_namen = 0
                     while num_namen < self.num_players_in_multiplayer and i < len(LEHRER_NAMEN):
-                        if LEHRER[LEHRER_NAMEN[i]]["bedingungen_für_unlock"] == None:
+                        if LEHRER[LEHRER_NAMEN[i]]["bedingungen_fuer_unlock"] == None:
                             num_namen += 1
                             lehrer_namen.append(LEHRER_NAMEN[i])
                         i += 1
@@ -867,7 +867,7 @@ class Game:
                     i = 0
                     namen_gefunden = False
                     while not namen_gefunden and i < len(LEHRER_NAMEN):
-                        if LEHRER[LEHRER_NAMEN[i]]["bedingungen_für_unlock"] == None:
+                        if LEHRER[LEHRER_NAMEN[i]]["bedingungen_fuer_unlock"] == None:
                             lehrer_namen.append(LEHRER_NAMEN[i])
                             namen_gefunden = True
                         i += 1
@@ -887,7 +887,7 @@ class Game:
                 pressed = self.check_key_or_mouse_pressed([pygame.K_BACKSPACE,pygame.K_RETURN,pygame.K_y,pygame.K_x,pygame.K_c,pygame.K_LEFT,pygame.K_RIGHT,pygame.K_UP,pygame.K_DOWN])
 
                 time1 = self.make_time_measure()
-                # Alle Spielaktionen hier ausführen
+                # Alle Spielaktionen hier ausfuehren
                 if False in self.paused:
                     # alle sprites updaten
                     for player in self.players:
@@ -899,7 +899,7 @@ class Game:
                     self.detect_and_react_collisions()
                     # Im Arena Modus neue Zombiewellen losschicken
                     if self.spielmodus == ARENA_MODUS and self.num_zombie_wave < 3:
-                        if not time() - self.countdown_start_time <= 6:  # wenn nicht gerade im Countdown schauen, ob Zeit abgelaufen, bzw. zombies getötet
+                        if not time() - self.countdown_start_time <= 6:  # wenn nicht gerade im Countdown schauen, ob Zeit abgelaufen, bzw. zombies getoetet
                             if self.genauerer_spielmodus == AFTER_TIME and time() - self.last_zombie_wave_time >= TIME_BETWEEN_ZOMBIE_WAVES:
                                 self.countdown_start_time = time()
                                 self.make_new_zombie_wave()
@@ -917,7 +917,7 @@ class Game:
                                 eval("lehrer_funktionen.power_up_" + player.lehrer_name.replace(" ","_") + "(self,player)")
                                 self.last_power_up_use_time[count] = round(time() * 1000)
                 time2 = self.make_time_measure()
-                # Pause drücken (Lehrerauswahl)
+                # Pause druecken (Lehrerauswahl)
                 for player_num in range(len(self.players)):
                     if pressed[pygame.K_RETURN]:
                         self.paused[player_num] = True
@@ -940,7 +940,7 @@ class Game:
                 for lehrer in self.lehrer_to_be_unlocked:
                     if not lehrer in self.lehrer_unlocked_sofar:
                         for player in self.players:
-                            unlocked = eval(LEHRER[lehrer]["bedingungen_für_unlock"])
+                            unlocked = eval(LEHRER[lehrer]["bedingungen_fuer_unlock"])
                             if unlocked:
                                 self.lehrer_unlocked_sofar.append(lehrer)
                                 self.lehrer_unlocked_last = lehrer
@@ -1065,7 +1065,7 @@ class Game:
             if tile_object.name == 'endgegner_after_kill_point':
                 self.endgegner_after_kill_respawn_point.append(obj_center)
 
-        # Fehler abfangen: Spieler nicht auf der Karte, zu wenig joysticks für alle Spieler
+        # Fehler abfangen: Spieler nicht auf der Karte, zu wenig joysticks fuer alle Spieler
         #for count,player in enumerate(self.players):
         #    try:
         #        self.all_joysticks[count]
@@ -1076,12 +1076,12 @@ class Game:
         if len(self.zombies) == 0:
             raise Exception("No zombie found in loaded map")
 
-        # Bei der Arena die hälfte der Zombies wieder töten
+        # Bei der Arena die haelfte der Zombies wieder toeten
         if self.spielmodus == ARENA_MODUS:
             for x in range(int(0.5*len(self.zombies))):
                 choice(list(self.zombies)).kill()
 
-        # Je nach Schwierigkeit ein paar Zombies direkt töten, und ein paar health_packs entfernen
+        # Je nach Schwierigkeit ein paar Zombies direkt toeten, und ein paar health_packs entfernen
         for x in range(int(len(self.zombies)*SCHWIERIGKEIT_ZOMBIE_KILLS[self.schwierigkeit-1])):
             choice(list(self.zombies)).kill()
         for x in range(int(len(self.health_packs)*SCHWIERIGKEIT_HEALTH_KILLS[self.schwierigkeit-1])):
@@ -1119,7 +1119,7 @@ class Game:
                     eval("lehrer_funktionen.health_pack_" + player.lehrer_name.replace(" ","_") + "(self,player)")
                     self.werte_since_last_lehrer_change[player]["collected_health_packs"] += 1
 
-            # Zombie berührt Spieler
+            # Zombie beruehrt Spieler
             hits = pygame.sprite.spritecollide(player, self.zombies, False, collide_hit_rect)
             for hit in hits:
                 if random() < 0.7:
@@ -1133,7 +1133,7 @@ class Game:
                 player.hit()
                 player.pos += vec(MOB_KNOCKBACK, 0).rotate(-hits[0].rot)
 
-            # Endgegner berührt Spieler
+            # Endgegner beruehrt Spieler
             if self.spielmodus == ARENA_MODUS and self.num_zombie_wave == 3 and time() - self.end_gegner.spawn_time > 6 and self.end_gegner.alive :
                 hits = pygame.sprite.spritecollide(self.end_gegner, self.players, False)
                 if len(hits) > 0:
@@ -1146,7 +1146,7 @@ class Game:
                             player.pos = choice(self.endgegner_after_kill_respawn_point)
                             player.hit()
 
-            # Endgegner schießt den Spieler ab
+            # Endgegner schiesst den Spieler ab
             hits = pygame.sprite.spritecollide(player, self.endgegner_bullets, False, collide_hit_rect)
             for hit in hits:
                 if self.paused[count] == False:
@@ -1155,7 +1155,7 @@ class Game:
                     self.game_status = PLAYER_DIED
                 hit.kill()
 
-            # Spieler läuft auf ein personenabhägiges Hindernis (z.B Nägel am Boden)
+            # Spieler laeuft auf ein personenabhaegiges Hindernis (z.B Naegel am Boden)
             hits = pygame.sprite.spritecollide(player, self.personen_obstacles, False, collide_hit_rect)
             for hit in hits:
                 if pygame.time.get_ticks() - self.last_personen_obstacle_damage[count] > 60:
@@ -1175,7 +1175,7 @@ class Game:
             if hits == []:
                 self.was_on_obstacle_last_time[count] = False
 
-            # Spieler läuft auf personenabhängiges Objekt (Reaktion: personenabhängige Reaktion z.B Pfandflasche sammeln)
+            # Spieler laeuft auf personenabhaengiges Objekt (Reaktion: personenabhaengige Reaktion z.B Pfandflasche sammeln)
             hits = pygame.sprite.spritecollide(player, self.personen_objects, False, collide_hit_rect)
             for hit in hits:
                 if self.last_personen_object[count] == None:
@@ -1262,7 +1262,7 @@ class Game:
                     subscreen.blit(zombie.image_to_place_on,(player_pos.x+zombie.image_verschiebung[0],player_pos.y+zombie.image_verschiebung[1]))
 
             # Kleine Kartenansicht
-            if self.schöne_grafik:
+            if self.schoene_grafik:
                 area_around_player = pygame.Surface((self.small_map_sichtweite,self.small_map_sichtweite))
                 area_around_player.blit(self.map_img.subsurface(camera.player_umgebung.x, camera.player_umgebung.y, self.small_map_sichtweite,self.small_map_sichtweite),(0,0))
                 for zombie in self.zombies:
@@ -1287,7 +1287,7 @@ class Game:
                     self.screen.blit(area_around_player,     (self.WIDTH - 15 - self.small_map_size, self.HEIGHT - 20               - 15 - self.BIG_TEXT - self.small_map_size))
                     pygame.draw.rect(self.screen,BLACK,pygame.Rect(self.WIDTH - 15 - self.small_map_size, self.HEIGHT - 20 - 15 - self.BIG_TEXT - self.small_map_size,self.small_map_size,self.small_map_size),3)
         time2 = self.make_time_measure()
-        # Im splitscreen schwarze Linie an den Rändern zwischen den einzelnen Screens
+        # Im splitscreen schwarze Linie an den Raendern zwischen den einzelnen Screens
         if self.multiplayer:
             for player_num in range(len(self.players)):
                 if player_num != 0:
@@ -1439,7 +1439,7 @@ class Game:
         # Lebensanzeige
         BAR_LENGTH = 0.95 * self.live_bar_img_width
         BAR_HEIGHT = 0.075 * self.live_bar_img_height
-        # Prozentualelänge berechnen
+        # Prozentualelaenge berechnen
         if player.health / LEHRER[player.lehrer_name]["player_health"] < 0:
             pct = 0
         else:
@@ -1450,7 +1450,7 @@ class Game:
             fill_rect = pygame.Rect(int((0.031 * self.live_bar_img_width)+((self.WIDTH/self.num_players_in_multiplayer)*(player_num))), int(0.0426829 * self.live_bar_img_height), int(pct * BAR_LENGTH), int(BAR_HEIGHT))
         # Farbe
         if pct > 0.6:
-            col = LEBENSANZEIGE_GRÜN
+            col = LEBENSANZEIGE_GRUEN
         elif pct > 0.3:
             col = LEBENSANZEIGE_GELB
         else:
@@ -1481,7 +1481,7 @@ class Game:
 
     def draw_level_fortschritts_balken(self):
         if not self.game_status == COLLECTING_AT_END:
-        # Prozentualelänge berechnen
+        # Prozentualelaenge berechnen
             if self.genauerer_spielmodus == AFTER_TIME:
                 if self.spielmodus == MAP_MODUS:
                     pct = (time() - self.level_start_time) / TIME_MAP_LEVEL

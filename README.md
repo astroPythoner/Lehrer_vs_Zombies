@@ -33,7 +33,7 @@ Mit der Entertaste kommst du in die Spielerauswahl scrollen kannst du mit dem Ma
 Versuche die Zombies mit deinem PowerUp und deiner Waffe zu töten. Sammle die Healthpacks um dein Leben wieder aufzufüllen.
 Trete nicht auf die Hindernisse und sammle die Objekte deiner Person. Ist der Balken unten voll musst du nornuch die Butter finden.
 
-![Image could not be loaded](https://raw.githubusercontent.com/astroPythoner/Lehrer_vs_Zombies/master/img/erklärung_mit_hintergrund.png)
+![Image could not be loaded](https://raw.githubusercontent.com/astroPythoner/Lehrer_vs_Zombies/master/img/erklaerung_mit_hintergrund.png)
 
 ## Erweitere das Spiel
 

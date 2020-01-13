@@ -1,5 +1,5 @@
 # Diese Funktioen werden aufgerufen, wenn das entsprechende Eregniss im Spiel passiert.
-# Sollte beim hinzufügen eines neuen Lehrers vergessen werden die Funktionen in dieser Datei hinzuzufügen werden sie in constants.py automatisch erstellt
+# Sollte beim hinzufuegen eines neuen Lehrers vergessen werden die Funktionen in dieser Datei hinzuzufuegen werden sie in constants.py automatisch erstellt
 from constants import *
 from sprites import *
 

@@ -35,12 +35,12 @@
              "health_pack_amount" : 20,
              "obstacle_damage": 2,
              "obstacle_rotation" : true,
-             "obstacle_richtungsabhängig" : false,
+             "obstacle_richtungsabhaengig" : false,
              "obstacle_kill" : false,
              "object_rotation" : false,
              "object_kill" : true,
-             "bedingungen_für_unlock" : null,
-             "other_files" : {"frozen_zombie":["Zombie","zombie_frozen.png"],"big_eyes":["Player","Lehrer","player_nomagic_große_Augen.png"],"big_eyes_schwamm":["Player","Lehrer","player_nomagic_große_Augen_Schwamm.png"],"aua":["Sprechblasen","Aua Sprechblase.png"]}
+             "bedingungen_fuer_unlock" : null,
+             "other_files" : {"frozen_zombie":["Zombie","zombie_frozen.png"],"big_eyes":["Player","Lehrer","player_nomagic_mit_grosse_Augen.png"],"big_eyes_schwamm":["Player","Lehrer","player_nomagic_mit_grosse_Augen_und_Schwamm.png"],"aua":["Sprechblasen","Aua_Sprechblase.png"]}
             },
     "Écoltes": {
              "anrede" : "Monsieur",
@@ -78,12 +78,12 @@
              "health_pack_amount" : 18,
              "obstacle_damage": 2,
              "obstacle_rotation" : true,
-             "obstacle_richtungsabhängig" : false,
+             "obstacle_richtungsabhaengig" : false,
              "obstacle_kill" : false,
              "object_rotation" : false,
              "object_kill" : true,
-             "bedingungen_für_unlock" : null,
-             "other_files" : {"zombie_ohren_zu":["Zombie","zombie_ohren_zu.png"],"bonjour":["Sprechblasen","Bounjour Sprechblase.png"],"aua":["Sprechblasen","Aua Sprechblase.png"],"zut":["Sprechblasen","Zut Sprechblase.png"],"player_pfandflasche":["Player","Lehrer","player_ecoltes_Pfandflasche.png"],"player_pfandflasche_marmelade":["Player","Lehrer","player_ecoltes_Pfandflasche_Marmelade.png"]}
+             "bedingungen_fuer_unlock" : null,
+             "other_files" : {"zombie_ohren_zu":["Zombie","zombie_ohren_zu.png"],"bonjour":["Sprechblasen","Bonjour_Sprechblase.png"],"aua":["Sprechblasen","Aua_Sprechblase.png"],"zut":["Sprechblasen","Zut_Sprechblase.png"],"player_pfandflasche":["Player","Lehrer","player_ecoltes_Pfandflasche.png"],"player_pfandflasche_marmelade":["Player","Lehrer","player_ecoltes_Pfandflasche_Marmelade.png"]}
     },
     "Gnatrium": {
              "anrede" : "Herr",
@@ -121,12 +121,12 @@
              "health_pack_amount" : 20,
              "obstacle_damage": 2,
              "obstacle_rotation" : false,
-             "obstacle_richtungsabhängig" : true,
+             "obstacle_richtungsabhaengig" : true,
              "obstacle_kill" : false,
              "object_rotation" : false,
              "object_kill" : true,
-             "bedingungen_für_unlock" : null,
-             "other_files" : {"aua":["Sprechblasen","Aua Sprechblase.png"],"blumen_zombie":["Zombie","zombie_blumen.png"],"gaswolke":["Sonstiges","Gas Wolke.png"]}
+             "bedingungen_fuer_unlock" : null,
+             "other_files" : {"aua":["Sprechblasen","Aua_Sprechblase.png"],"blumen_zombie":["Zombie","zombie_blumen.png"],"gaswolke":["Sonstiges","Gas_Wolke.png"]}
     },
     "Windmauer": {
              "anrede" : "Frau",
@@ -164,19 +164,19 @@
              "health_pack_amount" : 20,
              "obstacle_damage": 1, 
              "obstacle_rotation" : false,
-             "obstacle_richtungsabhängig" : false,
+             "obstacle_richtungsabhaengig" : false,
              "obstacle_kill" : false,
              "object_rotation" : false, 
              "object_kill" : true,
-             "bedingungen_für_unlock": null,
-             "other_files" : {"kommatest":["Sprechblasen","Kommatest Sprechblase.png"],"abikorrektur":["Sprechblasen","Abikorrektur Sprechblase.png"],"bla bla bla":["Sprechblasen","Bla Bla Bla Sprechblase.png"],"zzz":["Sprechblasen","zzz.png"]}
+             "bedingungen_fuer_unlock": null,
+             "other_files" : {"kommatest":["Sprechblasen","Kommatest_Sprechblase.png"],"abikorrektur":["Sprechblasen","Abikorrektur_Sprechblase.png"],"bla bla bla":["Sprechblasen","Bla_Bla_Bla_Sprechblase.png"],"zzz":["Sprechblasen","zzz.png"]}
     },
     "Honyoung": {
              "anrede" : "Herr",
              "is_lehrer" : true,
              "name_in_file_names": "honyoung",
              "personen_item_text" : "Beautiful sentences",
-             "personen_beschreibung" : "Englisch Lehrer, der Strafarbeiten bei vergessenen Büchern gibt und schöne Sätze mag",
+             "personen_beschreibung" : "Englisch Lehrer, der Strafarbeiten bei vergessenen Buechern gibt und schöne Sätze mag",
              "player_health" : 125,
              "player_speed" : 260,
              "player_rot_speed" : 210,
@@ -207,17 +207,17 @@
              "health_pack_amount" : 30,
              "obstacle_damage": 1, 
              "obstacle_rotation" : false,
-             "obstacle_richtungsabhängig" : false,
+             "obstacle_richtungsabhaengig" : false,
              "obstacle_kill" : false,
              "object_rotation" : false, 
              "object_kill" : true,
-             "bedingungen_für_unlock": null,
-             "other_files" : {"I love that sentence":["Sprechblasen","I love that sentence Sprechblase.png"],"fisch":["Sprechblasen","fish Sprechblase.png"],"be quiet":["Sprechblasen","be quiet Sprechblase.png"]}
+             "bedingungen_fuer_unlock": null,
+             "other_files" : {"I love that sentence":["Sprechblasen","I_love_that_sentence_Sprechblase.png"],"fisch":["Sprechblasen","fish_Sprechblase.png"],"be quiet":["Sprechblasen","be_quiet_Sprechblase.png"]}
     },
     "Wolkenstädle": {
              "anrede" : "Herr",
              "is_lehrer" : true,
-             "name_in_file_names": "wolkenstädtle",
+             "name_in_file_names": "wolkenstaedtle",
              "personen_item_text" : "Hingesessen",
              "personen_beschreibung" : "Reich verheirateter Geschichtelehrer, der im sitzen unterricht macht.",
              "player_health" : 100,
@@ -237,7 +237,7 @@
                  "upgraded_weapon_name" : "neue Währung",
                  "upgrade_bedingungen" : "self.werte_since_last_lehrer_change[player]['zombies_killed'] > 10 and self.werte_since_last_lehrer_change[player]['collected_health_packs'] == 0",
                  "unlock_text" : "Töte 10 Zombies ohne ein Health Pack zu benötigen",
-                 "weapon_image" : ["bullet_wolkenstädtle_neue_Währung.png"],
+                 "weapon_image" : ["bullet_wolkenstaedtle_neue_Waehrung.png"],
                  "player_image" : "automatisch",
                  "weapon_bullet_speed" : 475,
                  "weapon_lifetime" : 4250,
@@ -250,12 +250,12 @@
              "health_pack_amount" : 25,
              "obstacle_damage": 1, 
              "obstacle_rotation" : true,
-             "obstacle_richtungsabhängig" : false,
+             "obstacle_richtungsabhaengig" : false,
              "obstacle_kill" : false,
              "object_rotation" : true, 
              "object_kill" : true,
-             "bedingungen_für_unlock": null,
-             "other_files" : {"Pferd":["Player","Lehrer","player_wolkenstädtle_Pferd.png"],"sitzen":["Player","Lehrer","player_wolkenstädtle_sitzen.png"],"Name?":["Sprechblasen","Name Sprechblase.png"],"Lenard?":["Sprechblasen","Lenard Sprechblase.png"]}
+             "bedingungen_fuer_unlock": null,
+             "other_files" : {"Pferd":["Player","Lehrer","player_wolkenstaedtle_Pferd.png"],"sitzen":["Player","Lehrer","player_wolkenstaedtle_sitzen.png"],"Name?":["Sprechblasen","Name_Sprechblase.png"],"Lenard?":["Sprechblasen","Lenard_Sprechblase.png"]}
     },
     "To Mathely": {
              "anrede" : "Herr",
@@ -293,12 +293,12 @@
              "health_pack_amount" : 28,
              "obstacle_damage": 1, 
              "obstacle_rotation" : false,
-             "obstacle_richtungsabhängig" : false,
+             "obstacle_richtungsabhaengig" : false,
              "obstacle_kill" : false,
              "object_rotation" : false, 
              "object_kill" : true,
-             "bedingungen_für_unlock": null,
-             "other_files" : {"noch nicht abschreiben":["Sprechblasen","noch nicht abschreiben Sprechblase.png"],"Michel":["Sprechblasen","Michel Sprechblase.png"],"umstellen":["Sprechblasen","umstellen Sprechblase.png"]}
+             "bedingungen_fuer_unlock": null,
+             "other_files" : {"noch nicht abschreiben":["Sprechblasen","noch_nicht_abschreiben_Sprechblase.png"],"Michel":["Sprechblasen","Michel_Sprechblase.png"],"umstellen":["Sprechblasen","umstellen_Sprechblase.png"]}
     },
     "Hozler": {
              "anrede" : "Gott",
@@ -336,11 +336,11 @@
              "health_pack_amount" : 30,
              "obstacle_damage": 1, 
              "obstacle_rotation" : false,
-             "obstacle_richtungsabhängig" : false,
+             "obstacle_richtungsabhaengig" : false,
              "obstacle_kill" : false,
              "object_rotation" : false, 
              "object_kill" : true,
-             "bedingungen_für_unlock": "time() - self.level_start_time > 15",
+             "bedingungen_fuer_unlock": "time() - self.level_start_time > 15",
              "other_files" : {}
     }
 }

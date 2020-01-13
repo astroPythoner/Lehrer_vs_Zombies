@@ -3,7 +3,7 @@ from os import path, listdir
 import json
 vec = pygame.math.Vector2
 
-# Bildschrimgröße
+# Bildschrimgroesse
 start_width = 480*2 #1600
 start_height = 320*2 #1000
 FPS = 60
@@ -13,7 +13,7 @@ pygame.init()
 pygame.mixer.init()
 pygame.display.set_mode((start_width, start_height), pygame.RESIZABLE)
 
-# Konstanten für Art des Spielendes und die Tastenarten
+# Konstanten fuer Art des Spielendes und die Tastenarten
 START_GAME = "start"
 BEFORE_FIRST_GAME = "before first game"
 PLAYING = "playing"
@@ -27,8 +27,8 @@ ARENA_MODUS = "arena modus"
 AFTER_TIME = "after time"
 AFTER_KILLED = "after killed"
 
-# Zeiten für den AFTER_TIME Modus (in sekunden)
-TIME_MAP_LEVEL = 500             # Wie lange man auf der großen Karte überleben muss
+# Zeiten fuer den AFTER_TIME Modus (in sekunden)
+TIME_MAP_LEVEL = 500             # Wie lange man auf der grossen Karte ueberleben muss
 TIME_BETWEEN_ZOMBIE_WAVES = 150  # Wie Viel Zeit zwischen 2 Zombiewellen vergeht
 
 # Schwierigkeiten
@@ -52,7 +52,7 @@ AUSWAHL_TEXT_COLOR = (215,200,200)
 AUSWAHL_TEXT_RED = (255,80,80)
 AUSWAHL_TEXT_GREEN = (50,200,50)
 LEHRER_UNLOCKED_TEXT_COLOR = (135,120,120)
-LEBENSANZEIGE_GRÜN = (0,200,0)
+LEBENSANZEIGE_GRUEN = (0,200,0)
 LEBENSANZEIGE_ROT = (200,0,0)
 LEBENSANZEIGE_GELB = (230,210,45)
 POWER_UP_TIME_COLOR = (80,100,185)
@@ -85,7 +85,7 @@ SMALL_MAP_ENDGEGNER_COLOR = (255,80,100)
 NS = "NS" #|
 OW = "OW" #-
 
-# Lautstärke
+# Lautstaerke
 game_music_volume = 1
 game_sound_volume = 0.5
 
@@ -97,7 +97,7 @@ with open('players.json') as json_data:
 
 LEHRER_NAMEN = list(LEHRER.keys())
 
-# Maps  (Von jedem dieser Mapnamen muss im Ordner maps eine _big.tmx und _small.tmx datei liegen. Die kleine ist für den Arenamodus, die große für den Karten modus)
+# Maps  (Von jedem dieser Mapnamen muss im Ordner maps eine _big.tmx und _small.tmx datei liegen. Die kleine ist fuer den Arenamodus, die Groesse fuer den Karten modus)
 MAP_NAMES = ["Stadt","Schule"]
 
 # Zombies
@@ -113,7 +113,7 @@ TARGET_CHANGE_TIME = 5000
 TARGET_CHANGE_TIME_RANDOM = 500
 
 # Endgegner
-ENDGEGNER_HEALTH = [100,120,140,150,160] # Anzahl der Treffer je nach Schwierigkeit die gebraucht werden um Endgegner zu töten
+ENDGEGNER_HEALTH = [100,120,140,150,160] # Anzahl der Treffer je nach Schwierigkeit die gebraucht werden um Endgegner zu toeten
 ENDGEGNER_HEALTH_MULTIPLAYER = [180,200,220,230,240] # Im mulitplayer
 MAXIMAL_NUM_ENDGEGNER_ZOMBIES = [6,6,7,7,8] # Damit der Endgegner nicht endlos Zombies erstellt und diese irgendwann zu viele werden gibt es eine Grenze
 MAXIMAL_NUM_EXTRA_ZOMBIES = 10
@@ -173,7 +173,7 @@ HUD_FONT = join_paths([img_folder,"Fonts",'Impacted2.0.ttf'])
 ARIAL_FONT = pygame.font.match_font("arial")
 
 # Bilder und Grafiken laden
-def bilder_für_jeden_lehrer_laden(pfad,file_name_ohne_lehrer_name_hinten,dict_keys = [],convert_alpha = True, dict_with_img_and_icon = False, nur_von_is_lehrer = False, check_for_automatisch = ""):
+def bilder_fuer_jeden_lehrer_laden(pfad,file_name_ohne_lehrer_name_hinten,dict_keys = [],convert_alpha = True, dict_with_img_and_icon = False, nur_von_is_lehrer = False, check_for_automatisch = ""):
     return_dict = {}
     for lehrer in LEHRER:
         dict = LEHRER[lehrer]
@@ -199,19 +199,19 @@ def bilder_für_jeden_lehrer_laden(pfad,file_name_ohne_lehrer_name_hinten,dict_k
                     return_dict[lehrer] = pygame.image.load(path.join(pfad, file_name_ohne_lehrer_name_hinten + lehrer_name_in_file + ".png"))
     return return_dict
 
-PLAYER_IMGES = bilder_für_jeden_lehrer_laden(join_paths([img_folder,"Player","Lehrer"]),"player_")
-UPGRADE_PLAYER_IMGES = bilder_für_jeden_lehrer_laden(join_paths([img_folder,"Player","Lehrer"]),"player_",dict_keys=["weapon_upgrade"],check_for_automatisch = "player_image")
-BULLET_IMGES = bilder_für_jeden_lehrer_laden(join_paths([img_folder, "Player","Waffen"]),"bullet_",check_for_automatisch = "weapon_bullets")
-UPGRADE_BULLET_IMGES = bilder_für_jeden_lehrer_laden(join_paths([img_folder, "Player","Waffen"]),"bullet_",dict_keys=["weapon_upgrade"],check_for_automatisch = "weapon_image")
-PEROSNEN_OBJECT_IMGES = bilder_für_jeden_lehrer_laden(join_paths([img_folder,"Objects","Objects"]),"object_",dict_with_img_and_icon=True)
-PERSONEN_OBSTACLE_IMGES = bilder_für_jeden_lehrer_laden(join_paths([img_folder,"Objects","Obstacles"]),"obstacle_",dict_with_img_and_icon=True)
-PERSONEN_POWER_UP_ICONS = bilder_für_jeden_lehrer_laden(join_paths([img_folder,"Objects","PowerUp Icons"]),"powerup_icon_")
+PLAYER_IMGES = bilder_fuer_jeden_lehrer_laden(join_paths([img_folder,"Player","Lehrer"]),"player_")
+UPGRADE_PLAYER_IMGES = bilder_fuer_jeden_lehrer_laden(join_paths([img_folder,"Player","Lehrer"]),"player_",dict_keys=["weapon_upgrade"],check_for_automatisch = "player_image")
+BULLET_IMGES = bilder_fuer_jeden_lehrer_laden(join_paths([img_folder, "Player","Waffen"]),"bullet_",check_for_automatisch = "weapon_bullets")
+UPGRADE_BULLET_IMGES = bilder_fuer_jeden_lehrer_laden(join_paths([img_folder, "Player","Waffen"]),"bullet_",dict_keys=["weapon_upgrade"],check_for_automatisch = "weapon_image")
+PEROSNEN_OBJECT_IMGES = bilder_fuer_jeden_lehrer_laden(join_paths([img_folder,"Objects","Objects"]),"object_",dict_with_img_and_icon=True)
+PERSONEN_OBSTACLE_IMGES = bilder_fuer_jeden_lehrer_laden(join_paths([img_folder,"Objects","Obstacles"]),"obstacle_",dict_with_img_and_icon=True)
+PERSONEN_POWER_UP_ICONS = bilder_fuer_jeden_lehrer_laden(join_paths([img_folder,"Objects","PowerUp Icons"]),"powerup_icon_")
 
 LIVE_BAR_IMG = pygame.image.load(path.join(img_folder,"livebar.png")).convert_alpha()
 
 MOB_IMG = pygame.image.load(join_paths([img_folder,"Zombie",MOB_IMG])).convert_alpha()
 GRAB_IMG = pygame.image.load(join_paths([img_folder,"Zombie","zombie_grab.png"])).convert_alpha()
-LEHRER_IMGES = bilder_für_jeden_lehrer_laden(join_paths([img_folder,"Player","Lehrer"]),"player_",nur_von_is_lehrer=True)
+LEHRER_IMGES = bilder_fuer_jeden_lehrer_laden(join_paths([img_folder,"Player","Lehrer"]),"player_",nur_von_is_lehrer=True)
 SPLAT = pygame.image.load(join_paths([img_folder,"Zombie",SPLAT])).convert_alpha()
 SPLAT = pygame.transform.scale(SPLAT, (64, 64))
 RED_SPLAT = pygame.image.load(join_paths([img_folder,"Zombie",RED_SPLAT])).convert_alpha()
@@ -221,25 +221,25 @@ HEALTH_PACK_IMG = pygame.image.load(join_paths([img_folder, "Objects","health_pa
 SMALL_HEART_IMG = pygame.image.load(join_paths([img_folder, "small_heart.png"])).convert_alpha()
 
 ENDGEGNER_BULLET = pygame.image.load(join_paths([img_folder, "Endgegner","bullet.png"])).convert_alpha()
-ENDGEGNER_WALK_N_JUMP_IMG = pygame.image.load(join_paths([img_folder, "Endgegner","endgegner Walk_n_Jump.png"])).convert_alpha()
-ENDGEGNER_SHOOT_IMG = pygame.image.load(join_paths([img_folder, "Endgegner","endgegner Shoot.png"])).convert_alpha()
-ENDGEGNER_ZOMBIE_IMG = pygame.image.load(join_paths([img_folder, "Endgegner","endgegner Zombie.png"])).convert_alpha()
+ENDGEGNER_WALK_N_JUMP_IMG = pygame.image.load(join_paths([img_folder, "Endgegner","endgegner_Walk_n_Jump.png"])).convert_alpha()
+ENDGEGNER_SHOOT_IMG = pygame.image.load(join_paths([img_folder, "Endgegner","endgegner_Shoot.png"])).convert_alpha()
+ENDGEGNER_ZOMBIE_IMG = pygame.image.load(join_paths([img_folder, "Endgegner","endgegner_Zombie.png"])).convert_alpha()
 ENDGEGNER_IMGES = {WALK_N_JUMP:ENDGEGNER_WALK_N_JUMP_IMG,WEAPON:ENDGEGNER_SHOOT_IMG,ZOMBIE:ENDGEGNER_ZOMBIE_IMG}
-ENDGEGNER_GRUBE = pygame.image.load(join_paths([img_folder, "Endgegner","endgegner Grube.png"])).convert_alpha()
+ENDGEGNER_GRUBE = pygame.image.load(join_paths([img_folder, "Endgegner","endgegner_Grube.png"])).convert_alpha()
 ENDGEGNER_EXPLOSION_IMAGES = [pygame.image.load(join_paths([img_folder, "Endgegner","Explosion",filename])).convert_alpha() for filename in listdir(join_paths([img_folder,"Endgegner","Explosion"]))]
 
 AT_END_IMG = pygame.image.load(path.join(img_folder, "Butter.png")).convert_alpha()
 TEXT_FIND_AT_END = "Wo ist die Butter?"
 
-ERKLÄRUNG = (pygame.image.load(path.join(img_folder,"erklärung.png")))
+ERKLAERUNG = (pygame.image.load(path.join(img_folder,"erklaerung.png")))
 
-# richtungsabhängige hindernisse (z.b. Neutronenstrahl) bei allen lehrer, die das haben, laden
+# richtungsabhaengige hindernisse (z.b. Neutronenstrahl) bei allen lehrer, die das haben, laden
 for lehrer in LEHRER:
-    if LEHRER[lehrer]["obstacle_richtungsabhängig"]:
+    if LEHRER[lehrer]["obstacle_richtungsabhaengig"]:
         dict = {}
         for richtung in ["NS","NS_begin","NS_end","OW","OW_begin","OW_end"]:
             dict[richtung] = pygame.image.load(join_paths([img_folder,"Objects","Obstacles","obstacle_"+LEHRER[lehrer]["name_in_file_names"]+"_"+richtung+".png"])).convert_alpha()
-        LEHRER[lehrer]["richtungsabhängige_bilder"] = dict
+        LEHRER[lehrer]["richtungsabhaengige_bilder"] = dict
 
 # restliche Dateien der einzelnen Lehrer laden
 for lehrer in LEHRER:
@@ -250,7 +250,7 @@ for lehrer in LEHRER:
 pygame.mixer.music.load(path.join(music_folder, BG_MUSIC))
 pygame.mixer.music.set_volume(game_music_volume)
 
-def sounds_für_jeden_lehrer_laden(pfad,file_name_ohne_lehrer_name_hinten,volume = game_sound_volume):
+def sounds_fuer_jeden_lehrer_laden(pfad,file_name_ohne_lehrer_name_hinten,volume = game_sound_volume):
     return_dict = {}
     for lehrer in LEHRER:
         s = pygame.mixer.Sound(path.join(pfad,file_name_ohne_lehrer_name_hinten + LEHRER[lehrer]["name_in_file_names"] + ".wav"))
@@ -258,7 +258,7 @@ def sounds_für_jeden_lehrer_laden(pfad,file_name_ohne_lehrer_name_hinten,volume
         return_dict[lehrer] = s
     return return_dict
 
-WEAPON_WAVS = sounds_für_jeden_lehrer_laden(path.join(snd_folder,"Waffen"),"shoot_")
+WEAPON_WAVS = sounds_fuer_jeden_lehrer_laden(path.join(snd_folder,"Waffen"),"shoot_")
 
 def sounds_aus_array_laden(pfad,array,volume):
     return_array = []
