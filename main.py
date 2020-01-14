@@ -16,7 +16,7 @@ class Game:
         for lehrer in LEHRER:
             for funktionsname in ["power_up_", "object_collect_", "obstacle_", "health_pack_"]:
                 try:
-                    name = "lehrer_funktionen."+funktionsname + lehrer.replace(" ","_") + "(test=True,player=None,game=None)"
+                    name = "lehrer_funktionen."+funktionsname + LEHRER[lehrer]['name_in_file_names'].replace(" ","_") + "(test=True,player=None,game=None)"
                     eval(name)
                 except AttributeError:
                     with open("lehrer_funktionen.py", "a") as file:
@@ -914,7 +914,7 @@ class Game:
                     for count,player in enumerate(self.players):
                         if MAUS_RIGHT in pressed or pressed[pygame.K_y] or pressed[pygame.K_x] or pressed[pygame.K_c]:
                             if time()*1000 - self.last_power_up_use_time[count] >= LEHRER[player.lehrer_name]["power_up_time"]:
-                                eval("lehrer_funktionen.power_up_" + player.lehrer_name.replace(" ","_") + "(self,player)")
+                                eval("lehrer_funktionen.power_up_" + LEHRER[player.lehrer_name]['name_in_file_names'].replace(" ","_") + "(self,player)")
                                 self.last_power_up_use_time[count] = round(time() * 1000)
                 time2 = self.make_time_measure()
                 # Pause druecken (Lehrerauswahl)
@@ -1116,7 +1116,7 @@ class Game:
                 if player.health < LEHRER[player.lehrer_name]["player_health"]:
                     hit.kill()
                     player.add_health(LEHRER[player.lehrer_name]["health_pack_amount"])
-                    eval("lehrer_funktionen.health_pack_" + player.lehrer_name.replace(" ","_") + "(self,player)")
+                    eval("lehrer_funktionen.health_pack_" + LEHRER[player.lehrer_name]['name_in_file_names'].replace(" ","_") + "(self,player)")
                     self.werte_since_last_lehrer_change[player]["collected_health_packs"] += 1
 
             # Zombie beruehrt Spieler
@@ -1169,7 +1169,7 @@ class Game:
                 if LEHRER[player.lehrer_name]["obstacle_kill"]:
                     hit.kill()
                 if self.was_on_obstacle_last_time[count] == False:
-                    eval("lehrer_funktionen.obstacle_" + player.lehrer_name.replace(" ","_") + "(self,player)")
+                    eval("lehrer_funktionen.obstacle_" + LEHRER[player.lehrer_name]['name_in_file_names'].replace(" ","_") + "(self,player)")
                     self.werte_since_last_lehrer_change[player]["num_obstacles_stept_on"] += 1
                 self.was_on_obstacle_last_time[count] = True
             if hits == []:
@@ -1184,7 +1184,7 @@ class Game:
                     self.werte_since_last_lehrer_change[player]["collected_objects"] += 1
                     if LEHRER[player.lehrer_name]["object_kill"]:
                         hit.kill()
-                    eval("lehrer_funktionen.object_collect_" + player.lehrer_name.replace(" ","_") + "(self,player)")
+                    eval("lehrer_funktionen.object_collect_" + LEHRER[player.lehrer_name]['name_in_file_names'].replace(" ","_") + "(self,player)")
             if hits == []:
                 self.last_personen_object[count] = None
 

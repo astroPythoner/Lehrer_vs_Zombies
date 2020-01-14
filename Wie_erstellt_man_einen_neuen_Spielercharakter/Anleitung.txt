@@ -88,8 +88,7 @@ self.werte_since_last_lehrer_change[player]['collected_objects'] >= 10
 
 Für ein neuen Charakter brauchst du mindestens 7 Bilder. Es können beliebig viele weitere Bilder hinzugefügt werden, umd sie zum Beispiel bei PowerUps oder ähnlichem zu verwnden. Ein Beispiel aller benötigten Bilder für ein neuen Spieler findest du im Ordner 'Wie erstellt man einen neuen Spielercharakter'. Hier die Liste:
 
-* player_<name>: Bild des Spielers; 49x43 (beim Zeichnen dieses Bildes können die einzelnen Datei für
-  Schatten, Shirt und Kopf verändert und aufeinander gelegt werden) Pfad:img/player/lehrer
+* player_<name>: Bild des Spielers; 49x43 (einfache Erstellung unten erklärt) Pfad:img/player/lehrer
 * bullet_<name>: Bild der Waffe; Größe beliebig (Schussrichtung rechts) Pfad:img/player/Waffen
 * powerup_icon_<name>: Symbol für PowerUp; 122x122 (Achtung wird im Spiel rund ausgeschnitten, also nicht in die Excken zeichnen) Pfad:img/Objects/PowerUp Icons
 * obstacle_<name>: Bild des Hindernisses auf das der Spieler treten kann; 64x64 Pfad:img/Objects/Obstacles
@@ -99,6 +98,15 @@ Für ein neuen Charakter brauchst du mindestens 7 Bilder. Es können beliebig vi
 
 Wenn du weitere Bilder erstellt lege entweder in den passenden Ordner z.B zu den Schüssen,Spielern, ... oder
 lege sie zur Übersicht in den 'Sonstiges' Ordner, wenn es eine Sprechblase ist, was oft benutzt wird lege sie in den 'Sprechblasen' Ordner
+
+#### Erstellung von player_<name>.png mit spieler_zeichnen.py
+Im Ordner 'Wie erstellt man einen neuen Spielercharakter/spieler_zeichnen findest du die Datei spieler_zeichnen.py.
+Wenn du die Datei öffnest findest du in den ersten Zeilen einige Einstellungen zum automatischen erstellen einer Spielfigur.
+Die Farben für Shirt, Gesicht, Hände, und Haare bestehen aus vier Werten rot, grün, blau und Durchsichtigkeit, alle sind Werte von 0 bis 255.
+Die Durchsichtigkeit sollte jedoch auf 255 bleiben. Unter den Farben kannst du noch Frisur und Anzahl der Hände bestimmen,
+wähle dazu einen der hinter dem Wert in der Zeile stehenden Wert aus. Den Namen des Lehrers trägst du bei lehrer_file_name ein.
+Die Datei wird automatisch an richtiger Stelle mit richtigem Namen gespeichert.
+
 
 
 ## Sounds:
