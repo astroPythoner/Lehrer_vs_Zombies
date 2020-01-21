@@ -121,4 +121,4 @@ bild.blit(shirt_img,(0,0))
 bild.blit(face_img,(0,0))
 bild.blit(hair_img,(0,0))
 
-pygame.image.save(bild,os.path.join(img_folder,"player_"+lehrer_file_name+".png"))s
+pygame.image.save(bild,os.path.join(img_folder,"player_"+lehrer_file_name+".png"))

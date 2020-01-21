@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="15" height="15" tilewidth="64" tileheight="64" infinite="0" nextlayerid="5" nextobjectid="48">
+ <tileset firstgid="1" source="../../Tilemap_Zombie/Kenney topview.tsx"/>
+ <layer id="1" name="Ground" width="15" height="15">
+  <data encoding="csv">
+4,2,4,2,4,2,3,1,3,13,13,13,13,13,13,
+1,3,1,4,1,4,2,3,4,13,13,13,13,13,13,
+4,1,1,3,2,4,3,4,3,13,13,13,13,13,13,
+1,2,2,1,2,2,1,4,1,13,13,13,13,13,13,
+122,124,124,127,103,103,156,124,2684354713,124,127,103,103,156,123,
+152,103,103,103,103,103,103,103,152,103,103,103,103,103,152,
+152,103,103,103,103,103,103,103,152,103,103,103,103,103,152,
+152,103,103,103,103,103,103,103,128,103,103,103,103,103,152,
+152,103,103,103,103,103,103,103,103,103,103,103,103,103,152,
+152,103,103,103,103,103,103,103,103,103,103,103,103,103,152,
+152,103,103,103,103,103,103,103,103,103,103,103,103,103,152,
+152,103,103,103,103,103,103,103,155,103,103,103,103,103,152,
+152,103,103,103,103,103,103,103,152,103,103,103,103,103,152,
+152,103,103,103,103,103,103,103,152,103,103,103,103,103,152,
+150,124,124,124,124,124,124,124,126,124,124,124,124,124,151
+</data>
+ </layer>
+ <layer id="2" name="Deko" width="15" height="15">
+  <data encoding="csv">
+0,189,0,0,217,192,0,0,161,0,0,0,139,140,0,
+189,0,0,0,0,0,0,0,0,0,0,0,167,168,0,
+0,190,191,0,0,0,0,0,0,0,0,0,0,0,0,
+0,218,219,217,0,0,0,217,0,0,0,0,0,3221225494,3221225493,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,138,0,0,0,0,0,1610613066,0,138,0,0,0,0,0,
+0,0,0,383,384,384,385,0,0,0,0,0,3221226021,3221226021,0,
+0,1610613235,0,411,412,412,413,0,0,0,0,2684355109,361,363,0,
+0,1610613234,0,411,412,412,413,0,0,0,0,2684355109,417,419,0,
+0,1610613233,0,439,440,440,441,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,1610613068,0,
+0,0,0,0,53,54,0,0,0,0,0,0,0,1610613070,0,
+0,2684355029,0,0,81,82,0,0,0,0,0,0,0,1610613040,0,
+0,2684355031,0,529,109,110,529,0,0,279,304,304,306,305,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="3" name="Deko2" width="15" height="15">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,2684355115,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,222,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,1610613014,0,
+0,221,0,0,0,0,248,0,0,0,3221225749,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup id="4" name="Objekte">
+  <object id="1" name="zombie" x="768" y="272" width="24.2131" height="22.7888"/>
+  <object id="2" name="zombie" x="752" y="752" width="24.2131" height="22.7888"/>
+  <object id="3" name="zombie" x="432" y="80" width="24.2131" height="22.7888"/>
+  <object id="4" name="zombie" x="208" y="624" width="24.2131" height="22.7888"/>
+  <object id="5" name="player" x="528" y="592" width="24.2131" height="22.7888"/>
+  <object id="6" name="obstacle" x="846" y="400" width="30" height="30"/>
+  <object id="7" name="obstacle" x="782" y="400" width="30" height="30"/>
+  <object id="8" name="obstacle" x="718" y="464" width="30" height="30"/>
+  <object id="9" name="obstacle" x="718" y="544" width="30" height="30"/>
+  <object id="11" name="obstacle" x="592" y="333" width="30" height="30"/>
+  <object id="12" name="obstacle" x="464" y="205" width="30" height="30"/>
+  <object id="13" name="obstacle" x="208" y="205" width="30" height="30"/>
+  <object id="14" name="obstacle" x="80" y="333" width="30" height="30"/>
+  <object id="15" name="obstacle" x="336" y="13" width="30" height="30"/>
+  <object id="16" name="obstacle" x="80" y="13" width="30" height="30"/>
+  <object id="17" name="obstacle" x="16" y="77" width="30" height="30"/>
+  <object id="18" name="obstacle" x="93" y="158" width="64" height="64"/>
+  <object id="19" name="obstacle" x="272" y="13" width="30" height="30"/>
+  <object id="20" name="obstacle" x="528" y="13" width="30" height="30"/>
+  <object id="21" name="obstacle" x="385" y="840" width="61" height="42"/>
+  <object id="22" name="obstacle" x="193" y="840" width="61" height="42"/>
+  <object id="23" name="obstacle" x="64" y="768" width="64" height="128"/>
+  <object id="24" name="obstacle" x="64" y="448" width="64" height="192"/>
+  <object id="25" name="obstacle" x="800" y="0" width="64" height="128"/>
+  <object id="26" name="obstacle" x="848" y="208" width="96" height="32"/>
+  <object id="27" name="obstacle" x="512" y="320" width="64" height="192"/>
+  <object id="28" name="obstacle" x="0" y="256" width="64" height="704"/>
+  <object id="29" name="obstacle" x="896" y="256" width="64" height="704"/>
+  <object id="30" name="obstacle" x="512" y="704" width="64" height="192"/>
+  <object id="31" name="obstacle" x="384" y="256" width="320" height="64"/>
+  <object id="32" name="obstacle" x="64" y="256" width="192" height="64"/>
+  <object id="33" name="obstacle" x="64" y="896" width="896" height="64"/>
+  <object id="34" name="obstacle" x="832" y="256" width="64" height="64"/>
+  <object id="35" name="obstacle" x="464" y="336" width="30" height="30"/>
+  <object id="36" name="obstacle" x="256" y="704" width="128" height="192"/>
+  <object id="37" name="obstacle" x="768" y="448" width="128" height="128"/>
+  <object id="38" name="obstacle" x="832" y="640" width="64" height="256"/>
+  <object id="39" name="obstacle" x="640" y="829" width="192" height="67"/>
+  <object id="40" name="obstacle" x="576" y="861" width="64" height="30"/>
+  <object id="41" name="Personen obstacle" x="704" y="640" width="128" height="64"/>
+  <object id="42" name="Personen obstacle" x="576" y="64" width="192" height="64"/>
+  <object id="43" name="Personen obstacle" x="320" y="384" width="192" height="64"/>
+  <object id="44" name="Personen objekt" x="640" y="384" width="64" height="64"/>
+  <object id="45" name="Personen objekt" x="576" y="640" width="64" height="64"/>
+  <object id="46" name="Personen objekt" x="320" y="512" width="64" height="64"/>
+  <object id="47" name="Personen objekt" x="256" y="128" width="64" height="64"/>
+ </objectgroup>
+</map>

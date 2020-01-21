@@ -348,28 +348,30 @@ class Mob(pygame.sprite.Sprite):
                 if self.target != None:
                     target_dist = self.target.pos - self.pos
                     if target_dist.length_squared() < self.detect_radius**2:
-                        # In Richtung target laufen
-                        if random() < 0.002:
-                            choice(ZOMBIE_WAVS).play()
-                        self.rot = target_dist.angle_to(vec(1, 0))
-                        for count,player in enumerate(self.game.players):
-                            self.image[count] = pygame.transform.rotate(self.orig_image[count], self.rot)
-                        self.rect.center = self.pos
-                        self.acc = vec(1, 0).rotate(-self.rot)
-                        self.avoid_mobs()
-                        try:
-                            self.acc.scale_to_length(self.speed)
-                        except ValueError:
+                            # In Richtung target laufen
+                            if random() < 0.002:
+                                choice(ZOMBIE_WAVS).play()
+                            self.rot = target_dist.angle_to(vec(1, 0))
+                            for count,player in enumerate(self.game.players):
+                                self.image[count] = pygame.transform.rotate(self.orig_image[count], self.rot)
+                            self.rect.center = self.pos
                             self.acc = vec(1, 0).rotate(-self.rot)
-                            self.acc.scale_to_length(self.speed)
-                        self.acc += self.vel * -1
-                        self.vel += self.acc * self.game.dt
-                        self.pos += self.vel * self.game.dt + 0.5 * self.acc * self.game.dt ** 2
-                        self.hit_rect.centerx = self.pos.x
-                        collide_with_obstacles(self, self.game.obstacles, 'x')
-                        self.hit_rect.centery = self.pos.y
-                        collide_with_obstacles(self, self.game.obstacles, 'y')
-                        self.rect.center = self.hit_rect.center
+                            self.avoid_mobs()
+                            try:
+                                self.acc.scale_to_length(self.speed)
+                            except ValueError:
+                                self.acc = vec(1, 0).rotate(-self.rot)
+                                self.acc.scale_to_length(self.speed)
+                            if not (self.game.spielmodus == TUTORIAL and (self.game.game_status == TUTORIAL_WALK or self.game.game_status == TUTORIAL_COLLECT or self.game.game_status == TUTORIAL_SHOOT)):
+                                # bewegen
+                                self.acc += self.vel * -1
+                                self.vel += self.acc * self.game.dt
+                                self.pos += self.vel * self.game.dt + 0.5 * self.acc * self.game.dt ** 2
+                                self.hit_rect.centerx = self.pos.x
+                                collide_with_obstacles(self, self.game.obstacles, 'x')
+                                self.hit_rect.centery = self.pos.y
+                                collide_with_obstacles(self, self.game.obstacles, 'y')
+                                self.rect.center = self.hit_rect.center
                     else:
                         # target nichtmehr in der Naehe, neues target wird gesucht
                         if self.game.multiplayer:

@@ -67,6 +67,7 @@ Werte in werte_since_last_lehrer_change:
 * "time_lehrer_change":  Wie lange man den Lehrer schon ausgewählt hat (in Sekunden)
 * "zombies_killed": Anzahl getöteter Zombies
 * "collected_health_packs": Anzahl gesammleter Health Packs
+* "num_power_ups": Anzahl der benutzten Power-Ups
 
 Beispiele für Bedingungen:
 

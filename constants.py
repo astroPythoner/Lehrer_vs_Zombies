@@ -20,6 +20,11 @@ PLAYING = "playing"
 PLAYER_DIED = "player died"
 COLLECTING_AT_END = "collecting at end"
 WON_GAME = "won game"
+TUTORIAL = "tutorial"
+TUTORIAL_WALK = "walk"
+TUTORIAL_COLLECT = "collect"
+TUTORIAL_SHOOT = "shoot"
+TUTORIAL_POWER_UP = "power up"
 
 # Spielmodi
 MAP_MODUS = "map modus"
@@ -98,7 +103,8 @@ with open('players.json') as json_data:
 LEHRER_NAMEN = list(LEHRER.keys())
 
 # Maps  (Von jedem dieser Mapnamen muss im Ordner maps eine _big.tmx und _small.tmx datei liegen. Die kleine ist fuer den Arenamodus, die Groesse fuer den Karten modus)
-MAP_NAMES = ["Stadt","Schule"]
+# Auch 'Tutorial' (genau so) hier reinschreiben, allerdings nicht an erster Stelle, da diese Karte als Standartkarte genommen wird
+MAP_NAMES = ["Stadt","Schule","Toturial"]
 
 # Zombies
 MOB_IMG = 'zombie.png'
@@ -232,6 +238,13 @@ AT_END_IMG = pygame.image.load(path.join(img_folder, "Butter.png")).convert_alph
 TEXT_FIND_AT_END = "Wo ist die Butter?"
 
 ERKLAERUNG = (pygame.image.load(path.join(img_folder,"erklaerung.png")))
+
+MAUS_IMG = pygame.image.load(join_paths([img_folder, "tasten","maus.png"])).convert_alpha()
+MAUS_RECHTS_IMG = pygame.image.load(join_paths([img_folder, "tasten","maus_rechts.png"])).convert_alpha()
+MAUS_LINKS_IMG = pygame.image.load(join_paths([img_folder, "tasten","maus_links.png"])).convert_alpha()
+PFEILTASTE_IMG = pygame.image.load(join_paths([img_folder, "tasten","pfeiltasten.png"])).convert_alpha()
+LEERTASTE_IMG = pygame.image.load(join_paths([img_folder, "tasten","leertaste.png"])).convert_alpha()
+X_Y_IMG = pygame.image.load(join_paths([img_folder, "tasten","x_y_taste.png"])).convert_alpha()
 
 # richtungsabhaengige hindernisse (z.b. Neutronenstrahl) bei allen lehrer, die das haben, laden
 for lehrer in LEHRER:

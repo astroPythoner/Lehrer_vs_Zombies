@@ -359,6 +359,8 @@ class Game:
                 for player_num in range(len(self.players)):
                     self.paused[player_num] = False
                 self.draw_start_game_screen(loading=True)
+                if self.map_name == "Toturial":
+                    self.spielmodus = TUTORIAL
                 break
 
     def make_lehrer_selection_pictures(self):
@@ -817,7 +819,10 @@ class Game:
 
         while True:
             # Spiel beginnen
-            self.game_status = PLAYING
+            if self.spielmodus == TUTORIAL:
+                self.game_status = TUTORIAL_WALK
+            else:
+                self.game_status = PLAYING
             if self.players != []:
                 # Die gleichen Lehrer wie im letzen Spiuel solange diese auch direkt freigeschaltet sind
                 if not self.multiplayer:
@@ -881,7 +886,7 @@ class Game:
             self.update_forground_text_img()
 
             ######## Hauptschleife des Spiels #######
-            while self.game_status == PLAYING or self.game_status == COLLECTING_AT_END:
+            while self.game_status == PLAYING or self.game_status == COLLECTING_AT_END or self.spielmodus == TUTORIAL:
                 self.dt = self.clock.tick(FPS) / 1000.0
 
                 pressed = self.check_key_or_mouse_pressed([pygame.K_BACKSPACE,pygame.K_RETURN,pygame.K_y,pygame.K_x,pygame.K_c,pygame.K_LEFT,pygame.K_RIGHT,pygame.K_UP,pygame.K_DOWN])
@@ -890,9 +895,10 @@ class Game:
                 # Alle Spielaktionen hier ausfuehren
                 if False in self.paused:
                     # alle sprites updaten
-                    for player in self.players:
-                        if pygame.mouse.get_pressed()[0] or pygame.key.get_pressed()[pygame.K_SPACE]:
-                            player.shoot()
+                    if (self.spielmodus == TUTORIAL and (self.game_status == TUTORIAL_POWER_UP or self.game_status == TUTORIAL_SHOOT)) or self.spielmodus != TUTORIAL:
+                        for player in self.players:
+                            if pygame.mouse.get_pressed()[0] or pygame.key.get_pressed()[pygame.K_SPACE]:
+                                player.shoot()
                     self.all_sprites.update()
                     for count,camera in enumerate(self.camera):
                         camera.update(self.players[count])
@@ -910,22 +916,46 @@ class Game:
                                 self.make_new_zombie_wave()
                                 self.num_zombie_wave += 1
                                 self.last_zombie_wave_time = time() + 5
+                    # Im Tutorial weiter machen:
+                    if self.spielmodus == TUTORIAL:
+                        if self.game_status == TUTORIAL_WALK and time() - self.werte_since_last_lehrer_change[self.players[0]]["time_lehrer_change"] > 8:
+                            self.game_status = TUTORIAL_COLLECT
+                        elif self.game_status == TUTORIAL_COLLECT and self.werte_since_last_lehrer_change[self.players[0]]["collected_objects"] >= 4:
+                            self.game_status = TUTORIAL_SHOOT
+                        elif self.game_status == TUTORIAL_SHOOT and len(self.zombies) == 0:
+                            self.game_status = TUTORIAL_POWER_UP
+                            self.make_new_zombie_wave()
+                        elif self.game_status == TUTORIAL_POWER_UP and len(self.zombies) == 0:
+                            if self.werte_since_last_lehrer_change[self.players[0]]["num_power_ups"] >= 1:
+                                self.game_status = COLLECTING_AT_END
+                                self.find_at_end = Find_at_End(self, self.player_pos.x, self.player_pos.y)
+                            else:
+                                self.make_new_zombie_wave()
                     # Power-Up benutzen
-                    for count,player in enumerate(self.players):
-                        if MAUS_RIGHT in pressed or pressed[pygame.K_y] or pressed[pygame.K_x] or pressed[pygame.K_c]:
-                            if time()*1000 - self.last_power_up_use_time[count] >= LEHRER[player.lehrer_name]["power_up_time"]:
-                                eval("lehrer_funktionen.power_up_" + LEHRER[player.lehrer_name]['name_in_file_names'].replace(" ","_") + "(self,player)")
-                                self.last_power_up_use_time[count] = round(time() * 1000)
+                    if (self.spielmodus == TUTORIAL and self.game_status == TUTORIAL_POWER_UP) or self.spielmodus != TUTORIAL:
+                        for count,player in enumerate(self.players):
+                            if MAUS_RIGHT in pressed or pressed[pygame.K_y] or pressed[pygame.K_x] or pressed[pygame.K_c]:
+                                if time()*1000 - self.last_power_up_use_time[count] >= LEHRER[player.lehrer_name]["power_up_time"]:
+                                    eval("lehrer_funktionen.power_up_" + LEHRER[player.lehrer_name]['name_in_file_names'].replace(" ","_") + "(self,player)")
+                                    self.werte_since_last_lehrer_change[player]["num_power_ups"] += 1
+                                    if self.spielmodus == TUTORIAL and self.game_status == TUTORIAL_POWER_UP:
+                                        self.last_power_up_use_time[count] = round(time() * 1000) - LEHRER[player.lehrer_name]["power_up_time"] + 2500
+                                    else:
+                                        self.last_power_up_use_time[count] = round(time() * 1000)
                 time2 = self.make_time_measure()
                 # Pause druecken (Lehrerauswahl)
-                for player_num in range(len(self.players)):
-                    if pressed[pygame.K_RETURN]:
-                        self.paused[player_num] = True
-                        self.make_lehrer_selection(self.screen,player_num)
-                        self.clock.tick(FPS)
+                if self.spielmodus != TUTORIAL:
+                    for player_num in range(len(self.players)):
+                        if pressed[pygame.K_RETURN]:
+                            self.paused[player_num] = True
+                            self.make_lehrer_selection(self.screen,player_num)
+                            self.clock.tick(FPS)
 
                 # Spiel abbrechen
                 if pressed[pygame.K_BACKSPACE]:
+                    if self.spielmodus == TUTORIAL:
+                        self.spielmodus = MAP_MODUS
+                        self.map_name = MAP_NAMES[0]
                     self.game_status = BEFORE_FIRST_GAME
                 # Spiel gewonnen?
                 if ((self.spielmodus == MAP_MODUS and (len(self.zombies) == 0 or (self.genauerer_spielmodus==AFTER_TIME and time() - self.level_start_time >= TIME_MAP_LEVEL))) or (self.spielmodus==ARENA_MODUS and self.num_zombie_wave==3 and not self.end_gegner.alive)) and self.game_status == PLAYING:
@@ -937,24 +967,25 @@ class Game:
                     self.update_forground_text_img()
 
                 # Lehrer freischalten
-                for lehrer in self.lehrer_to_be_unlocked:
-                    if not lehrer in self.lehrer_unlocked_sofar:
-                        for player in self.players:
-                            unlocked = eval(LEHRER[lehrer]["bedingungen_fuer_unlock"])
-                            if unlocked:
-                                self.lehrer_unlocked_sofar.append(lehrer)
-                                self.lehrer_unlocked_last = lehrer
-                                self.time_last_lehrer_unlock = time()
-                # Waffen upgrade freischalten
-                for count, player in enumerate(self.players):
-                    if not player.weapon_upgrade_unlocked:
-                        unlocked = eval(LEHRER[player.lehrer_name]["weapon_upgrade"]["upgrade_bedingungen"])
-                        if unlocked or player.lehrer_name in self.upgraded_weapons_lehrer_namen:
-                            player.weapon_upgrade_unlocked = True
-                            player.update_image()
-                            self.weapon_upgrade_unlock_times[count] = time()
-                            if player.lehrer_name not in self.upgraded_weapons_lehrer_namen:
-                                self.upgraded_weapons_lehrer_namen.append(player.lehrer_name)
+                if self.spielmodus != TUTORIAL:
+                    for lehrer in self.lehrer_to_be_unlocked:
+                        if not lehrer in self.lehrer_unlocked_sofar:
+                            for player in self.players:
+                                unlocked = eval(LEHRER[lehrer]["bedingungen_fuer_unlock"])
+                                if unlocked:
+                                    self.lehrer_unlocked_sofar.append(lehrer)
+                                    self.lehrer_unlocked_last = lehrer
+                                    self.time_last_lehrer_unlock = time()
+                    # Waffen upgrade freischalten
+                    for count, player in enumerate(self.players):
+                        if not player.weapon_upgrade_unlocked:
+                            unlocked = eval(LEHRER[player.lehrer_name]["weapon_upgrade"]["upgrade_bedingungen"])
+                            if unlocked or player.lehrer_name in self.upgraded_weapons_lehrer_namen:
+                                player.weapon_upgrade_unlocked = True
+                                player.update_image()
+                                self.weapon_upgrade_unlock_times[count] = time()
+                                if player.lehrer_name not in self.upgraded_weapons_lehrer_namen:
+                                    self.upgraded_weapons_lehrer_namen.append(player.lehrer_name)
 
                 time3 = self.make_time_measure()
                 # zeichnen
@@ -968,6 +999,8 @@ class Game:
                     self.measured_times[2].append(time3 - time2)
                     self.measured_times[3].append(time4 - time3)
 
+            if self.spielmodus == TUTORIAL:
+                self.spielmodus = MAP_MODUS
             self.make_start_game_selection()
 
     def make_new_zombie_wave(self):
@@ -979,12 +1012,16 @@ class Game:
                 obj_center = vec(tile_object.x + tile_object.width / 2,tile_object.y + tile_object.height / 2)
                 if tile_object.name == 'zombie':
                     neue_zombies.append([obj_center.x, obj_center.y])
-            for x in range(int(0.5 * len(neue_zombies))):
-                neue_zombies.pop(randrange(len(neue_zombies)))
-            for x in range(int(len(neue_zombies)*SCHWIERIGKEIT_ZOMBIE_KILLS[self.schwierigkeit-1])):
-                neue_zombies.pop(randrange(len(neue_zombies)))
+            if self.spielmodus != TUTORIAL:
+                for x in range(int(0.5 * len(neue_zombies))):
+                    neue_zombies.pop(randrange(len(neue_zombies)))
+                for x in range(int(len(neue_zombies)*SCHWIERIGKEIT_ZOMBIE_KILLS[self.schwierigkeit-1])):
+                    neue_zombies.pop(randrange(len(neue_zombies)))
             for neuer_zombie in neue_zombies:
-                Grab(self,neuer_zombie[0],neuer_zombie[1])
+                if self.spielmodus != TUTORIAL:
+                    Grab(self,neuer_zombie[0],neuer_zombie[1])
+                else:
+                    Mob(self,neuer_zombie[0],neuer_zombie[0])
         self.update_forground_text_img()
 
     def new(self, lehrer_namen):
@@ -1013,6 +1050,8 @@ class Game:
             self.map = TiledMap(path.join(map_folder, self.map_name+'_big.tmx'))
         elif self.spielmodus == ARENA_MODUS:
             self.map = TiledMap(path.join(map_folder, self.map_name+'_small.tmx'))
+        elif self.spielmodus == TUTORIAL:
+            self.map = TiledMap(path.join(map_folder, 'Tutorial.tmx'))
         self.map_img = self.map.make_map()
         self.map.rect = self.map_img.get_rect()
         self.small_map_sichtweite = min([self.small_map_sichtweite,self.map_img.get_width(),self.map_img.get_height()])
@@ -1025,12 +1064,14 @@ class Game:
                         player = Player(self, obj_center.x, obj_center.y, lehrer_namen[i],i)
                         self.players.append(player)
                         self.weapon_upgrade_unlock_times.append(0)
-                        self.werte_since_last_lehrer_change[player] = {"shoots": 0, "treffer":0, "collected_objects": 0, "num_obstacles_stept_on": 0, "time_lehrer_change": time(), "zombies_killed": 0, "collected_health_packs": 0}
+                        self.werte_since_last_lehrer_change[player] = {"shoots": 0, "treffer":0, "collected_objects": 0, "num_obstacles_stept_on": 0, "time_lehrer_change": time(), "zombies_killed": 0, "collected_health_packs": 0, "num_power_ups":0}
                 else:
                     player = Player(self, obj_center.x, obj_center.y, lehrer_namen[0], 0)
                     self.players.append(player)
                     self.weapon_upgrade_unlock_times.append(0)
-                    self.werte_since_last_lehrer_change[player] = {"shoots": 0, "treffer":0, "collected_objects": 0, "num_obstacles_stept_on": 0, "time_lehrer_change": time(), "zombies_killed": 0, "collected_health_packs": 0}
+                    self.werte_since_last_lehrer_change[player] = {"shoots": 0, "treffer":0, "collected_objects": 0, "num_obstacles_stept_on": 0, "time_lehrer_change": time(), "zombies_killed": 0, "collected_health_packs": 0, "num_power_ups":0}
+        for count, tile_object in enumerate(self.map.tmxdata.objects):
+            obj_center = vec(tile_object.x + tile_object.width / 2, tile_object.y + tile_object.height / 2)
             if tile_object.name == 'zombie':
                 Mob(self, obj_center.x, obj_center.y)
             if tile_object.name == 'obstacle':
@@ -1082,10 +1123,11 @@ class Game:
                 choice(list(self.zombies)).kill()
 
         # Je nach Schwierigkeit ein paar Zombies direkt toeten, und ein paar health_packs entfernen
-        for x in range(int(len(self.zombies)*SCHWIERIGKEIT_ZOMBIE_KILLS[self.schwierigkeit-1])):
-            choice(list(self.zombies)).kill()
-        for x in range(int(len(self.health_packs)*SCHWIERIGKEIT_HEALTH_KILLS[self.schwierigkeit-1])):
-            choice(list(self.health_packs)).kill()
+        if self.spielmodus != TUTORIAL:
+            for x in range(int(len(self.zombies)*SCHWIERIGKEIT_ZOMBIE_KILLS[self.schwierigkeit-1])):
+                choice(list(self.zombies)).kill()
+            for x in range(int(len(self.health_packs)*SCHWIERIGKEIT_HEALTH_KILLS[self.schwierigkeit-1])):
+                choice(list(self.health_packs)).kill()
 
         # Sonstiges
         self.num_zombie_wave = 1
@@ -1106,7 +1148,8 @@ class Game:
             self.collected_person_objects.append(0)
             self.live_bar_images.append(False)
 
-        LEVEL_START_WAV.play()
+        if self.spielmodus != TUTORIAL:
+            LEVEL_START_WAV.play()
 
     def detect_and_react_collisions(self):
         for count, player in enumerate(self.players):
@@ -1120,18 +1163,19 @@ class Game:
                     self.werte_since_last_lehrer_change[player]["collected_health_packs"] += 1
 
             # Zombie beruehrt Spieler
-            hits = pygame.sprite.spritecollide(player, self.zombies, False, collide_hit_rect)
-            for hit in hits:
-                if random() < 0.7:
-                    choice(PLAYER_HIT_WAVS).play()
-                if self.paused[count] == False:
-                    player.health -= MOB_DAMAGE[self.schwierigkeit-1]
-                hit.vel = vec(0, 0)
-                if player.health <= 0:
-                    self.game_status = PLAYER_DIED
-            if hits:
-                player.hit()
-                player.pos += vec(MOB_KNOCKBACK, 0).rotate(-hits[0].rot)
+            if not (self.spielmodus == TUTORIAL and (self.game_status == TUTORIAL_WALK or self.game_status == TUTORIAL_COLLECT)):
+                hits = pygame.sprite.spritecollide(player, self.zombies, False, collide_hit_rect)
+                for hit in hits:
+                    if random() < 0.7:
+                        choice(PLAYER_HIT_WAVS).play()
+                    if self.paused[count] == False:
+                        player.health -= MOB_DAMAGE[self.schwierigkeit-1]
+                    hit.vel = vec(0, 0)
+                    if player.health <= 0:
+                        self.game_status = PLAYER_DIED
+                if hits:
+                    player.hit()
+                    player.pos += vec(MOB_KNOCKBACK, 0).rotate(-hits[0].rot)
 
             # Endgegner beruehrt Spieler
             if self.spielmodus == ARENA_MODUS and self.num_zombie_wave == 3 and time() - self.end_gegner.spawn_time > 6 and self.end_gegner.alive :
@@ -1156,41 +1200,46 @@ class Game:
                 hit.kill()
 
             # Spieler laeuft auf ein personenabhaegiges Hindernis (z.B Naegel am Boden)
-            hits = pygame.sprite.spritecollide(player, self.personen_obstacles, False, collide_hit_rect)
-            for hit in hits:
-                if pygame.time.get_ticks() - self.last_personen_obstacle_damage[count] > 60:
-                    self.last_personen_obstacle_damage[count] = pygame.time.get_ticks()
-                    if random() < 0.7:
-                        choice(PLAYER_HIT_WAVS).play()
-                    if self.paused[count] == False:
-                        player.health -= LEHRER[player.lehrer_name]["obstacle_damage"]
-                    if player.health <= 0:
-                        self.game_status = PLAYER_DIED
-                if LEHRER[player.lehrer_name]["obstacle_kill"]:
-                    hit.kill()
-                if self.was_on_obstacle_last_time[count] == False:
-                    eval("lehrer_funktionen.obstacle_" + LEHRER[player.lehrer_name]['name_in_file_names'].replace(" ","_") + "(self,player)")
-                    self.werte_since_last_lehrer_change[player]["num_obstacles_stept_on"] += 1
-                self.was_on_obstacle_last_time[count] = True
-            if hits == []:
-                self.was_on_obstacle_last_time[count] = False
+            if self.spielmodus == TUTORIAL and self.game_status != TUTORIAL_WALK or self.spielmodus != TUTORIAL:
+                hits = pygame.sprite.spritecollide(player, self.personen_obstacles, False, collide_hit_rect)
+                for hit in hits:
+                    if pygame.time.get_ticks() - self.last_personen_obstacle_damage[count] > 60:
+                        self.last_personen_obstacle_damage[count] = pygame.time.get_ticks()
+                        if random() < 0.7:
+                            choice(PLAYER_HIT_WAVS).play()
+                        if self.paused[count] == False:
+                            player.health -= LEHRER[player.lehrer_name]["obstacle_damage"]
+                        if player.health <= 0:
+                            self.game_status = PLAYER_DIED
+                    if LEHRER[player.lehrer_name]["obstacle_kill"]:
+                        hit.kill()
+                    if self.was_on_obstacle_last_time[count] == False:
+                        eval("lehrer_funktionen.obstacle_" + LEHRER[player.lehrer_name]['name_in_file_names'].replace(" ","_") + "(self,player)")
+                        self.werte_since_last_lehrer_change[player]["num_obstacles_stept_on"] += 1
+                    self.was_on_obstacle_last_time[count] = True
+                if hits == []:
+                    self.was_on_obstacle_last_time[count] = False
 
             # Spieler laeuft auf personenabhaengiges Objekt (Reaktion: personenabhaengige Reaktion z.B Pfandflasche sammeln)
-            hits = pygame.sprite.spritecollide(player, self.personen_objects, False, collide_hit_rect)
-            for hit in hits:
-                if self.last_personen_object[count] == None:
-                    self.last_personen_object[count] = hit
-                    self.collected_person_objects[count] += 1
-                    self.werte_since_last_lehrer_change[player]["collected_objects"] += 1
-                    if LEHRER[player.lehrer_name]["object_kill"]:
-                        hit.kill()
-                    eval("lehrer_funktionen.object_collect_" + LEHRER[player.lehrer_name]['name_in_file_names'].replace(" ","_") + "(self,player)")
-            if hits == []:
-                self.last_personen_object[count] = None
+            if self.spielmodus == TUTORIAL and self.game_status != TUTORIAL_WALK or self.spielmodus != TUTORIAL:
+                hits = pygame.sprite.spritecollide(player, self.personen_objects, False, collide_hit_rect)
+                for hit in hits:
+                    if self.last_personen_object[count] == None:
+                        self.last_personen_object[count] = hit
+                        self.collected_person_objects[count] += 1
+                        self.werte_since_last_lehrer_change[player]["collected_objects"] += 1
+                        if LEHRER[player.lehrer_name]["object_kill"]:
+                            hit.kill()
+                        eval("lehrer_funktionen.object_collect_" + LEHRER[player.lehrer_name]['name_in_file_names'].replace(" ","_") + "(self,player)")
+                if hits == []:
+                    self.last_personen_object[count] = None
 
             # Spieler sammelt das Objekt, das am Ende gefunden wird ein
             if self.game_status == COLLECTING_AT_END:
                 if pygame.sprite.collide_rect(player, self.find_at_end):
+                    if self.spielmodus == TUTORIAL:
+                        self.spielmodus = MAP_MODUS
+                        self.map_name = MAP_NAMES[0]
                     self.find_at_end.collected = True
                     self.game_status = WON_GAME
 
@@ -1236,20 +1285,21 @@ class Game:
 
             # Sprites
             for sprite in self.all_sprites:
-                if isinstance(sprite, Mob):
-                    sprite.draw_health()
-                if isinstance(sprite.image,list):
-                    if not self.multiplayer:
-                        self.screen.blit(sprite.image[count], camera.apply(sprite))
+                if not (self.spielmodus == TUTORIAL and ((isinstance(sprite, Personen_Obstacle) or isinstance(sprite, Personen_Object)) and self.game_status == TUTORIAL_WALK) or (isinstance(sprite, Mob) and (self.game_status == TUTORIAL_WALK or self.game_status == TUTORIAL_COLLECT))):
+                    if isinstance(sprite, Mob):
+                        sprite.draw_health()
+                    if isinstance(sprite.image,list):
+                        if not self.multiplayer:
+                            self.screen.blit(sprite.image[count], camera.apply(sprite))
+                        else:
+                            pos_rect = camera.apply(sprite)
+                            subscreen.blit(sprite.image[count], pos_rect)
                     else:
-                        pos_rect = camera.apply(sprite)
-                        subscreen.blit(sprite.image[count], pos_rect)
-                else:
-                    if not self.multiplayer:
-                        self.screen.blit(sprite.image, camera.apply(sprite))
-                    else:
-                        pos_rect = camera.apply(sprite)
-                        subscreen.blit(sprite.image, pos_rect)
+                        if not self.multiplayer:
+                            self.screen.blit(sprite.image, camera.apply(sprite))
+                        else:
+                            pos_rect = camera.apply(sprite)
+                            subscreen.blit(sprite.image, pos_rect)
 
             # Bilder auf Spieler oder Zombie malen (z.B. Sprechblasen)
             for player in self.players:
@@ -1308,25 +1358,46 @@ class Game:
                 self.screen.blit(self.number_surfaces[int(digit)], (pos[0] + digit_count * self.bigest_num_length, pos[1] - self.BIG_TEXT*1.2))
         self.screen.blit(self.forground_text_img,(0,0))
         # Lehrerunlock
-        if time() - self.time_last_lehrer_unlock < 4:
-            self.draw_text(self.screen,LEHRER[self.lehrer_unlocked_last]["anrede"]+" "+self.lehrer_unlocked_last+" freigeschaltet", self.BIG_TEXT, self.WIDTH/2,self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 5 - self.BIG_TEXT - 10 - 15 - self.BIG_TEXT - 12, rect_place="unten_mitte", color = LEHRER_UNLOCKED_TEXT_COLOR)
-            self.screen.blit(PLAYER_IMGES[self.lehrer_unlocked_last],(self.WIDTH/2-(PLAYER_IMGES[self.lehrer_unlocked_last].get_width())/2, self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 5 - self.BIG_TEXT - 10 - 15 - self.BIG_TEXT - 5 - self.BIG_TEXT - 12 - PLAYER_IMGES[self.lehrer_unlocked_last].get_height()))
+        if self.spielmodus != TUTORIAL:
+            if time() - self.time_last_lehrer_unlock < 4:
+                self.draw_text(self.screen,LEHRER[self.lehrer_unlocked_last]["anrede"]+" "+self.lehrer_unlocked_last+" freigeschaltet", self.BIG_TEXT, self.WIDTH/2,self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 5 - self.BIG_TEXT - 10 - 15 - self.BIG_TEXT - 12, rect_place="unten_mitte", color = LEHRER_UNLOCKED_TEXT_COLOR)
+                self.screen.blit(PLAYER_IMGES[self.lehrer_unlocked_last],(self.WIDTH/2-(PLAYER_IMGES[self.lehrer_unlocked_last].get_width())/2, self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 5 - self.BIG_TEXT - 10 - 15 - self.BIG_TEXT - 5 - self.BIG_TEXT - 12 - PLAYER_IMGES[self.lehrer_unlocked_last].get_height()))
         # Waffenupgrade
-        for count, player in enumerate(self.players):
-            if player.weapon_upgrade_unlocked and time() - self.weapon_upgrade_unlock_times[count] < 4.5:
-                self.draw_text(self.screen, LEHRER[player.lehrer_name]["weapon_upgrade"]["upgraded_weapon_name"] + " " + " freigeschaltet", self.BIG_TEXT, self.WIDTH / 2, self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 10 - 15, rect_place="unten_mitte", color=LEHRER_UNLOCKED_TEXT_COLOR)
-            elif time() - self.werte_since_last_lehrer_change[player]["time_lehrer_change"] < 5:
-                if self.get_text_rect(LEHRER[player.lehrer_name]["weapon_upgrade"]["unlock_text"],self.BIG_TEXT).width > self.WIDTH:
-                    text = LEHRER[player.lehrer_name]["weapon_upgrade"]["unlock_text"]
-                    self.draw_text(self.screen, text[:int(len(text)/2)], self.BIG_TEXT, self.WIDTH / 2, self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 10 - 15 - self.BIG_TEXT - 5, rect_place="unten_mitte", color=LEHRER_UNLOCKED_TEXT_COLOR)
-                    self.draw_text(self.screen, text[int(len(text)/2):], self.BIG_TEXT, self.WIDTH / 2, self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 10 - 15, rect_place="unten_mitte", color=LEHRER_UNLOCKED_TEXT_COLOR)
-                else:
-                    self.draw_text(self.screen, LEHRER[player.lehrer_name]["weapon_upgrade"]["unlock_text"], self.BIG_TEXT, self.WIDTH / 2, self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 10 - 15, rect_place="unten_mitte", color=LEHRER_UNLOCKED_TEXT_COLOR)
+        if self.spielmodus != TUTORIAL:
+            for count, player in enumerate(self.players):
+                if player.weapon_upgrade_unlocked and time() - self.weapon_upgrade_unlock_times[count] < 4.5:
+                    self.draw_text(self.screen, LEHRER[player.lehrer_name]["weapon_upgrade"]["upgraded_weapon_name"] + " " + " freigeschaltet", self.BIG_TEXT, self.WIDTH / 2, self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 10 - 15, rect_place="unten_mitte", color=LEHRER_UNLOCKED_TEXT_COLOR)
+                elif time() - self.werte_since_last_lehrer_change[player]["time_lehrer_change"] < 5:
+                    if self.get_text_rect(LEHRER[player.lehrer_name]["weapon_upgrade"]["unlock_text"],self.BIG_TEXT).width > self.WIDTH:
+                        text = LEHRER[player.lehrer_name]["weapon_upgrade"]["unlock_text"]
+                        self.draw_text(self.screen, text[:int(len(text)/2)], self.BIG_TEXT, self.WIDTH / 2, self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 10 - 15 - self.BIG_TEXT - 5, rect_place="unten_mitte", color=LEHRER_UNLOCKED_TEXT_COLOR)
+                        self.draw_text(self.screen, text[int(len(text)/2):], self.BIG_TEXT, self.WIDTH / 2, self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 10 - 15, rect_place="unten_mitte", color=LEHRER_UNLOCKED_TEXT_COLOR)
+                    else:
+                        self.draw_text(self.screen, LEHRER[player.lehrer_name]["weapon_upgrade"]["unlock_text"], self.BIG_TEXT, self.WIDTH / 2, self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 10 - 15, rect_place="unten_mitte", color=LEHRER_UNLOCKED_TEXT_COLOR)
         # Countdown vor Zombiewelle
         if self.spielmodus == ARENA_MODUS:
             if time() - self.countdown_start_time <= 5:
                 self.draw_text(self.screen, str(5 - round(time() - self.countdown_start_time)), self.calculate_fit_size(0.2, 0.4), self.WIDTH / 2, self.HEIGHT / 2, color=WHITE, rect_place="mitte")
         time6 = self.make_time_measure()
+        # Tutorial
+        if self.spielmodus == TUTORIAL:
+            if self.game_status == TUTORIAL_WALK:
+                if self.with_maussteuerung:
+                    self.draw_text(self.screen,"Bewege dich mit der Maus und halte Shift zum Schleichen und rückwärts Gehen",self.NORMAL_TEXT,self.WIDTH/2,self.HEIGHT*(1/3))
+                    self.screen.blit(MAUS_IMG,(self.WIDTH/2,20))
+                else:
+                    self.draw_text(self.screen,"Bewege dich mit den Pfeiltasten",self.NORMAL_TEXT,self.WIDTH/2,self.HEIGHT*(1/3))
+                    self.screen.blit(PFEILTASTE_IMG, (self.WIDTH/2 - PFEILTASTE_IMG.get_rect().w/2), 20)
+            elif self.game_status == TUTORIAL_COLLECT:
+                self.draw_text(self.screen, "Sammel diese Objekte ohne auf die Hindernisse zu treten", self.NORMAL_TEXT, self.WIDTH / 2, self.HEIGHT * (1 / 3))
+            elif self.game_status == TUTORIAL_SHOOT:
+                self.draw_text(self.screen, "Schieße mit Leertaste oder linker Maustaste auf die Zombies", self.NORMAL_TEXT, self.WIDTH / 2, self.HEIGHT * (1 / 3))
+                self.screen.blit(MAUS_LINKS_IMG, (self.WIDTH/2 - MAUS_LINKS_IMG.get_rect().w/2, 20))
+                self.screen.blit(LEERTASTE_IMG, (self.WIDTH/2 - LEERTASTE_IMG.get_rect().w/2, 40 + MAUS_LINKS_IMG.get_rect().h))
+            elif self.game_status == TUTORIAL_POWER_UP:
+                self.draw_text(self.screen, "Benutzte mit X oder rechter Maustaste dein Power-Up", self.NORMAL_TEXT, self.WIDTH / 2, self.HEIGHT * (1 / 3))
+                self.screen.blit(MAUS_RECHTS_IMG, (self.WIDTH/2 - MAUS_RECHTS_IMG.get_rect().w/2, 20))
+                self.screen.blit(X_Y_IMG, (self.WIDTH / 2 - X_Y_IMG.get_rect().w/ 2, 40 + MAUS_LINKS_IMG.get_rect().h))
 
         if self.measure_times:
             self.measured_times[4].append(time6 - time1)
@@ -1373,7 +1444,8 @@ class Game:
             if self.spielmodus == ARENA_MODUS:
                 for x in range(3):
                     pygame.draw.circle(surface, LEVEL_FORTSCHRITTS_FARBE, (int(15 + self.level_bar_lenght / 3 * x), int(self.HEIGHT - 20 - self.level_bar_height / 2)), int(self.level_bar_height * 0.8), 3)
-            pygame.draw.rect(surface, LEVEL_FORTSCHRITTS_FARBE, pygame.Rect((15, self.HEIGHT-20-self.level_bar_height-3), (self.level_bar_lenght+6,self.level_bar_height+6)),3)
+            elif self.spielmodus == MAP_MODUS:
+                pygame.draw.rect(surface, LEVEL_FORTSCHRITTS_FARBE, pygame.Rect((15, self.HEIGHT-20-self.level_bar_height-3), (self.level_bar_lenght+6,self.level_bar_height+6)),3)
 
         self.forground_text_img = surface
 
@@ -1480,7 +1552,7 @@ class Game:
             self.screen.blit(self.live_bar_images[player_num],(int((self.WIDTH/self.num_players_in_multiplayer)*(player_num)),0))
 
     def draw_level_fortschritts_balken(self):
-        if not self.game_status == COLLECTING_AT_END:
+        if not self.game_status == COLLECTING_AT_END and self.spielmodus != TUTORIAL:
         # Prozentualelaenge berechnen
             if self.genauerer_spielmodus == AFTER_TIME:
                 if self.spielmodus == MAP_MODUS:
@@ -1498,7 +1570,10 @@ class Game:
                             pct = (time() - self.last_zombie_wave_time) / TIME_BETWEEN_ZOMBIE_WAVES / 3 + (self.num_zombie_wave-1)/3
             elif self.genauerer_spielmodus == AFTER_KILLED:
                 if self.spielmodus == MAP_MODUS:
-                    pct = ((self.level_start_num_zombies-len(self.zombies)) / self.level_start_num_zombies)
+                    if self.level_start_num_zombies > 0:
+                        pct = ((self.level_start_num_zombies-len(self.zombies)) / self.level_start_num_zombies)
+                    else:
+                        pct = 0
                 elif self.spielmodus == ARENA_MODUS:
                     if time() - self.countdown_start_time <= 6:
                         pct = (self.num_zombie_wave - 1) / 3
