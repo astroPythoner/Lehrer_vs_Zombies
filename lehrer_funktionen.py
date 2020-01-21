@@ -171,3 +171,22 @@ def obstacle_hozler(game, player, test = False):
 def health_pack_hozler(game, player, test = False):
     if not test:
         pass
+
+def power_up_schueler(game, player, test = False):
+    if not test:
+        for zombie in game.zombies:
+            if is_zombie_close_to_player(zombie, player.pos):
+                zombie.change_img_for_given_time(None, 3000, stand_still_during_time=True, damge_during_time=MOB_HEALTH * 2 / 3)
+        Shaking_object(game, PERSONEN_POWER_UP_ICONS["Schüler"], player.pos, 3000)
+
+def object_collect_schueler(game, player, test = False):
+    if not test:
+        Spielhack(game, player)
+
+def obstacle_schueler(game, player, test = False):
+    if not test:
+        player.place_img_on_player_for_given_time(LEHRER["Schüler"]["other_files"]["unnoetig"], 1500, 30, 0)
+
+def health_pack_schueler(game, player, test = False):
+    if not test:
+        pass

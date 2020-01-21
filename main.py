@@ -21,7 +21,7 @@ class Game:
                 except AttributeError:
                     with open("lehrer_funktionen.py", "a") as file:
                         was_lehrerfunktionen_vollstaendig = False
-                        file.write("\ndef " + funktionsname + lehrer.replace(" ","_") + "(game, player, test = False):\n    if not test:\n        pass\n")
+                        file.write("\ndef " + funktionsname + LEHRER[lehrer]['name_in_file_names'].replace(" ","_") + "(game, player, test = False):\n    if not test:\n        pass\n")
         if not was_lehrerfunktionen_vollstaendig:
             raise Exception("lehrer_funktionen.py war nicht vollstaendig und wurde so weit automatisch vervollstaendigt, dass das Spiel beim nachsten Durchlauf funktionert. Mehr Infos zu den Lehrerfunktionen findest du in der Anleitung zum Spielercharakter erstellen unter dem Punkt Unterprogramme")
         pygame.mixer.pre_init(44100, -16, 4, 2048)
@@ -686,7 +686,7 @@ class Game:
                 return
 
     def change_to_other_lehrer(self,lehrer_name,alter_lehrer, player):
-        self.werte_since_last_lehrer_change[player]={"shoots": 0, "treffer":0, "collected_objects": 0, "num_obstacles_stept_on": 0, "time_lehrer_change": time(), "zombies_killed": 0, "collected_health_packs": 0}
+        self.werte_since_last_lehrer_change[player]={"shoots": 0, "treffer":0, "collected_objects": 0, "num_obstacles_stept_on": 0, "time_lehrer_change": time(), "zombies_killed": 0, "collected_health_packs": 0, "num_power_ups":0}
         player.lehrer_name = lehrer_name
         player.weapon_upgrade_unlocked = False
         player.update_image()
@@ -1444,7 +1444,7 @@ class Game:
             if self.spielmodus == ARENA_MODUS:
                 for x in range(3):
                     pygame.draw.circle(surface, LEVEL_FORTSCHRITTS_FARBE, (int(15 + self.level_bar_lenght / 3 * x), int(self.HEIGHT - 20 - self.level_bar_height / 2)), int(self.level_bar_height * 0.8), 3)
-            elif self.spielmodus == MAP_MODUS:
+            if self.spielmodus != TUTORIAL:
                 pygame.draw.rect(surface, LEVEL_FORTSCHRITTS_FARBE, pygame.Rect((15, self.HEIGHT-20-self.level_bar_height-3), (self.level_bar_lenght+6,self.level_bar_height+6)),3)
 
         self.forground_text_img = surface
@@ -1552,7 +1552,7 @@ class Game:
             self.screen.blit(self.live_bar_images[player_num],(int((self.WIDTH/self.num_players_in_multiplayer)*(player_num)),0))
 
     def draw_level_fortschritts_balken(self):
-        if not self.game_status == COLLECTING_AT_END and self.spielmodus != TUTORIAL:
+        if self.game_status != COLLECTING_AT_END and self.spielmodus != TUTORIAL:
         # Prozentualelaenge berechnen
             if self.genauerer_spielmodus == AFTER_TIME:
                 if self.spielmodus == MAP_MODUS:

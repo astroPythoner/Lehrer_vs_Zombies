@@ -857,6 +857,6 @@ class Spielhack(pygame.sprite.Sprite):
     def update(self):
         zeit = time() * 1000 - self.start_time
         if zeit%80 and int((zeit/self.dauer)*self.game.HEIGHT) <= self.game.HEIGHT:
-            self.image.blit(LEHRER["Fabian"]["other_files"][choice(["eins","null"])],(randrange(0,self.game.WIDTH),int((zeit/self.dauer)*self.game.HEIGHT)))
+            self.image.blit(LEHRER["Schüler"]["other_files"][choice(["eins","null"])],(randrange(0,self.game.WIDTH),int((zeit/self.dauer)*self.game.HEIGHT)))
         if int((zeit/self.dauer)*self.game.HEIGHT) > self.game.HEIGHT + 200:
             self.kill()
