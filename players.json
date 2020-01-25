@@ -152,7 +152,7 @@
                  "upgrade_bedingungen" : "self.werte_since_last_lehrer_change[player]['shoots'] >= 20 and self.werte_since_last_lehrer_change[player]['treffer']/self.werte_since_last_lehrer_change[player]['shoots'] > 0.8",
                  "unlock_text": "Schieße 20 mal und erreiche eine Trefferquote von 80%",
                  "weapon_image" : ["bullet_windmauer_Faust.png"],
-                 "player_image" : "automatisch",
+                 "player_image" : ["player_windmauer_faust.png"],
                  "weapon_bullet_speed" : 310,
                  "weapon_lifetime" : 4300,
                  "weapon_rate" : 430,

@@ -725,7 +725,7 @@ class Game:
             pressed = self.check_key_or_mouse_pressed([pygame.K_ESCAPE])
 
             if MAUS_LEFT in pressed:
-                if self.check_maus_pos_on_rect(pressed[MAUS_LEFT],pygame.Rect((pos[0]+(width/2)-(0.2*width),pos[1]+height - 0.2*height),(0.2*width,0.2*height))):
+                if self.check_maus_pos_on_rect(pressed[MAUS_LEFT],pygame.Rect((pos[0]+(width/2)-(0.3*width),pos[1]+height - 0.3*height),(0.6*width,0.6*height))):
                     break
 
     def make_time_measure(self):
@@ -886,7 +886,7 @@ class Game:
             self.update_forground_text_img()
 
             ######## Hauptschleife des Spiels #######
-            while self.game_status == PLAYING or self.game_status == COLLECTING_AT_END or self.spielmodus == TUTORIAL:
+            while self.game_status == PLAYING or self.game_status == COLLECTING_AT_END or (self.spielmodus == TUTORIAL and self.game_status != PLAYER_DIED):
                 self.dt = self.clock.tick(FPS) / 1000.0
 
                 pressed = self.check_key_or_mouse_pressed([pygame.K_BACKSPACE,pygame.K_RETURN,pygame.K_y,pygame.K_x,pygame.K_c,pygame.K_LEFT,pygame.K_RIGHT,pygame.K_UP,pygame.K_DOWN])
@@ -1384,20 +1384,20 @@ class Game:
             if self.game_status == TUTORIAL_WALK:
                 if self.with_maussteuerung:
                     self.draw_text(self.screen,"Bewege dich mit der Maus und halte Shift zum Schleichen und rückwärts Gehen",self.NORMAL_TEXT,self.WIDTH/2,self.HEIGHT*(1/3))
-                    self.screen.blit(MAUS_IMG,(self.WIDTH/2,20))
+                    self.screen.blit(MAUS_IMG,(int(self.WIDTH/2),20))
                 else:
                     self.draw_text(self.screen,"Bewege dich mit den Pfeiltasten",self.NORMAL_TEXT,self.WIDTH/2,self.HEIGHT*(1/3))
-                    self.screen.blit(PFEILTASTE_IMG, (self.WIDTH/2 - PFEILTASTE_IMG.get_rect().w/2), 20)
+                    self.screen.blit(PFEILTASTE_IMG, (int(self.WIDTH/2 - PFEILTASTE_IMG.get_rect().w/2), 20))
             elif self.game_status == TUTORIAL_COLLECT:
                 self.draw_text(self.screen, "Sammel diese Objekte ohne auf die Hindernisse zu treten", self.NORMAL_TEXT, self.WIDTH / 2, self.HEIGHT * (1 / 3))
             elif self.game_status == TUTORIAL_SHOOT:
                 self.draw_text(self.screen, "Schieße mit Leertaste oder linker Maustaste auf die Zombies", self.NORMAL_TEXT, self.WIDTH / 2, self.HEIGHT * (1 / 3))
-                self.screen.blit(MAUS_LINKS_IMG, (self.WIDTH/2 - MAUS_LINKS_IMG.get_rect().w/2, 20))
-                self.screen.blit(LEERTASTE_IMG, (self.WIDTH/2 - LEERTASTE_IMG.get_rect().w/2, 40 + MAUS_LINKS_IMG.get_rect().h))
+                self.screen.blit(MAUS_LINKS_IMG, (int(self.WIDTH/2 - MAUS_LINKS_IMG.get_rect().w/2), 20))
+                self.screen.blit(LEERTASTE_IMG, (int(self.WIDTH/2 - LEERTASTE_IMG.get_rect().w/2), 40 + MAUS_LINKS_IMG.get_rect().h))
             elif self.game_status == TUTORIAL_POWER_UP:
                 self.draw_text(self.screen, "Benutzte mit X oder rechter Maustaste dein Power-Up", self.NORMAL_TEXT, self.WIDTH / 2, self.HEIGHT * (1 / 3))
-                self.screen.blit(MAUS_RECHTS_IMG, (self.WIDTH/2 - MAUS_RECHTS_IMG.get_rect().w/2, 20))
-                self.screen.blit(X_Y_IMG, (self.WIDTH / 2 - X_Y_IMG.get_rect().w/ 2, 40 + MAUS_LINKS_IMG.get_rect().h))
+                self.screen.blit(MAUS_RECHTS_IMG, (int(self.WIDTH/2 - MAUS_RECHTS_IMG.get_rect().w/2), 20))
+                self.screen.blit(X_Y_IMG, (int(self.WIDTH / 2 - X_Y_IMG.get_rect().w/ 2), 40 + MAUS_LINKS_IMG.get_rect().h))
 
         if self.measure_times:
             self.measured_times[4].append(time6 - time1)
