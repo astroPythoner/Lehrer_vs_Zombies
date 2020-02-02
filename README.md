@@ -41,6 +41,10 @@ Du willst andere Charaktere oder coolere Karten. Kein Problem, lese dir die Anle
 
 Links: [Karten erstellen Wiki](https://github.com/astroPythoner/Lehrer_vs_Zombies/wiki/Wie-erstelle-ich-eine-neue-Karte), [Charaktere hinzufügen Wiki](https://github.com/astroPythoner/Lehrer_vs_Zombies/wiki/Wie-erstelle-ich-neue-Charaktere), [Karten erstellen Datei](https://github.com/astroPythoner/Lehrer_vs_Zombies/blob/master/Wie%20erstellt%20man%20eine%20neue%20Karte/Anleitung.txt), [Charaktere hinzufügen Datei](https://github.com/astroPythoner/Lehrer_vs_Zombies/blob/master/Wie%20erstellt%20man%20einen%20neuen%20Spielercharakter/Anleitung.txt)
 
+![image not found](https://raw.githubusercontent.com/astroPythoner/Lehrer_vs_Zombies/master/img/screenshot1.png)
+![](https://raw.githubusercontent.com/astroPythoner/Lehrer_vs_Zombies/master/img/screenshot2.png)
+![](https://raw.githubusercontent.com/astroPythoner/Lehrer_vs_Zombies/master/img/screenshot3.png)
+
 ***
 
 # Copyright/Attribution Notice:

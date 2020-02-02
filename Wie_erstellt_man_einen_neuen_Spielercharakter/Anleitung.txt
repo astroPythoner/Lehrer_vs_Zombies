@@ -107,7 +107,9 @@ Die Farben für Shirt, Gesicht, Hände, und Haare bestehen aus vier Werten rot, 
 Die Durchsichtigkeit sollte jedoch auf 255 bleiben. Unter den Farben kannst du noch Frisur und Anzahl der Hände bestimmen,
 wähle dazu einen der hinter dem Wert in der Zeile stehenden Wert aus. Den Namen des Lehrers trägst du bei lehrer_file_name ein.
 Die Datei wird automatisch an richtiger Stelle mit richtigem Namen gespeichert.
-
+Du kannst auch die Datei spieler_zeichnen_tkinter_frame verwenden. Hierfür müssen allerdings tkinter und Pillow (PIL) installiert sein.
+Du kannst dann in dem Fenster, das sich beim Ausführen der Datei öffnet, mit den Reglern und Auswahlboxen das Bild des Lehrers einstellen und dann auf speichern drücken.
+Das Bild wird unter dem Namen neuer_lehrer in den Ordner img/player/lehrer gelegt, du musst also noch die Datei passend zu der Figur umbenennen
 
 
 ## Sounds:

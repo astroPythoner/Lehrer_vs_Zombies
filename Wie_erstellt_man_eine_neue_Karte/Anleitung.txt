@@ -9,7 +9,7 @@ Als Kachelgröße musst du 64 auf 64 Pixel nehmen. Wähle dann im Menü Karte ->
 Wähle die Datei spritesheet_tiles.png (with thanks to Kenney from https://opengameart.org/content/topdown-shooter and opengameart.org).
 Das Tileset hat eine Kachelgröße von 64 auf 64 Pixel. Der Abstand zwischen den Bildern sind 10 Pixel. Orientierung ist 0,0, Hintergrundfarbe gibt es keine. Die Orientierung ist auch Orthogonal.
 Du kannst jetzt ein neue Karte erstellen. Um Hindernisse, Zombies, Spieler, Endgegner oder Sammelobjekte zu erstellen füge eine Itemebene hinzu.
-Auf dem Bild in diesem Ordner sind alle zusätzlichen Objekte zu sehen und hier nochmal aufgelistet:
+Auf dem Bild in diesem Ordner (Beispiel Tiled.png) sind alle zusätzlichen Objekte zu sehen und hier nochmal aufgelistet:
 
 * obstacle: Hindernisse wie Wände, Stühle, Tische, ...
 * health: Healthpacks
@@ -22,4 +22,4 @@ Auf dem Bild in diesem Ordner sind alle zusätzlichen Objekte zu sehen und hier 
 
 !! Im Code musst du in der Datei constants.py das Array MAP_NAMES um den Namen deiner Karte erweitern !!
 
-Video von KidsCanCode (http://kidscancode.org/lessons/) gibt es unter http://https://www.youtube.com/watch?v=Mr5l4U9S4kI&list=PLsk-HSGFjnaH5yghzu7PcOzm9NhsW0Urw&index=47
+Video von KidsCanCode gibt es unter http://https://www.youtube.com/watch?v=Mr5l4U9S4kI&list=PLsk-HSGFjnaH5yghzu7PcOzm9NhsW0Urw&index=47

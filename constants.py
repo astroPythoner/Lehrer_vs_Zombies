@@ -3,6 +3,8 @@ from os import path, listdir
 import json
 vec = pygame.math.Vector2
 
+version = "2.1.0"
+
 # Bildschrimgroesse
 start_width = 480*2 #1600
 start_height = 320*2 #1000
@@ -37,7 +39,7 @@ TIME_MAP_LEVEL = 500             # Wie lange man auf der grossen Karte ueberlebe
 TIME_BETWEEN_ZOMBIE_WAVES = 150  # Wie Viel Zeit zwischen 2 Zombiewellen vergeht
 
 # Schwierigkeiten
-SCHWIERIGKEIT_ZOMBIE_KILLS = [0.2,0.15,0.1,0.05,0  ] # Prozentualer Anteil der Zombies, die je nach Schwierigkeit weniger sind
+SCHWIERIGKEIT_ZOMBIE_KILLS = [1,0.15,0.1,0.05,0  ] # Prozentualer Anteil der Zombies, die je nach Schwierigkeit weniger sind
 SCHWIERIGKEIT_HEALTH_KILLS = [0  ,0.05,0.1,0.15,0.2] # Prozentualer Anteil der Health Packs, die je nach Schwierigkeit weniger sind
 
 # Dateienpfade herausfinden

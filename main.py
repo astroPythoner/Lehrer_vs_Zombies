@@ -36,7 +36,7 @@ class Game:
         self.background_rect = self.background.get_rect()
 
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.RESIZABLE)
-        pygame.display.set_caption("Tilmap Zombie!")
+        pygame.display.set_caption("Tilmap Zombie! - "+version)
         self.clock = pygame.time.Clock()
 
         self.update_text_sizes()
@@ -1271,7 +1271,7 @@ class Game:
                             self.end_gegner.kill()
 
     def draw_display(self):
-        pygame.display.set_caption("{:.2f}".format(self.clock.get_fps()))
+        pygame.display.set_caption("{:.2f} - {}".format(self.clock.get_fps(),version))
         # Zeichnen
         time1 = self.make_time_measure()
         for count,camera in enumerate(self.camera):
@@ -1389,7 +1389,7 @@ class Game:
                     self.draw_text(self.screen,"Bewege dich mit den Pfeiltasten",self.NORMAL_TEXT,self.WIDTH/2,self.HEIGHT*(1/3))
                     self.screen.blit(PFEILTASTE_IMG, (int(self.WIDTH/2 - PFEILTASTE_IMG.get_rect().w/2), 20))
             elif self.game_status == TUTORIAL_COLLECT:
-                self.draw_text(self.screen, "Sammel diese Objekte ohne auf die Hindernisse zu treten", self.NORMAL_TEXT, self.WIDTH / 2, self.HEIGHT * (1 / 3))
+                self.draw_text(self.screen, "Sammel die Objekte ohne auf die Hindernisse zu treten", self.NORMAL_TEXT, self.WIDTH / 2, self.HEIGHT * (1 / 3))
             elif self.game_status == TUTORIAL_SHOOT:
                 self.draw_text(self.screen, "Schieße mit Leertaste oder linker Maustaste auf die Zombies", self.NORMAL_TEXT, self.WIDTH / 2, self.HEIGHT * (1 / 3))
                 self.screen.blit(MAUS_LINKS_IMG, (int(self.WIDTH/2 - MAUS_LINKS_IMG.get_rect().w/2), 20))
