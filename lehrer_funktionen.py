@@ -176,7 +176,7 @@ def power_up_schueler(game, player, test = False):
     if not test:
         for zombie in game.zombies:
             if is_zombie_close_to_player(zombie, player.pos):
-                zombie.change_img_for_given_time(None, 3000, stand_still_during_time=True, damge_during_time=MOB_HEALTH * 2 / 3)
+                zombie.change_img_for_given_time(None, 3000, stand_still_during_time=True, damge_during_time=MOB_HEALTH * 2/3)
         Shaking_object(game, PERSONEN_POWER_UP_ICONS["Schüler"], player.pos, 3000)
 
 def object_collect_schueler(game, player, test = False):
@@ -188,5 +188,28 @@ def obstacle_schueler(game, player, test = False):
         player.place_img_on_player_for_given_time(LEHRER["Schüler"]["other_files"]["unnoetig"], 1500, 30, 0)
 
 def health_pack_schueler(game, player, test = False):
+    if not test:
+        pass
+
+def power_up_gruss(game, player, test = False):
+    if not test:
+        player.place_img_on_player_for_given_time(LEHRER["Gruß"]["other_files"]["Das haengt von der Definition ab"],4250, 30, -50)
+        first = True
+        for zombie in game.zombies:
+            if is_zombie_close_to_player(zombie, player.pos):
+                zombie.change_img_for_given_time(LEHRER["Gruß"]["other_files"]["anderer_zombie"], 4000,damge_during_time=MOB_HEALTH * 1 / 2)
+                if first:
+                    zombie.place_img_on_zombie_for_given_time(LEHRER["Gruß"]["other_files"]["sind wir zombies"], 4000, 30,-30)
+                    first = False
+
+def object_collect_gruss(game, player, test = False):
+    if not test:
+        player.place_img_on_player_for_given_time(LEHRER["Gruß"]["other_files"]["bewiesen"], 1500, 35, -25)
+
+def obstacle_gruss(game, player, test = False):
+    if not test:
+        player.place_img_on_player_for_given_time(LEHRER["Gruß"]["other_files"]["warum laedt des nicht"], 1500, 40, -35)
+
+def health_pack_gruss(game, player, test = False):
     if not test:
         pass

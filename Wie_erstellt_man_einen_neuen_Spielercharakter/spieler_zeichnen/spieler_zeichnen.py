@@ -42,7 +42,7 @@ def set_img_at(img,color,normal_color,x,y):
         pass
     else:
         color_tuple = (abs(min([normal_color.r - color[0],255])), abs(min([normal_color.g - color[1],255])), abs(min([normal_color.b - color[2],255])), abs(min([normal_color.a - color[3],255])))
-        color_to_set = pygame.Color(color_tuple)
+        color_to_set = pygame.Color(*color_tuple)
         img.set_at((x, y), color_to_set)
 
 def draw_player(shirt_farbe=shirt_farbe,hautfarbe_hand=hautfarbe_hand,hautfarbe_gesicht=hautfarbe_gesicht,haarfarbe=haarfarbe,frisur=frisur,einhaendig=einhaendig,background=pygame.Color(0,0,0,0),size=(49,43)):

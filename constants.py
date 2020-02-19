@@ -3,7 +3,7 @@ from os import path, listdir
 import json
 vec = pygame.math.Vector2
 
-version = "2.1.0"
+version = "2.1.1"
 
 # Bildschrimgroesse
 start_width = 480*2 #1600
@@ -288,32 +288,43 @@ ZOMBIE_WAVS = sounds_aus_array_laden(path.join(snd_folder, "Zombies"),ZOMBIE_MOA
 ZOMBIE_HIT_WAVS = sounds_aus_array_laden(path.join(snd_folder, "Zombies"),ZOMBIE_HIT_SOUNDS,game_sound_volume)
 PLAYER_HIT_WAVS = sounds_aus_array_laden(path.join(snd_folder, "pain"),PLAYER_HIT_SOUNDS,game_sound_volume)
 
+
+
+def print_tabelle(zeige,zeige_upgrade,name,data):
+    ### schreibt die im dict stehenden werte aus zeige und zeige_upgrade in zwei Zeilen für normale Werte mit Name vorne dran und upgrade werte
+    # zwei Texte für upgrade und werte
+    werte_text = name + " " * ((len("Voller Lehrername") + 1) - (len(name)))
+    upgrade_text = "upgrade" + " " * ((len("Voller Lehrername") + 1) - 7)
+
+    # alle zu zeigenden Werte durchgehen und zu werte bzw. upgrade text hinzufügen
+    for count, y in enumerate(zeige):
+        werte_text += str(round(data[y],2)) + " "*((len(y) + 1) - (len(str(round(data[y],2)))))
+        if y in zeige_upgrade:
+            upgrade_text += str(round(data["weapon_upgrade"][y],2)) + " "*((len(y) + 1) - (len(str(round(data["weapon_upgrade"][y],2)))))
+        else:
+            upgrade_text += " " * (len(y) + 1)
+
+    # Text schreiben
+    print(werte_text)
+    if with_upgrades:
+        print(upgrade_text)
 if __name__ == '__main__':
     # Werte zu den Lehrern als Tabelle zeigen
-    zeige = ["player_health","player_speed","player_rot_speed","power_up_time","weapon_bullet_speed","weapon_lifetime","weapon_rate","weapon_kickback","weapon_spread","weapon_damage","health_pack_amount"]
-    zeige_upgrade = ["weapon_lifetime","weapon_rate","weapon_kickback","weapon_spread","weapon_damage","bullet_count"]
-    with_upgrades = False
+    zeige = ["player_health","player_speed","player_rot_speed","power_up_time","weapon_bullet_speed","weapon_lifetime","weapon_rate","weapon_spread","weapon_damage","health_pack_amount","obstacle_damage"]
+    zeige_upgrade = ["weapon_bullet_speed","weapon_lifetime","weapon_rate","weapon_spread","weapon_damage","bullet_count"]
+    with_upgrades = True
+
+    # Überschriften
     text = "Voller Lehrername "
     for y in zeige:
         text += y + " "
     print(text)
+
+    avg = {'weapon_upgrade':{}}
     for x in LEHRER:
-        text = x
-        upgrade_text = "upgrade"
-        for j in range(len(upgrade_text),len("Voller Lehrername")+1):
-            upgrade_text += " "
-        for j in range(len(x),len("Voller Lehrername")+1):
-            text += " "
-        for y in zeige:
-            text += str(LEHRER[x][y])
-            for i in range(len(str(LEHRER[x][y])),len(y)+1):
-                text += " "
+        print_tabelle(zeige,zeige_upgrade,x,LEHRER[x])
+        for count, y in enumerate(zeige):
+            avg[y] = (avg[y] * count + LEHRER[x][y]) / (count + 1) if y in avg else LEHRER[x][y]
             if y in zeige_upgrade:
-                upgrade_text += str(LEHRER[x]["weapon_upgrade"][y])
-                for i in range(len(str(LEHRER[x]["weapon_upgrade"][y])), len(y) + 1):
-                    upgrade_text += " "
-            else:
-                upgrade_text += " "*(len(y)+1)
-        print(text)
-        if with_upgrades:
-            print(upgrade_text)
+                avg['weapon_upgrade'][y] = (avg[y] * count + LEHRER[x]["weapon_upgrade"][y]) / (count + 1) if y in avg else LEHRER[x]["weapon_upgrade"][y]
+    print_tabelle(zeige,zeige_upgrade,"Schnitt",avg)
