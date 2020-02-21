@@ -1,8 +1,8 @@
 {
-    "No Magic":{
+    "nomagic":{
              "anrede" : "",
+             "name": "No Magic",
              "is_lehrer" : true,
-             "name_in_file_names": "nomagic",
              "personen_item_text" : "Trainierte Augen",
              "personen_beschreibung" : "Läuft barfuß rum und trainiert seine Augen. Kennt die 3 Lösungsverfahren.",
              "player_health" : 120,
@@ -42,10 +42,10 @@
              "bedingungen_fuer_unlock" : null,
              "other_files" : {"frozen_zombie":["Zombie","zombie_frozen.png"],"big_eyes":["Player","Lehrer","player_nomagic_mit_grosse_Augen.png"],"big_eyes_schwamm":["Player","Lehrer","player_nomagic_mit_grosse_Augen_und_Schwamm.png"],"aua":["Sprechblasen","Aua_Sprechblase.png"]}
             },
-    "Écoltes": {
+    "ecoltes": {
              "anrede" : "Monsieur",
+             "name": "Écoltes",
              "is_lehrer" : true,
-             "name_in_file_names": "ecoltes",
              "personen_item_text" : "Gesammelte Pfandflaschen",
              "personen_beschreibung" : "Spricht gerne Französisch und macht Unterricht am Computer. Sammelt Pfandflaschen.",
              "player_health" : 100,
@@ -63,7 +63,7 @@
              "bullet_count" : 1,
              "weapon_upgrade" : {
                  "upgraded_weapon_name" : "Marmeladen Crepe",
-                 "upgrade_bedingungen" : "player.health == LEHRER['Écoltes']['player_health'] and self.werte_since_last_lehrer_change[player]['zombies_killed'] > 5",
+                 "upgrade_bedingungen" : "player.health == LEHRER['ecoltes']['player_health'] and self.werte_since_last_lehrer_change[player]['zombies_killed'] > 5",
                  "unlock_text": "Töte fünf Zombies und habe danach immernoch volles Leben",
                  "weapon_image" : ["bullet_ecoltes_Marmelade.png"],
                  "player_image" : ["player_ecoltes_Marmelade.png"],
@@ -85,10 +85,10 @@
              "bedingungen_fuer_unlock" : null,
              "other_files" : {"zombie_ohren_zu":["Zombie","zombie_ohren_zu.png"],"bonjour":["Sprechblasen","Bonjour_Sprechblase.png"],"aua":["Sprechblasen","Aua_Sprechblase.png"],"zut":["Sprechblasen","Zut_Sprechblase.png"],"player_pfandflasche":["Player","Lehrer","player_ecoltes_Pfandflasche.png"],"player_pfandflasche_marmelade":["Player","Lehrer","player_ecoltes_Pfandflasche_Marmelade.png"]}
     },
-    "Gnatrium": {
+    "gnatrium": {
              "anrede" : "Herr",
+             "name": "Gnatrium",
              "is_lehrer" : true,
-             "name_in_file_names": "gnatrium",
              "personen_item_text" : "Gesagte Gels",
              "personen_beschreibung" : "Schadenfroher Chemielehrer der ständig 'gel' sagt und den Klimawandel leugnet.",
              "player_health" : 130,
@@ -128,10 +128,10 @@
              "bedingungen_fuer_unlock" : null,
              "other_files" : {"aua":["Sprechblasen","Aua_Sprechblase.png"],"blumen_zombie":["Zombie","zombie_blumen.png"],"gaswolke":["Sonstiges","Gas_Wolke.png"]}
     },
-    "Windmauer": {
+    "windmauer": {
              "anrede" : "Frau",
+             "name": "Windmauer",
              "is_lehrer" : true,
-             "name_in_file_names": "windmauer",
              "personen_item_text" : "Korrigierte Abis",
              "personen_beschreibung" : "Deutschlehrerin, die stundenlang reden kann. Mag keine Kommafehler.",
              "player_health" : 80,
@@ -171,10 +171,10 @@
              "bedingungen_fuer_unlock": null,
              "other_files" : {"kommatest":["Sprechblasen","Kommatest_Sprechblase.png"],"abikorrektur":["Sprechblasen","Abikorrektur_Sprechblase.png"],"bla bla bla":["Sprechblasen","Bla_Bla_Bla_Sprechblase.png"],"zzz":["Sprechblasen","zzz.png"]}
     },
-    "Honyoung": {
+    "honyoung": {
              "anrede" : "Herr",
+             "name": "Honyoung",
              "is_lehrer" : true,
-             "name_in_file_names": "honyoung",
              "personen_item_text" : "Beautiful sentences",
              "personen_beschreibung" : "Englisch Lehrer, der Strafarbeiten bei vergessenen Buechern gibt und schöne Sätze mag",
              "player_health" : 125,
@@ -214,10 +214,10 @@
              "bedingungen_fuer_unlock": null,
              "other_files" : {"I love that sentence":["Sprechblasen","I_love_that_sentence_Sprechblase.png"],"fisch":["Sprechblasen","fish_Sprechblase.png"],"be quiet":["Sprechblasen","be_quiet_Sprechblase.png"]}
     },
-    "Wolkenstädle": {
+    "wolkenstaedtle": {
              "anrede" : "Herr",
+             "name": "wolkenstaedtle",
              "is_lehrer" : true,
-             "name_in_file_names": "wolkenstaedtle",
              "personen_item_text" : "Hingesessen",
              "personen_beschreibung" : "Reich verheirateter Geschichtelehrer, der im sitzen unterricht macht.",
              "player_health" : 100,
@@ -257,10 +257,10 @@
              "bedingungen_fuer_unlock": null,
              "other_files" : {"Pferd":["Player","Lehrer","player_wolkenstaedtle_Pferd.png"],"sitzen":["Player","Lehrer","player_wolkenstaedtle_sitzen.png"],"Name?":["Sprechblasen","Name_Sprechblase.png"],"Lenard?":["Sprechblasen","Lenard_Sprechblase.png"]}
     },
-    "To Mathely": {
+    "tomathely": {
              "anrede" : "Herr",
+             "name": "To Mathely",
              "is_lehrer" : true,
-             "name_in_file_names": "tomathely",
              "personen_item_text" : "Gesagte Michels",
              "personen_beschreibung" : "Mathe Lehrer der Aufschriebe am Beamer macht und oft Tabletts benutzt",
              "player_health" : 125,
@@ -300,10 +300,10 @@
              "bedingungen_fuer_unlock": null,
              "other_files" : {"noch nicht abschreiben":["Sprechblasen","noch_nicht_abschreiben_Sprechblase.png"],"Michel":["Sprechblasen","Michel_Sprechblase.png"],"umstellen":["Sprechblasen","umstellen_Sprechblase.png"]}
     },
-    "Gruß": {
+    "gruss": {
              "anrede" : "Frau",
+             "name": "Gruß",
              "is_lehrer" : true,
-             "name_in_file_names": "gruss",
              "personen_item_text" : "Gesammelte Beweiskästchen",
              "personen_beschreibung" : "Mathe und Chemie Lehrerin, die Aufschriebe am Tablett, mit sinkendem Akku trotz Stromanschluss, macht",
              "player_health" : 115,
@@ -343,10 +343,10 @@
              "bedingungen_fuer_unlock": null,
              "other_files" : {"warum laedt des nicht":["Sprechblasen","Warum_laedt_des_nicht_Sprechblase.png"],"bewiesen":["Sprechblasen","bewiesen_Sprechblase.png"],"sind wir zombies": ["Sprechblasen","Sind_wir_Zombies_Sprechblase.png"],"Das haengt von der Definition ab": ["Sprechblasen","Das_haengt_von_der_Definition_ab_Sprechblase.png"],"anderer_zombie":["Player","Lehrer","player_wolkenstaedtle_Pferd.png"]}
     },
-    "Hozler": {
+    "hozler": {
              "anrede" : "Gott",
+             "name": "Hozler",
              "is_lehrer" : true,
-             "name_in_file_names": "hozler",
              "personen_item_text" : "gefundene Götter",
              "personen_beschreibung" : "Lustiger Informatiklehrer, der keine Struktogramme zeichnet. Wird von Gott wiederbelebt.",
              "player_health" : 150,
@@ -386,10 +386,10 @@
              "bedingungen_fuer_unlock": "time() - self.level_start_time > 15",
              "other_files" : {}
     },
-	"Schüler": {
+	"schueler": {
              "anrede" : "",
+             "name": "Schüler",
              "is_lehrer" : false,
-             "name_in_file_names": "schueler",
              "personen_item_text" : "Gehackte Spiele",
              "personen_beschreibung" : "Papierfliegerwerfende Entwickler des Spiels, der keine Struktogramme zeichnet.",
              "player_health" : 180,

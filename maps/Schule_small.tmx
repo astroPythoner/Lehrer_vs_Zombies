@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="40" height="40" tilewidth="64" tileheight="64" infinite="0" nextlayerid="10" nextobjectid="776">
- <tileset firstgid="1" source="../Kenney topview.tsx"/>
+ <tileset firstgid="1" source="../Kenney_topview.tsx"/>
  <layer id="1" name="Ground" width="40" height="40">
   <data encoding="csv">
 502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,502,

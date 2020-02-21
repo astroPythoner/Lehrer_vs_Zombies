@@ -14,7 +14,7 @@ Du kannst jetzt alle Namen, Parameter und Werte verändern:
 
 * anrede: In der Regel "Herr" oder "Frau", kann auch leer bleiben
 * is_lehrer: Für alle Lehrer True, für Schüler False. Schüler spielen im Spiel gegen die Lehrer. Für ein Schüler muss also mindestens ein Lehrer exsistieren
-* name_in_file_names: Name der in den Bild und Sound Datei verwendet wird (oft ohne Leerzeichen und Sonderzeichen, damit es keine Probleme gibt)
+* name: Name desd Lehrers (hier können auch Sonderzeichen verwendet werden, da der eigentliche Name ja auch in den Dateien verwendet wird sollte dieser Leer- und Sonderzeichen los sein)
 * person_item_text: Names des Objektes, das der Spieler einsammeln kann
 * personen_beschreibung: Beschreibe deinen Lehrer kurz
 * player_health: Wie viel Leben der Spieler hat

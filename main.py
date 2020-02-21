@@ -16,12 +16,12 @@ class Game:
         for lehrer in LEHRER:
             for funktionsname in ["power_up_", "object_collect_", "obstacle_", "health_pack_"]:
                 try:
-                    name = "lehrer_funktionen."+funktionsname + LEHRER[lehrer]['name_in_file_names'].replace(" ","_") + "(test=True,player=None,game=None)"
+                    name = "lehrer_funktionen."+funktionsname + lehrer.replace(" ","_") + "(test=True,player=None,game=None)"
                     eval(name)
                 except AttributeError:
                     with open("lehrer_funktionen.py", "a") as file:
                         was_lehrerfunktionen_vollstaendig = False
-                        file.write("\ndef " + funktionsname + LEHRER[lehrer]['name_in_file_names'].replace(" ","_") + "(game, player, test = False):\n    if not test:\n        pass\n")
+                        file.write("\ndef " + funktionsname + lehrer.replace(" ","_") + "(game, player, test = False):\n    if not test:\n        pass\n")
         if not was_lehrerfunktionen_vollstaendig:
             raise Exception("lehrer_funktionen.py war nicht vollstaendig und wurde so weit automatisch vervollstaendigt, dass das Spiel beim nachsten Durchlauf funktionert. Mehr Infos zu den Lehrerfunktionen findest du in der Anleitung zum Spielercharakter erstellen unter dem Punkt Unterprogramme")
         pygame.mixer.pre_init(44100, -16, 4, 2048)
@@ -70,7 +70,7 @@ class Game:
         self.upgraded_weapons_lehrer_namen = []
         self.lehrer_unlocked_last = None
         for lehrer in LEHRER:
-            width = self.get_text_rect(LEHRER[lehrer]["anrede"] + " " + lehrer, self.HUGE_TEXT).width
+            width = self.get_text_rect(LEHRER[lehrer]["anrede"] + " " + LEHRER[lehrer]["name"], self.HUGE_TEXT).width
             if width > self.longest_lehrer_name:
                 self.longest_lehrer_name = width
             width = self.get_text_rect("Waffe: " + str(LEHRER[lehrer]["weapon_name"]), self.SMALL_TEXT, ARIAL_FONT).width
@@ -388,7 +388,7 @@ class Game:
             #                                                     ###############
 
             # Name
-            self.draw_text(surf, LEHRER[lehrer]["anrede"] + " " + lehrer, self.HUGE_TEXT, 15, 15, rect_place="oben_links", color=AUSWAHL_TEXT_COLOR)
+            self.draw_text(surf, LEHRER[lehrer]["anrede"] + " " + LEHRER[lehrer]["name"], self.HUGE_TEXT, 15, 15, rect_place="oben_links", color=AUSWAHL_TEXT_COLOR)
             # Bild des Lehrers
             surf.blit(PLAYER_IMGES[lehrer], (self.longest_lehrer_name + 30, 15))
 
@@ -936,7 +936,7 @@ class Game:
                         for count,player in enumerate(self.players):
                             if MAUS_RIGHT in pressed or pressed[pygame.K_y] or pressed[pygame.K_x] or pressed[pygame.K_c]:
                                 if time()*1000 - self.last_power_up_use_time[count] >= LEHRER[player.lehrer_name]["power_up_time"]:
-                                    eval("lehrer_funktionen.power_up_" + LEHRER[player.lehrer_name]['name_in_file_names'].replace(" ","_") + "(self,player)")
+                                    eval("lehrer_funktionen.power_up_" + player.lehrer_name.replace(" ","_") + "(self,player)")
                                     self.werte_since_last_lehrer_change[player]["num_power_ups"] += 1
                                     if self.spielmodus == TUTORIAL and self.game_status == TUTORIAL_POWER_UP:
                                         self.last_power_up_use_time[count] = round(time() * 1000) - LEHRER[player.lehrer_name]["power_up_time"] + 2500
@@ -1159,7 +1159,7 @@ class Game:
                 if player.health < LEHRER[player.lehrer_name]["player_health"]:
                     hit.kill()
                     player.add_health(LEHRER[player.lehrer_name]["health_pack_amount"])
-                    eval("lehrer_funktionen.health_pack_" + LEHRER[player.lehrer_name]['name_in_file_names'].replace(" ","_") + "(self,player)")
+                    eval("lehrer_funktionen.health_pack_" + player.lehrer_name.replace(" ","_") + "(self,player)")
                     self.werte_since_last_lehrer_change[player]["collected_health_packs"] += 1
 
             # Zombie beruehrt Spieler
@@ -1214,7 +1214,7 @@ class Game:
                     if LEHRER[player.lehrer_name]["obstacle_kill"]:
                         hit.kill()
                     if self.was_on_obstacle_last_time[count] == False:
-                        eval("lehrer_funktionen.obstacle_" + LEHRER[player.lehrer_name]['name_in_file_names'].replace(" ","_") + "(self,player)")
+                        eval("lehrer_funktionen.obstacle_" + player.lehrer_name.replace(" ","_") + "(self,player)")
                         self.werte_since_last_lehrer_change[player]["num_obstacles_stept_on"] += 1
                     self.was_on_obstacle_last_time[count] = True
                 if hits == []:
@@ -1230,7 +1230,7 @@ class Game:
                         self.werte_since_last_lehrer_change[player]["collected_objects"] += 1
                         if LEHRER[player.lehrer_name]["object_kill"]:
                             hit.kill()
-                        eval("lehrer_funktionen.object_collect_" + LEHRER[player.lehrer_name]['name_in_file_names'].replace(" ","_") + "(self,player)")
+                        eval("lehrer_funktionen.object_collect_" + player.lehrer_name.replace(" ","_") + "(self,player)")
                 if hits == []:
                     self.last_personen_object[count] = None
 
@@ -1276,7 +1276,12 @@ class Game:
         time1 = self.make_time_measure()
         for count,camera in enumerate(self.camera):
             # Karte
-            shown_part_of_map = self.map_img.subsurface((camera.inverted.x,camera.inverted.y,self.WIDTH/len(self.players),self.HEIGHT))
+            try:
+                shown_part_of_map = self.map_img.subsurface((camera.inverted.x,camera.inverted.y,self.WIDTH/len(self.players),self.HEIGHT))
+            except ValueError:
+                # Screen size bigger than map
+                self.window_resize(self.map_img.get_width(),self.map_img.get_height())
+                shown_part_of_map = self.map_img.subsurface((camera.inverted.x,camera.inverted.y,self.WIDTH/len(self.players),self.HEIGHT))
             self.screen.blit(shown_part_of_map, (self.WIDTH/len(self.players)*count,0))
 
             # Bildschirm in splitscreen bereiche unterteilen
@@ -1313,29 +1318,32 @@ class Game:
 
             # Kleine Kartenansicht
             if self.schoene_grafik:
-                area_around_player = pygame.Surface((self.small_map_sichtweite,self.small_map_sichtweite))
-                area_around_player.blit(self.map_img.subsurface(camera.player_umgebung.x, camera.player_umgebung.y, self.small_map_sichtweite,self.small_map_sichtweite),(0,0))
-                for zombie in self.zombies:
-                    pygame.draw.rect(area_around_player, SMALL_MAP_ZOMBIE_COLOR, pygame.Rect(int(zombie.pos.x - camera.player_umgebung.x - self.small_map_circle_sizes[0]/2), int(zombie.pos.y - camera.player_umgebung.y - self.small_map_circle_sizes[0]/2), self.small_map_circle_sizes[0], self.small_map_circle_sizes[0]))
-                for player in self.players:
-                    pygame.draw.circle(area_around_player, SMALL_MAP_PLAYER_COLOR, (int(player.pos.x - camera.player_umgebung.x), int(player.pos.y - camera.player_umgebung.y)), self.small_map_circle_sizes[1])
                 try:
-                    pygame.draw.circle(area_around_player, SMALL_MAP_ENDGEGNER_COLOR, (int(self.end_gegner.pos.x - camera.player_umgebung.x), int(self.end_gegner.pos.y - camera.player_umgebung.y)), self.small_map_circle_sizes[2])
-                except AttributeError:
-                    pass
-                area_around_player = pygame.transform.scale(area_around_player, (self.small_map_size,self.small_map_size))
-                area_around_player.set_alpha(180)
-                area_around_player.convert_alpha()
-                if self.multiplayer:
-                    if count == 1:
-                        self.screen.blit(area_around_player, (self.WIDTH - 15 - self.small_map_size, self.HEIGHT - 30 - self.HEIGHT*0.02 - 15 - self.BIG_TEXT - self.small_map_size))
-                        pygame.draw.rect(self.screen, BLACK, pygame.Rect(self.WIDTH - 15 - self.small_map_size, self.HEIGHT - 30 - self.HEIGHT*0.02 - 15 - self.BIG_TEXT - self.small_map_size, self.small_map_size, self.small_map_size), 3)
+                    area_around_player = pygame.Surface((self.small_map_sichtweite,self.small_map_sichtweite))
+                    area_around_player.blit(self.map_img.subsurface(camera.player_umgebung.x, camera.player_umgebung.y, self.small_map_sichtweite,self.small_map_sichtweite),(0,0))
+                    for zombie in self.zombies:
+                        pygame.draw.rect(area_around_player, SMALL_MAP_ZOMBIE_COLOR, pygame.Rect(int(zombie.pos.x - camera.player_umgebung.x - self.small_map_circle_sizes[0]/2), int(zombie.pos.y - camera.player_umgebung.y - self.small_map_circle_sizes[0]/2), self.small_map_circle_sizes[0], self.small_map_circle_sizes[0]))
+                    for player in self.players:
+                        pygame.draw.circle(area_around_player, SMALL_MAP_PLAYER_COLOR, (int(player.pos.x - camera.player_umgebung.x), int(player.pos.y - camera.player_umgebung.y)), self.small_map_circle_sizes[1])
+                    try:
+                        pygame.draw.circle(area_around_player, SMALL_MAP_ENDGEGNER_COLOR, (int(self.end_gegner.pos.x - camera.player_umgebung.x), int(self.end_gegner.pos.y - camera.player_umgebung.y)), self.small_map_circle_sizes[2])
+                    except AttributeError:
+                        pass
+                    area_around_player = pygame.transform.scale(area_around_player, (self.small_map_size,self.small_map_size))
+                    area_around_player.set_alpha(180)
+                    area_around_player.convert_alpha()
+                    if self.multiplayer:
+                        if count == 1:
+                            self.screen.blit(area_around_player, (self.WIDTH - 15 - self.small_map_size, self.HEIGHT - 30 - self.HEIGHT*0.02 - 15 - self.BIG_TEXT - self.small_map_size))
+                            pygame.draw.rect(self.screen, BLACK, pygame.Rect(self.WIDTH - 15 - self.small_map_size, self.HEIGHT - 30 - self.HEIGHT*0.02 - 15 - self.BIG_TEXT - self.small_map_size, self.small_map_size, self.small_map_size), 3)
+                        else:
+                            self.screen.blit(area_around_player, (15                         , self.HEIGHT - 30 - self.HEIGHT*0.02 - 15 - self.BIG_TEXT - self.small_map_size))
+                            pygame.draw.rect(self.screen, BLACK, pygame.Rect(15 , self.HEIGHT - 30 - self.HEIGHT*0.02 - 15 - self.BIG_TEXT - self.small_map_size, self.small_map_size, self.small_map_size), 3)
                     else:
-                        self.screen.blit(area_around_player, (15                         , self.HEIGHT - 30 - self.HEIGHT*0.02 - 15 - self.BIG_TEXT - self.small_map_size))
-                        pygame.draw.rect(self.screen, BLACK, pygame.Rect(15 , self.HEIGHT - 30 - self.HEIGHT*0.02 - 15 - self.BIG_TEXT - self.small_map_size, self.small_map_size, self.small_map_size), 3)
-                else:
-                    self.screen.blit(area_around_player,     (self.WIDTH - 15 - self.small_map_size, self.HEIGHT - 20               - 15 - self.BIG_TEXT - self.small_map_size))
-                    pygame.draw.rect(self.screen,BLACK,pygame.Rect(self.WIDTH - 15 - self.small_map_size, self.HEIGHT - 20 - 15 - self.BIG_TEXT - self.small_map_size,self.small_map_size,self.small_map_size),3)
+                        self.screen.blit(area_around_player,     (self.WIDTH - 15 - self.small_map_size, self.HEIGHT - 20               - 15 - self.BIG_TEXT - self.small_map_size))
+                        pygame.draw.rect(self.screen,BLACK,pygame.Rect(self.WIDTH - 15 - self.small_map_size, self.HEIGHT - 20 - 15 - self.BIG_TEXT - self.small_map_size,self.small_map_size,self.small_map_size),3)
+                except Exception:
+                    pass
         time2 = self.make_time_measure()
         # Im splitscreen schwarze Linie an den Raendern zwischen den einzelnen Screens
         if self.multiplayer:
@@ -1485,9 +1493,9 @@ class Game:
 
         # Texte zum Lehrer
         if self.multiplayer and player_num >= self.num_players_in_multiplayer/2:
-            self.draw_text(surface, LEHRER[player.lehrer_name]["anrede"] + " " + player.lehrer_name, self.NORMAL_TEXT, bild_breite - 0.6805 * self.live_bar_img_width, 0.165 * self.live_bar_img_height,rect_place="oben_rechts")
+            self.draw_text(surface, LEHRER[player.lehrer_name]["anrede"] + " " + LEHRER[player.lehrer_name]["name"], self.NORMAL_TEXT, bild_breite - 0.6805 * self.live_bar_img_width, 0.165 * self.live_bar_img_height,rect_place="oben_rechts")
         else:
-            self.draw_text(surface, LEHRER[player.lehrer_name]["anrede"] + " " + player.lehrer_name, self.NORMAL_TEXT, 0.6805 * self.live_bar_img_width, 0.165 * self.live_bar_img_height, rect_place="oben_links")
+            self.draw_text(surface, LEHRER[player.lehrer_name]["anrede"] + " " + LEHRER[player.lehrer_name]["name"], self.NORMAL_TEXT, 0.6805 * self.live_bar_img_width, 0.165 * self.live_bar_img_height, rect_place="oben_links")
         # Beschreibung umbrechen und dann jede Zeile einzeln zeichnen
         beschreibungs_texte = [""]
         array_num = 0

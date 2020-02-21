@@ -3,7 +3,7 @@ from os import path, listdir
 import json
 vec = pygame.math.Vector2
 
-version = "2.1.1"
+version = "2.2.0"
 
 # Bildschrimgroesse
 start_width = 480*2 #1600
@@ -185,13 +185,12 @@ def bilder_fuer_jeden_lehrer_laden(pfad,file_name_ohne_lehrer_name_hinten,dict_k
     return_dict = {}
     for lehrer in LEHRER:
         dict = LEHRER[lehrer]
-        lehrer_name_in_file = dict["name_in_file_names"]
         for dict_key in dict_keys:
             dict = dict[dict_key]
         if (nur_von_is_lehrer and dict["is_lehrer"]) or not nur_von_is_lehrer:
             if dict_with_img_and_icon:
-                return_dict[lehrer] = {"img": pygame.image.load(path.join(pfad, file_name_ohne_lehrer_name_hinten + lehrer_name_in_file + ".png")).convert_alpha(),
-                                       "icon": pygame.image.load(path.join(pfad, file_name_ohne_lehrer_name_hinten + "icon_" + lehrer_name_in_file + ".png")).convert_alpha()}
+                return_dict[lehrer] = {"img": pygame.image.load(path.join(pfad, file_name_ohne_lehrer_name_hinten + lehrer + ".png")).convert_alpha(),
+                                       "icon": pygame.image.load(path.join(pfad, file_name_ohne_lehrer_name_hinten + "icon_" + lehrer + ".png")).convert_alpha()}
             else:
                 if convert_alpha:
                     if check_for_automatisch != "":
@@ -200,11 +199,11 @@ def bilder_fuer_jeden_lehrer_laden(pfad,file_name_ohne_lehrer_name_hinten,dict_k
                             for element in dict[check_for_automatisch]:
                                 return_dict[lehrer][element] = pygame.image.load(path.join(pfad,element)).convert_alpha()
                         else:
-                            return_dict[lehrer] = pygame.image.load(path.join(pfad, file_name_ohne_lehrer_name_hinten + lehrer_name_in_file + ".png")).convert_alpha()
+                            return_dict[lehrer] = pygame.image.load(path.join(pfad, file_name_ohne_lehrer_name_hinten + lehrer + ".png")).convert_alpha()
                     else:
-                        return_dict[lehrer] = pygame.image.load(path.join(pfad, file_name_ohne_lehrer_name_hinten + lehrer_name_in_file + ".png")).convert_alpha()
+                        return_dict[lehrer] = pygame.image.load(path.join(pfad, file_name_ohne_lehrer_name_hinten + lehrer + ".png")).convert_alpha()
                 else:
-                    return_dict[lehrer] = pygame.image.load(path.join(pfad, file_name_ohne_lehrer_name_hinten + lehrer_name_in_file + ".png"))
+                    return_dict[lehrer] = pygame.image.load(path.join(pfad, file_name_ohne_lehrer_name_hinten + lehrer + ".png"))
     return return_dict
 
 PLAYER_IMGES = bilder_fuer_jeden_lehrer_laden(join_paths([img_folder,"Player","Lehrer"]),"player_")
@@ -253,7 +252,7 @@ for lehrer in LEHRER:
     if LEHRER[lehrer]["obstacle_richtungsabhaengig"]:
         dict = {}
         for richtung in ["NS","NS_begin","NS_end","OW","OW_begin","OW_end"]:
-            dict[richtung] = pygame.image.load(join_paths([img_folder,"Objects","Obstacles","obstacle_"+LEHRER[lehrer]["name_in_file_names"]+"_"+richtung+".png"])).convert_alpha()
+            dict[richtung] = pygame.image.load(join_paths([img_folder,"Objects","Obstacles","obstacle_"+lehrer+"_"+richtung+".png"])).convert_alpha()
         LEHRER[lehrer]["richtungsabhaengige_bilder"] = dict
 
 # restliche Dateien der einzelnen Lehrer laden
@@ -268,7 +267,7 @@ pygame.mixer.music.set_volume(game_music_volume)
 def sounds_fuer_jeden_lehrer_laden(pfad,file_name_ohne_lehrer_name_hinten,volume = game_sound_volume):
     return_dict = {}
     for lehrer in LEHRER:
-        s = pygame.mixer.Sound(path.join(pfad,file_name_ohne_lehrer_name_hinten + LEHRER[lehrer]["name_in_file_names"] + ".wav"))
+        s = pygame.mixer.Sound(path.join(pfad,file_name_ohne_lehrer_name_hinten + lehrer + ".wav"))
         s.set_volume(volume)
         return_dict[lehrer] = s
     return return_dict
