@@ -1499,9 +1499,9 @@ class Game:
 
         # Texte zum Lehrer
         if self.multiplayer and player_num >= self.num_players_in_multiplayer / 2:
-            self.draw_text(surface, LEHRER[player.lehrer_name]["anrede"] + " " + LEHRER[player.lehrer_name]["name"], self.NORMAL_TEXT, int(bild_breite - 0.6805 * self.live_bar_img_width, 0.165 * self.live_bar_img_height), rect_place="oben_rechts")
+            self.draw_text(surface, LEHRER[player.lehrer_name]["anrede"] + " " + LEHRER[player.lehrer_name]["name"], self.NORMAL_TEXT, int(bild_breite - 0.6805 * self.live_bar_img_width), int(0.165 * self.live_bar_img_height), rect_place="oben_rechts")
         else:
-            self.draw_text(surface, LEHRER[player.lehrer_name]["anrede"] + " " + LEHRER[player.lehrer_name]["name"], self.NORMAL_TEXT, int(0.6805 * self.live_bar_img_width, 0.165 * self.live_bar_img_height), rect_place="oben_links")
+            self.draw_text(surface, LEHRER[player.lehrer_name]["anrede"] + " " + LEHRER[player.lehrer_name]["name"], self.NORMAL_TEXT, int(0.6805 * self.live_bar_img_width), int(0.165 * self.live_bar_img_height), rect_place="oben_links")
         # Beschreibung umbrechen und dann jede Zeile einzeln zeichnen
         beschreibungs_texte = [""]
         array_num = 0
@@ -1512,9 +1512,9 @@ class Game:
                 beschreibungs_texte.append("")
         for count, text in enumerate(beschreibungs_texte):
             if self.multiplayer and player_num >= self.num_players_in_multiplayer / 2:
-                self.draw_text(surface, beschreibungs_texte[count], self.SMALL_TEXT, int(bild_breite - 0.569444 * self.live_bar_img_width, 0.2 * self.live_bar_img_height + self.NORMAL_TEXT + count * (self.SMALL_TEXT + 5)), rect_place="oben_rechts", font_name=ARIAL_FONT, color=BLACK)
+                self.draw_text(surface, beschreibungs_texte[count], self.SMALL_TEXT, int(bild_breite - 0.569444 * self.live_bar_img_width), int(0.2 * self.live_bar_img_height + self.NORMAL_TEXT + count * (self.SMALL_TEXT + 5)), rect_place="oben_rechts", font_name=ARIAL_FONT, color=BLACK)
             else:
-                self.draw_text(surface, beschreibungs_texte[count], self.SMALL_TEXT, int(0.569444 * self.live_bar_img_width, 0.2 * self.live_bar_img_height + self.NORMAL_TEXT + count * (self.SMALL_TEXT + 5)), rect_place="oben_links", font_name=ARIAL_FONT, color=BLACK)
+                self.draw_text(surface, beschreibungs_texte[count], self.SMALL_TEXT, int(0.569444 * self.live_bar_img_width), int(0.2 * self.live_bar_img_height + self.NORMAL_TEXT + count * (self.SMALL_TEXT + 5)), rect_place="oben_links", font_name=ARIAL_FONT, color=BLACK)
 
         self.live_bar_images[player_num] = surface
 
@@ -1598,7 +1598,7 @@ class Game:
                         else:
                             pct = ((self.level_start_num_zombies - len(self.zombies)) / self.level_start_num_zombies) / 3 + (self.num_zombie_wave - 1) / 3
             # Rechteck zeichnen
-            pygame.draw.rect(self.screen, LEVEL_FORTSCHRITTS_FARBE, pygame.Rect((15, self.HEIGHT - 20 - self.level_bar_height), (int(pct * self.level_bar_lenght), self.level_bar_height)), 0)
+            pygame.draw.rect(self.screen, LEVEL_FORTSCHRITTS_FARBE, pygame.Rect((15, int(self.HEIGHT - 20 - self.level_bar_height)), (int(pct * self.level_bar_lenght), int(self.level_bar_height))), 0)
 
     def quit(self):
         if self.measure_times:
