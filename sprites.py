@@ -6,7 +6,9 @@ import pytweening as tween
 from itertools import chain
 from time import time
 from math import sin, sqrt
+
 vec = pygame.math.Vector2
+
 
 def collide_with_obstacles(sprite, group, dir):
     if dir == 'x':
@@ -37,6 +39,7 @@ def collide_with_obstacles(sprite, group, dir):
             return True
     return False
 
+
 class Player(pygame.sprite.Sprite):
     def __init__(self, game, x, y, lehrer_name, player_num):
         self._layer = PLAYER_LAYER
@@ -65,7 +68,7 @@ class Player(pygame.sprite.Sprite):
         self.image_on_player_start_time = time() * 1000
         self.image_on_player_duration_time = 0
         self.image_to_place_on = pygame.Surface((10, 10))
-        self.image_verschiebung = (0,0)
+        self.image_verschiebung = (0, 0)
         self.in_image_on_player = False
 
     def move_player(self):
@@ -75,7 +78,7 @@ class Player(pygame.sprite.Sprite):
 
             if pygame.key.get_pressed()[pygame.K_LSHIFT] or pygame.mouse.get_pressed()[1]:
                 richtung = 0
-                winkel_diff = (maus_pos - mitte).angle_to(vec(1,0).rotate(-self.rot))
+                winkel_diff = (maus_pos - mitte).angle_to(vec(1, 0).rotate(-self.rot))
                 if winkel_diff < 0:
                     winkel_diff += 360
                 if winkel_diff <= 90 or winkel_diff >= 270:
@@ -84,12 +87,12 @@ class Player(pygame.sprite.Sprite):
                     richtung = -0.3
 
                 distance = (maus_pos - mitte).length()
-                if distance < self.game.maussteuerung_circle_radius/4:
-                    self.vel = vec(0,0)
+                if distance < self.game.maussteuerung_circle_radius / 4:
+                    self.vel = vec(0, 0)
                 elif distance < self.game.maussteuerung_circle_radius:
-                    self.vel = vec(richtung*(distance / self.game.maussteuerung_circle_radius * (LEHRER[self.lehrer_name]["player_speed"]-40)),0).rotate(-self.rot)
+                    self.vel = vec(richtung * (distance / self.game.maussteuerung_circle_radius * (LEHRER[self.lehrer_name]["player_speed"] - 40)), 0).rotate(-self.rot)
                 else:
-                    self.vel = vec(richtung*(LEHRER[self.lehrer_name]["player_speed"]-40),0).rotate(-self.rot)
+                    self.vel = vec(richtung * (LEHRER[self.lehrer_name]["player_speed"] - 40), 0).rotate(-self.rot)
 
                 self.pos += self.vel * self.game.dt
 
@@ -97,17 +100,17 @@ class Player(pygame.sprite.Sprite):
                 desired = (maus_pos - mitte).normalize()
                 distance = (maus_pos - mitte).length()
                 if distance < self.game.maussteuerung_circle_radius:
-                    desired *= distance / self.game.maussteuerung_circle_radius * (LEHRER[self.lehrer_name]["player_speed"]-40)
+                    desired *= distance / self.game.maussteuerung_circle_radius * (LEHRER[self.lehrer_name]["player_speed"] - 40)
                 else:
-                    desired *= (LEHRER[self.lehrer_name]["player_speed"]-40)
+                    desired *= (LEHRER[self.lehrer_name]["player_speed"] - 40)
                 steer = (desired - self.vel)
-                if steer.length() > (LEHRER[self.lehrer_name]["player_rot_speed"]/10):
-                    steer.scale_to_length((LEHRER[self.lehrer_name]["player_rot_speed"]/10))
+                if steer.length() > (LEHRER[self.lehrer_name]["player_rot_speed"] / 10):
+                    steer.scale_to_length((LEHRER[self.lehrer_name]["player_rot_speed"] / 10))
 
                 self.vel += steer
 
-                if self.vel.length() > (LEHRER[self.lehrer_name]["player_speed"]-40):
-                    self.vel.scale_to_length((LEHRER[self.lehrer_name]["player_speed"]-40))
+                if self.vel.length() > (LEHRER[self.lehrer_name]["player_speed"] - 40):
+                    self.vel.scale_to_length((LEHRER[self.lehrer_name]["player_speed"] - 40))
 
                 self.rot = -self.vel.as_polar()[1]
 
@@ -150,8 +153,8 @@ class Player(pygame.sprite.Sprite):
                     spread = uniform(-LEHRER[self.lehrer_name]["weapon_spread"], LEHRER[self.lehrer_name]["weapon_spread"])
                 damage = LEHRER[self.lehrer_name]["weapon_damage"]
                 if self.weapon_upgrade_unlocked:
-                    damage =LEHRER[self.lehrer_name]["weapon_upgrade"]["weapon_damage"]
-                Bullet(self.game, pos, dir.rotate(spread), damage,self.rot, self)
+                    damage = LEHRER[self.lehrer_name]["weapon_upgrade"]["weapon_damage"]
+                Bullet(self.game, pos, dir.rotate(spread), damage, self.rot, self)
                 snd = WEAPON_WAVS[self.lehrer_name]
                 if snd.get_num_channels() > 2:
                     snd.stop()
@@ -176,10 +179,10 @@ class Player(pygame.sprite.Sprite):
         self.hit_rect.centery = self.pos.y
         collide_with_obstacles(self, self.game.obstacles, 'y')
         self.rect.center = self.hit_rect.center
-        if self.image_change_start_time + self.image_change_duration_time <= time()*1000 and self.in_other_image:
+        if self.image_change_start_time + self.image_change_duration_time <= time() * 1000 and self.in_other_image:
             self.update_image()
             self.in_other_image = False
-        if self.image_on_player_start_time + self.image_on_player_duration_time <= time()*1000 and self.in_image_on_player:
+        if self.image_on_player_start_time + self.image_on_player_duration_time <= time() * 1000 and self.in_image_on_player:
             self.update_image()
             self.in_image_on_player = False
             # Das auf den Spieler zu zeichnende Bild wird nach zeichnen der Karte und Figuren in der Funktion draw_display im main.py auf den screen gezeichnet
@@ -191,7 +194,7 @@ class Player(pygame.sprite.Sprite):
 
     def update_image(self):
         if self.weapon_upgrade_unlocked:
-            if isinstance(UPGRADE_PLAYER_IMGES[self.lehrer_name],type(dict)):
+            if isinstance(UPGRADE_PLAYER_IMGES[self.lehrer_name], type(dict)):
                 self.orig_image = UPGRADE_PLAYER_IMGES[self.lehrer_name][list(UPGRADE_PLAYER_IMGES[self.lehrer_name])[0]]
             else:
                 self.orig_image = UPGRADE_PLAYER_IMGES[self.lehrer_name]
@@ -210,12 +213,13 @@ class Player(pygame.sprite.Sprite):
         self.image_change_duration_time = time_in_millis
         self.in_other_image = True
 
-    def place_img_on_player_for_given_time(self,img,time_in_millis,x_verschiebung=0,y_verschiebung=0):
+    def place_img_on_player_for_given_time(self, img, time_in_millis, x_verschiebung=0, y_verschiebung=0):
         self.image_to_place_on = img
         self.image_verschiebung = (x_verschiebung, y_verschiebung)
         self.image_on_player_start_time = time() * 1000
         self.image_on_player_duration_time = time_in_millis
         self.in_image_on_player = True
+
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, game, pos, dir, damage, rot, player):
@@ -233,12 +237,12 @@ class Bullet(pygame.sprite.Sprite):
             self.image = bullet_image[choice(list(bullet_image))]
         else:
             self.image = bullet_image
-        self.image = pygame.transform.rotate(self.image,rot)
+        self.image = pygame.transform.rotate(self.image, rot)
         self.rect = self.image.get_rect()
         self.hit_rect = self.rect
         self.pos = vec(pos)
         self.rect.center = pos
-        #spread = uniform(-GUN_SPREAD, GUN_SPREAD)
+        # spread = uniform(-GUN_SPREAD, GUN_SPREAD)
         if player.weapon_upgrade_unlocked:
             self.vel = dir * LEHRER[player.lehrer_name]['weapon_upgrade']['weapon_bullet_speed'] * uniform(0.9, 1.1)
         else:
@@ -258,25 +262,27 @@ class Bullet(pygame.sprite.Sprite):
             if pygame.time.get_ticks() - self.spawn_time > LEHRER[self.player.lehrer_name]['weapon_lifetime']:
                 self.kill()
 
+
 class Grab(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, time_until_getting_zombie = 6000):
+    def __init__(self, game, x, y, time_until_getting_zombie=6000):
         self._layer = 2
         self.groups = game.all_sprites
         self.game = game
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.image = GRAB_IMG
         self.rect = self.image.get_rect()
-        self.rect.center = (x,y)
+        self.rect.center = (x, y)
         self.spawn_time = time() * 1000
         self.time_until_zombie = time_until_getting_zombie
 
     def update(self):
-        if time()*1000 - self.spawn_time > self.time_until_zombie:
+        if time() * 1000 - self.spawn_time > self.time_until_zombie:
             self.kill()
-            Mob(self.game, self.rect.centerx,self.rect.centery)
+            Mob(self.game, self.rect.centerx, self.rect.centery)
+
 
 class Mob(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, health = MOB_HEALTH, from_endgegner = False):
+    def __init__(self, game, x, y, health=MOB_HEALTH, from_endgegner=False):
         self._layer = MOB_LAYER
         if from_endgegner:
             self.groups = game.all_sprites, game.zombies, game.endgegner_zombies
@@ -287,14 +293,14 @@ class Mob(pygame.sprite.Sprite):
         self.game = game
         self.from_endgegner = from_endgegner
         self.image = []
-        for count,player in enumerate(self.game.players):
+        for count, player in enumerate(self.game.players):
             if LEHRER[player.lehrer_name]["is_lehrer"] or from_endgegner:
                 self.image.append(MOB_IMG.copy())
             else:
                 self.image.append(choice(list(LEHRER_IMGES.values())).copy())
         self.orig_image = []
         self.do_not_change_image = []
-        for count,image in enumerate(self.image):
+        for count, image in enumerate(self.image):
             self.orig_image.append(image)
             self.do_not_change_image.append(image)
             self.image[count] = pygame.transform.rotate(image, 0)
@@ -319,7 +325,7 @@ class Mob(pygame.sprite.Sprite):
         else:
             self.target = self.game.players[0]
         self.last_traget_change = 0
-        self.image_change_start_time = time()*1000
+        self.image_change_start_time = time() * 1000
         self.image_change_duration_time = 0
         self.in_other_image = False
         self.stand_still_during_time = False
@@ -341,37 +347,37 @@ class Mob(pygame.sprite.Sprite):
     def update(self):
         if False in self.game.paused:
             if self.in_other_image and self.damage_during_time > 0:
-                 damage = int((((time()*1000 - self.image_change_start_time) / self.image_change_duration_time) * self.damage_during_time) - self.damage_so_far)
-                 self.damage_so_far += damage
-                 self.health -= damage
+                damage = int((((time() * 1000 - self.image_change_start_time) / self.image_change_duration_time) * self.damage_during_time) - self.damage_so_far)
+                self.damage_so_far += damage
+                self.health -= damage
             if ((self.stand_still_during_time and not self.in_other_image) or not self.stand_still_during_time):
                 if self.target != None:
                     target_dist = self.target.pos - self.pos
-                    if target_dist.length_squared() < self.detect_radius**2:
-                            # In Richtung target laufen
-                            if random() < 0.002:
-                                choice(ZOMBIE_WAVS).play()
-                            self.rot = target_dist.angle_to(vec(1, 0))
-                            for count,player in enumerate(self.game.players):
-                                self.image[count] = pygame.transform.rotate(self.orig_image[count], self.rot)
-                            self.rect.center = self.pos
+                    if target_dist.length_squared() < self.detect_radius ** 2:
+                        # In Richtung target laufen
+                        if random() < 0.002:
+                            choice(ZOMBIE_WAVS).play()
+                        self.rot = target_dist.angle_to(vec(1, 0))
+                        for count, player in enumerate(self.game.players):
+                            self.image[count] = pygame.transform.rotate(self.orig_image[count], self.rot)
+                        self.rect.center = self.pos
+                        self.acc = vec(1, 0).rotate(-self.rot)
+                        self.avoid_mobs()
+                        try:
+                            self.acc.scale_to_length(self.speed)
+                        except ValueError:
                             self.acc = vec(1, 0).rotate(-self.rot)
-                            self.avoid_mobs()
-                            try:
-                                self.acc.scale_to_length(self.speed)
-                            except ValueError:
-                                self.acc = vec(1, 0).rotate(-self.rot)
-                                self.acc.scale_to_length(self.speed)
-                            if not (self.game.spielmodus == TUTORIAL and (self.game.game_status == TUTORIAL_WALK or self.game.game_status == TUTORIAL_COLLECT or self.game.game_status == TUTORIAL_SHOOT)):
-                                # bewegen
-                                self.acc += self.vel * -1
-                                self.vel += self.acc * self.game.dt
-                                self.pos += self.vel * self.game.dt + 0.5 * self.acc * self.game.dt ** 2
-                                self.hit_rect.centerx = self.pos.x
-                                collide_with_obstacles(self, self.game.obstacles, 'x')
-                                self.hit_rect.centery = self.pos.y
-                                collide_with_obstacles(self, self.game.obstacles, 'y')
-                                self.rect.center = self.hit_rect.center
+                            self.acc.scale_to_length(self.speed)
+                        if not (self.game.spielmodus == TUTORIAL and (self.game.game_status == TUTORIAL_WALK or self.game.game_status == TUTORIAL_COLLECT or self.game.game_status == TUTORIAL_SHOOT)):
+                            # bewegen
+                            self.acc += self.vel * -1
+                            self.vel += self.acc * self.game.dt
+                            self.pos += self.vel * self.game.dt + 0.5 * self.acc * self.game.dt ** 2
+                            self.hit_rect.centerx = self.pos.x
+                            collide_with_obstacles(self, self.game.obstacles, 'x')
+                            self.hit_rect.centery = self.pos.y
+                            collide_with_obstacles(self, self.game.obstacles, 'y')
+                            self.rect.center = self.hit_rect.center
                     else:
                         # target nichtmehr in der Naehe, neues target wird gesucht
                         if self.game.multiplayer:
@@ -389,7 +395,7 @@ class Mob(pygame.sprite.Sprite):
                             if target_dist < last_entfernung:
                                 last_entfernung = target_dist
                                 self.target = player
-                    self.last_traget_change = time() + randrange(-TARGET_CHANGE_TIME_RANDOM,TARGET_CHANGE_TIME_RANDOM)
+                    self.last_traget_change = time() + randrange(-TARGET_CHANGE_TIME_RANDOM, TARGET_CHANGE_TIME_RANDOM)
             if self.health <= 0:
                 choice(ZOMBIE_HIT_WAVS).play()
                 self.kill()
@@ -400,16 +406,16 @@ class Mob(pygame.sprite.Sprite):
                         self.game.map_img.blit(SPLAT, self.pos - vec(32, 32))
                     else:
                         self.game.map_img.blit(RED_SPLAT, self.pos - vec(32, 32))
-        if self.image_change_start_time + self.image_change_duration_time <= time()*1000 and self.in_other_image:
+        if self.image_change_start_time + self.image_change_duration_time <= time() * 1000 and self.in_other_image:
             self.update_image(True)
             self.in_other_image = False
-        if self.image_on_player_start_time + self.image_on_player_duration_time <= time()*1000 and self.in_image_on_mob:
+        if self.image_on_player_start_time + self.image_on_player_duration_time <= time() * 1000 and self.in_image_on_mob:
             self.update_image(True)
             self.in_image_on_mob = False
             # Das auf den Zombie zu zeichnende Bild wird nach zeichnen der Karte und Figuren in der Funktion draw_display im main.py auf den screen gezeichnet
 
     def draw_health(self):
-        for count in range(0,len(self.game.players)):
+        for count in range(0, len(self.game.players)):
             if self.in_other_image and self.stand_still_during_time:
                 self.image[count] = pygame.transform.rotate(self.orig_image[count], self.rot)
             self.rect.center = self.hit_rect.center
@@ -424,8 +430,8 @@ class Mob(pygame.sprite.Sprite):
             if self.health < self.start_health:
                 pygame.draw.rect(self.image[count], col, self.health_bar)
 
-    def update_image(self, bleibe_der_selbe_lehrer = False):
-        for count,player in enumerate(self.game.players):
+    def update_image(self, bleibe_der_selbe_lehrer=False):
+        for count, player in enumerate(self.game.players):
             if LEHRER[player.lehrer_name]["is_lehrer"] or self.from_endgegner:
                 self.image[count] = MOB_IMG.copy()
                 self.orig_image[count] = self.image[count]
@@ -442,8 +448,8 @@ class Mob(pygame.sprite.Sprite):
             self.image[count] = pygame.transform.rotate(self.orig_image[count], self.rot)
             self.rect.center = self.hit_rect.center
 
-    def change_img_for_given_time(self,image=None,time_is_millis=0, stand_still_during_time=False,damge_during_time = 0):
-        for player_num in range(0,len(self.game.players)):
+    def change_img_for_given_time(self, image=None, time_is_millis=0, stand_still_during_time=False, damge_during_time=0):
+        for player_num in range(0, len(self.game.players)):
             if image != None:
                 self.image[player_num] = image
                 self.orig_image[player_num] = self.image[player_num]
@@ -457,12 +463,13 @@ class Mob(pygame.sprite.Sprite):
             self.damage_so_far = 0
             self.in_other_image = True
 
-    def place_img_on_zombie_for_given_time(self,img,time_in_millis,x_verschiebung=0,y_verschiebung=0):
+    def place_img_on_zombie_for_given_time(self, img, time_in_millis, x_verschiebung=0, y_verschiebung=0):
         self.image_to_place_on = img
         self.image_verschiebung = (x_verschiebung, y_verschiebung)
         self.image_on_player_start_time = time() * 1000
         self.image_on_player_duration_time = time_in_millis
         self.in_image_on_mob = True
+
 
 class End_Gegner(pygame.sprite.Sprite):
     def __init__(self, game):
@@ -480,9 +487,9 @@ class End_Gegner(pygame.sprite.Sprite):
         self.rot = 0
         # Leben
         if self.game.multiplayer:
-            self.health = ENDGEGNER_HEALTH_MULTIPLAYER[self.game.schwierigkeit-1]
+            self.health = ENDGEGNER_HEALTH_MULTIPLAYER[self.game.schwierigkeit - 1]
         else:
-            self.health = ENDGEGNER_HEALTH[self.game.schwierigkeit-1]
+            self.health = ENDGEGNER_HEALTH[self.game.schwierigkeit - 1]
         self.alive = True
         # Am Anfang den 5 sekunden countdown abwarten
         self.spawn_time = time()
@@ -495,7 +502,7 @@ class End_Gegner(pygame.sprite.Sprite):
         # Zombies endsenden
         self.last_zombie = 0
         self.num_zomies = 0
-        self.zombie_rate = (ENDGEGNER_MOUDS_TIMES[ZOMBIE]/(ENDGEGNER_NUM_ZOMBIES-1)) - 150
+        self.zombie_rate = (ENDGEGNER_MOUDS_TIMES[ZOMBIE] / (ENDGEGNER_NUM_ZOMBIES - 1)) - 150
         # Laufen und springen
         self.last_jump = 0
         self.next_pos = choice(self.game.endgegner_jump_points)
@@ -508,21 +515,21 @@ class End_Gegner(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.hit_rect = self.rect
             self.rect.center = self.pos
-            if random() < 0.005 and len(self.game.zombies) < MAXIMAL_NUM_ENDGEGNER_ZOMBIES[self.game.schwierigkeit-1] + MAXIMAL_NUM_EXTRA_ZOMBIES - 1:
+            if random() < 0.005 and len(self.game.zombies) < MAXIMAL_NUM_ENDGEGNER_ZOMBIES[self.game.schwierigkeit - 1] + MAXIMAL_NUM_EXTRA_ZOMBIES - 1:
                 zombie_orte = []
                 for tile_object in self.game.map.tmxdata.objects:
-                    obj_center = vec(tile_object.x + tile_object.width / 2,tile_object.y + tile_object.height / 2)
+                    obj_center = vec(tile_object.x + tile_object.width / 2, tile_object.y + tile_object.height / 2)
                     if tile_object.name == 'zombie':
                         zombie_orte.append([obj_center.x, obj_center.y])
                 random_ort = choice(zombie_orte)
-                Grab(self.game,random_ort[0],random_ort[1],2500)
+                Grab(self.game, random_ort[0], random_ort[1], 2500)
 
     def change_modus(self):
         now = time() * 1000
         if self.modus == None:
             if now - self.last_modus_wechsel > ENDGEGNER_MODUS_WECHSEL_TIME:
                 self.last_modus_wechsel = time() * 1000
-                self.modus = ENDGEGNER_MODUS_REIHENFOLGE[(self.modus_index + 1)%len(ENDGEGNER_MODUS_REIHENFOLGE)]
+                self.modus = ENDGEGNER_MODUS_REIHENFOLGE[(self.modus_index + 1) % len(ENDGEGNER_MODUS_REIHENFOLGE)]
                 self.modus_index += 1
                 self.last_shot = 0
                 self.last_zombie = 0
@@ -540,15 +547,15 @@ class End_Gegner(pygame.sprite.Sprite):
             if now - self.last_shot > ENDGEGNER_SHOOT_RATE:
                 self.last_shot = now
                 dir = vec(1, 0).rotate(-self.rot)
-                End_Gegner_Bullet(self.game, self.pos + ENDGEGNER_WEAPON_BARREL_OFFSET.rotate(-self.rot), dir, ENDGEGNER_WEAPON_DAMAGE[self.game.schwierigkeit-1], -self.rot)
-                End_Gegner_Bullet(self.game, self.pos - ENDGEGNER_WEAPON_BARREL_OFFSET.rotate(-self.rot), dir.rotate(180), ENDGEGNER_WEAPON_DAMAGE[self.game.schwierigkeit-1], -self.rot)
+                End_Gegner_Bullet(self.game, self.pos + ENDGEGNER_WEAPON_BARREL_OFFSET.rotate(-self.rot), dir, ENDGEGNER_WEAPON_DAMAGE[self.game.schwierigkeit - 1], -self.rot)
+                End_Gegner_Bullet(self.game, self.pos - ENDGEGNER_WEAPON_BARREL_OFFSET.rotate(-self.rot), dir.rotate(180), ENDGEGNER_WEAPON_DAMAGE[self.game.schwierigkeit - 1], -self.rot)
         elif self.modus == ZOMBIE:
             if now - self.last_zombie > self.zombie_rate and self.num_zomies < ENDGEGNER_NUM_ZOMBIES:
-                if len(self.game.endgegner_zombies) == MAXIMAL_NUM_ENDGEGNER_ZOMBIES[self.game.schwierigkeit-1]:
+                if len(self.game.endgegner_zombies) == MAXIMAL_NUM_ENDGEGNER_ZOMBIES[self.game.schwierigkeit - 1]:
                     choice(list(self.game.endgegner_zombies)).kill()
                 self.last_zombie = now
                 self.num_zomies += 1
-                Mob(self.game, self.pos.x, self.pos.y, int(MOB_HEALTH*0.85), True)
+                Mob(self.game, self.pos.x, self.pos.y, int(MOB_HEALTH * 0.85), True)
         elif self.modus == WALK_N_JUMP:
             if now - self.last_jump > ENDGEGNER_JUMP_TIME:
                 for sprite in self.game.all_sprites:
@@ -579,11 +586,12 @@ class End_Gegner(pygame.sprite.Sprite):
                     if not gibt_bereits_eine_grube:
                         End_Gegner_Grube(self.game, self.next_pos)
                 # bewegen
-                if not pygame.sprite.spritecollide(self,self.game.obstacles,False,collide_hit_rect):
+                if not pygame.sprite.spritecollide(self, self.game.obstacles, False, collide_hit_rect):
                     self.pos += ENDGEGNER_WALK_SPEED.rotate(-self.rot) * self.game.dt
                 if now - self.last_shot > ENDGEGNER_WALK_WEAPON_RATE:
                     self.last_shot = now
-                    End_Gegner_Bullet(self.game, self.pos + ENDGEGNER_WALK_SHOOT_OFFSET.rotate(-self.rot), vec(1, 0).rotate(-self.rot), ENDGEGNER_WEAPON_DAMAGE[self.game.schwierigkeit-1], self.rot)
+                    End_Gegner_Bullet(self.game, self.pos + ENDGEGNER_WALK_SHOOT_OFFSET.rotate(-self.rot), vec(1, 0).rotate(-self.rot), ENDGEGNER_WEAPON_DAMAGE[self.game.schwierigkeit - 1], self.rot)
+
 
 class End_Gegner_Grube(pygame.sprite.Sprite):
     def __init__(self, game, pos):
@@ -594,8 +602,9 @@ class End_Gegner_Grube(pygame.sprite.Sprite):
         self.image = ENDGEGNER_GRUBE
         self.rect = self.image.get_rect()
         self.hit_rect = self.rect
-        self.rect.x = pos[0] - self.rect.width/2
-        self.rect.y = pos[1] - self.rect.height/2
+        self.rect.x = pos[0] - self.rect.width / 2
+        self.rect.y = pos[1] - self.rect.height / 2
+
 
 class End_Gegner_Bullet(pygame.sprite.Sprite):
     def __init__(self, game, pos, dir, damage, rot):
@@ -605,7 +614,7 @@ class End_Gegner_Bullet(pygame.sprite.Sprite):
         self.name = "Endgegner Bullet"
         self.game = game
         self.image = ENDGEGNER_BULLET
-        self.image = pygame.transform.rotate(self.image,rot)
+        self.image = pygame.transform.rotate(self.image, rot)
         self.rect = self.image.get_rect()
         self.hit_rect = self.rect
         self.pos = vec(pos)
@@ -619,6 +628,7 @@ class End_Gegner_Bullet(pygame.sprite.Sprite):
         self.rect.center = self.pos
         if pygame.sprite.spritecollideany(self, self.game.obstacles):
             self.kill()
+
 
 class End_Gegner_Explosion(pygame.sprite.Sprite):
     # Explosionen in unterschiedlichen Groessen
@@ -649,6 +659,7 @@ class End_Gegner_Explosion(pygame.sprite.Sprite):
                 self.rect = self.image.get_rect()
                 self.rect.center = center
 
+
 class Obstacle(pygame.sprite.Sprite):
     def __init__(self, game, x, y, w, h):
         self.groups = game.obstacles
@@ -662,8 +673,9 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
+
 class Personen_Obstacle(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, w, h, orientation=None, is_begin = False, is_end = False):
+    def __init__(self, game, x, y, w, h, orientation=None, is_begin=False, is_end=False):
         self.groups = game.personen_obstacles, game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.name = "Personen Obstacle"
@@ -678,7 +690,7 @@ class Personen_Obstacle(pygame.sprite.Sprite):
         self.is_begin = is_begin
         self.is_end = is_end
         self.image = []
-        for count,player in enumerate(self.game.players):
+        for count, player in enumerate(self.game.players):
             if LEHRER[player.lehrer_name]["obstacle_richtungsabhaengig"]:
                 richtung = orientation
                 if is_begin:
@@ -689,10 +701,10 @@ class Personen_Obstacle(pygame.sprite.Sprite):
             else:
                 self.image.append(PERSONEN_OBSTACLE_IMGES[player.lehrer_name]["img"])
             if LEHRER[player.lehrer_name]["obstacle_rotation"]:
-                self.image[count] = pygame.transform.rotate(self.image[count], choice([0,90,180,270,360]))
+                self.image[count] = pygame.transform.rotate(self.image[count], choice([0, 90, 180, 270, 360]))
 
     def update_image(self):
-        for count,player in enumerate(self.game.players):
+        for count, player in enumerate(self.game.players):
             if LEHRER[player.lehrer_name]["obstacle_richtungsabhaengig"]:
                 richtung = self.orientation
                 if self.is_begin:
@@ -704,6 +716,7 @@ class Personen_Obstacle(pygame.sprite.Sprite):
                 self.image[count] = PERSONEN_OBSTACLE_IMGES[player.lehrer_name]["img"]
             if LEHRER[player.lehrer_name]["obstacle_rotation"]:
                 self.image[count] = pygame.transform.rotate(self.image[count], choice([0, 90, 180, 270, 360]))
+
 
 class Personen_Object(pygame.sprite.Sprite):
     def __init__(self, game, x, y, w, h):
@@ -718,16 +731,17 @@ class Personen_Object(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.image = []
-        for count,player in enumerate(self.game.players):
+        for count, player in enumerate(self.game.players):
             self.image.append(PEROSNEN_OBJECT_IMGES[player.lehrer_name]["img"])
             if LEHRER[player.lehrer_name]["object_rotation"]:
                 self.image[count] = pygame.transform.rotate(self.image[count], choice([0, 90, 180, 270, 360]))
 
     def update_image(self):
-        for count,player in enumerate(self.game.players):
+        for count, player in enumerate(self.game.players):
             self.image[count] = PEROSNEN_OBJECT_IMGES[player.lehrer_name]["img"]
             if LEHRER[player.lehrer_name]["object_rotation"]:
                 self.image[count] = pygame.transform.rotate(self.image[count], choice([0, 90, 180, 270, 360]))
+
 
 class Find_at_End(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -766,6 +780,7 @@ class Find_at_End(pygame.sprite.Sprite):
         self.rect.centery = self.y
         self.last_width = new_width
 
+
 class Health_Pack(pygame.sprite.Sprite):
     def __init__(self, game, pos):
         self._layer = ITEMS_LAYER
@@ -790,15 +805,16 @@ class Health_Pack(pygame.sprite.Sprite):
             self.step = 0
             self.dir *= -1
 
+
 class Gas_Wolke(pygame.sprite.Sprite):
-    def __init__(self,game,image,start_size,end_size,pos,time_in_millis,time_stay_after_growing=0):
+    def __init__(self, game, image, start_size, end_size, pos, time_in_millis, time_stay_after_growing=0):
         self.groups = game.all_sprites
         self._layer = EFFECTS_LAYER
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.name = "Gas Wolke"
         self.start_size = start_size
         self.orig_image = image
-        self.image = pygame.transform.scale(image,start_size)
+        self.image = pygame.transform.scale(image, start_size)
         self.rect = self.image.get_rect()
         self.rect.center = pos
         self.start_time = time() * 1000
@@ -808,17 +824,18 @@ class Gas_Wolke(pygame.sprite.Sprite):
         self.steigung_y = ((end_size[1] - start_size[1]) / (time_in_millis * 1.0))
 
     def update(self):
-        zeit = time()*1000-self.start_time
+        zeit = time() * 1000 - self.start_time
         if zeit <= self.dauer:
-            self.image = pygame.transform.scale(self.orig_image,(int(self.steigung_x*zeit+self.start_size[0]),int(self.steigung_y*zeit+self.start_size[1])))
+            self.image = pygame.transform.scale(self.orig_image, (int(self.steigung_x * zeit + self.start_size[0]), int(self.steigung_y * zeit + self.start_size[1])))
             pos = self.rect.center
             self.rect = self.image.get_rect()
             self.rect.center = pos
         if zeit > self.dauer + self.time_after_growing:
             self.kill()
 
+
 class Shaking_object(pygame.sprite.Sprite):
-    def __init__(self,game,image,pos,time_in_millis):
+    def __init__(self, game, image, pos, time_in_millis):
         self.groups = game.all_sprites
         self._layer = WALL_LAYER
         pygame.sprite.Sprite.__init__(self, self.groups)
@@ -831,22 +848,23 @@ class Shaking_object(pygame.sprite.Sprite):
         self.dauer = time_in_millis
 
     def update(self):
-        zeit = time()*1000-self.start_time
-        self.image = pygame.transform.rotate(self.orig_image,18*sin(zeit/4))
+        zeit = time() * 1000 - self.start_time
+        self.image = pygame.transform.rotate(self.orig_image, 18 * sin(zeit / 4))
         pos = self.rect.center
         self.rect = self.image.get_rect()
         self.rect.center = pos
         if zeit > self.dauer:
             self.kill()
 
+
 class Spielhack(pygame.sprite.Sprite):
-    def __init__(self,game,player,dauer_in_millis = 2000):
+    def __init__(self, game, player, dauer_in_millis=2000):
         self.groups = game.all_sprites
         self._layer = EFFECTS_LAYER
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.name = "Spielhack"
-        self.image = pygame.Surface((self.game.WIDTH,self.game.HEIGHT))
+        self.image = pygame.Surface((self.game.WIDTH, self.game.HEIGHT))
         self.image.set_colorkey(BLACK)
         self.image.convert()
         self.rect = self.image.get_rect()
@@ -856,7 +874,7 @@ class Spielhack(pygame.sprite.Sprite):
 
     def update(self):
         zeit = time() * 1000 - self.start_time
-        if zeit%80 and int((zeit/self.dauer)*self.game.HEIGHT) <= self.game.HEIGHT:
-            self.image.blit(LEHRER["schueler"]["other_files"][choice(["eins","null"])],(randrange(0,self.game.WIDTH),int((zeit/self.dauer)*self.game.HEIGHT)))
-        if int((zeit/self.dauer)*self.game.HEIGHT) > self.game.HEIGHT + 200:
+        if zeit % 80 and int((zeit / self.dauer) * self.game.HEIGHT) <= self.game.HEIGHT:
+            self.image.blit(LEHRER["schueler"]["other_files"][choice(["eins", "null"])], (randrange(0, self.game.WIDTH), int((zeit / self.dauer) * self.game.HEIGHT)))
+        if int((zeit / self.dauer) * self.game.HEIGHT) > self.game.HEIGHT + 200:
             self.kill()
