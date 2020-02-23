@@ -1,5 +1,6 @@
 import pygame
 import sys
+from math import ceil, floor
 from random import choice
 from time import time, sleep
 from constants import *
@@ -7,6 +8,13 @@ from sprites import *
 from tilemap import *
 from math import pi
 import lehrer_funktionen
+import __init__
+
+multiplayer_possible = True
+try:
+    from joystickpins import JoystickPins
+except Exception:
+    multiplayer_possible = False
 
 halbes_pi = pi / 2
 
@@ -51,6 +59,9 @@ class Game:
         self.last_power_up_use_time = []
         self.collected_person_objects = []
         self.paused = []
+
+        self.music_volume = game_music_volume
+        self.sound_volume = game_sound_volume
 
         self.live_bar_images = []
         if self.WIDTH / self.HEIGHT < 0.4555555:
@@ -109,7 +120,11 @@ class Game:
         self.map_name = MAP_NAMES[0]
         self.with_maussteuerung = True
         self.multiplayer = False
-        self.num_players_in_multiplayer = 2
+        self.num_players_in_multiplayer = 1
+        self.use_tastatur = True
+        self.all_joysticks = []
+        self.used_joysticks = []
+        self.find_josticks()
         self.players = []
 
         self.level_start_time = 0
@@ -131,9 +146,10 @@ class Game:
         self.fps_werte = []
         self.measured_times = [[], [], [], [], [], [], [], [], []]
 
+    # Texte zeichnen
     def draw_text(self, surf, text, size, x, y, font_name=HUD_FONT, color=TEXT_COLOR, rect_place="oben_mitte"):
         # Zeichnet den text in der color auf die surf.
-        # x und y sind die Koordinaten des Punktes rect_place. rect_place kann "oben_mitte", "oben_links" oder "oben_rechts" sein.
+        # x und y sind die Koordinaten des Punktes rect_place.
         font = pygame.font.Font(font_name, size)
         text_surface = font.render(str(text), True, color)
         text_rect = text_surface.get_rect()
@@ -169,11 +185,16 @@ class Game:
         text_surface = font.render(str(text), True, WHITE)
         return text_surface.get_rect()
 
-    def check_key_or_mouse_pressed(self, check_for=[], joystick_num="both"):
-        return_dict = {}
+    # Tastatur und Mauseingaben
+    def check_key_or_mouse_pressed(self, check_for=[]):
+        ### returns dict of all joysticks with dict of given keys and True or False value depending on wether button was pressed e.x. {"Tastatur":{12:False,3:True},"PlaystationController":{12:False,3:False}}
+        return_dict = {"Tastatur": {}}
+        for joystick in self.all_joysticks:
+            return_dict[joystick.get_name()] = {}
+        for joystick in return_dict:
+            for key in check_for:
+                return_dict[joystick][key] = False
 
-        for key in check_for:
-            return_dict[key] = False
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -181,48 +202,76 @@ class Game:
 
             if event.type == pygame.KEYDOWN:
                 if event.key in check_for:
-                    return_dict[event.key] = True
+                    return_dict["Tastatur"][event.key] = True
                 if "text" in check_for:
-                    return_dict["text"] = event.unicode
+                    return_dict["Tastatur"]["text"] = event.unicode
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    return_dict[MAUS_LEFT] = event.pos
+                    return_dict["Tastatur"][MAUS_LEFT] = event.pos
                 elif event.button == 3:
-                    return_dict[MAUS_RIGHT] = event.pos
+                    return_dict["Tastatur"][MAUS_RIGHT] = event.pos
                 elif event.button == 4:
-                    return_dict[MAUS_ROLL_UP] = event.pos
+                    return_dict["Tastatur"][MAUS_ROLL_UP] = event.pos
                 elif event.button == 5:
-                    return_dict[MAUS_ROLL_DOWN] = event.pos
+                    return_dict["Tastatur"][MAUS_ROLL_DOWN] = event.pos
 
             if event.type == pygame.VIDEORESIZE:
                 self.window_resize(event.w, event.h)
 
+        for joystick in self.all_joysticks:
+            keys = {pygame.K_UP: joystick.get_axis_up, pygame.K_DOWN: joystick.get_axis_down, pygame.K_LEFT: joystick.get_axis_left, pygame.K_RIGHT: joystick.get_axis_right, pygame.K_RETURN: joystick.get_start, pygame.K_SPACE: joystick.get_select, pygame.K_a: joystick.get_Y, pygame.K_w: joystick.get_X, pygame.K_s: joystick.get_B, pygame.K_d: joystick.get_A, pygame.K_c: joystick.get_A}
+            maus = {MAUS_ROLL_DOWN: joystick.get_shoulder_left, MAUS_ROLL_UP: joystick.get_shoulder_right}
+            if joystick.get_start() and joystick.get_select():
+                self.quit()
+            for key in keys:
+                if key in check_for:
+                    return_dict[joystick.get_name()][key] = keys[key]()
+            for m in maus:
+                if maus[m]():
+                    return_dict[joystick.get_name()][m] = True
+
         return return_dict
+
+    def check_key_in_pressed(self, key, pressed):
+        for joystick in pressed:
+            if key in pressed[joystick]:
+                if pressed[joystick][key]:
+                    return True
+        return False
 
     def check_maus_pos_on_rect(self, maus_pos, rect):
         return rect.collidepoint(maus_pos)
 
-    def draw_start_game_screen(self, loading=False):
+    def find_josticks(self):
+        if multiplayer_possible:
+            # Knöpfe und Kontroller finden und Initialisieren
+            self.all_joysticks = []
+            for joy in range(pygame.joystick.get_count()):
+                pygame_joystick = pygame.joystick.Joystick(joy)
+                pygame_joystick.init()
+                my_joystick = JoystickPins(pygame_joystick)
+                print("adding joystick " + my_joystick.get_name())
+                self.all_joysticks.append(my_joystick)
+
+    # Hauptbildschirm
+    def draw_start_game_screen(self, cursor_pos, loading=False):
         return_dict = {}
 
         # Hintergrund
         self.screen.blit(self.background, self.background_rect)
 
-        # Schoene oder fluessige Grafik
-        if self.schoene_grafik:
-            return_dict["Grafik"] = self.draw_text(self.screen, "schöne Grafik", self.NORMAL_TEXT, 10, 10, rect_place="oben_links", color=AUSWAHL_TEXT_COLOR)
+        # Einstellungen
+        if cursor_pos[0] == 0 and cursor_pos[1] <= int(max([len(MAP_NAMES) - 1, 4]) / 2):
+            return_dict["Einstellungen"] = self.draw_text(self.screen, "Einstellungen", self.NORMAL_TEXT, 10, 10, rect_place="oben_links", color=AUSWAHL_TEXT_SELECTED)
         else:
-            return_dict["Grafik"] = self.draw_text(self.screen, "flüssige Grafik", self.NORMAL_TEXT, 10, 10, rect_place="oben_links", color=AUSWAHL_TEXT_COLOR)
-
-        # Maussteuerung an oder aus
-        if self.with_maussteuerung:
-            return_dict["Maus"] = self.draw_text(self.screen, "Maussteuerung", self.NORMAL_TEXT, 10, 15 + self.NORMAL_TEXT, rect_place="oben_links", color=AUSWAHL_TEXT_COLOR)
-        else:
-            return_dict["Maus"] = self.draw_text(self.screen, "Tastatursteuerung", self.NORMAL_TEXT, 10, 15 + self.NORMAL_TEXT, rect_place="oben_links", color=AUSWAHL_TEXT_COLOR)
+            return_dict["Einstellungen"] = self.draw_text(self.screen, "Einstellungen", self.NORMAL_TEXT, 10, 10, rect_place="oben_links", color=AUSWAHL_TEXT_COLOR)
 
         # Spielerkaerung
-        return_dict["Hilfe"] = self.draw_text(self.screen, "Hilfe/Erklärung", self.NORMAL_TEXT, self.WIDTH - 10, 10, rect_place="oben_rechts", color=AUSWAHL_TEXT_COLOR)
+        if cursor_pos[0] == 0 and cursor_pos[1] > int(max([len(MAP_NAMES) - 1, 4]) / 2):
+            return_dict["Hilfe"] = self.draw_text(self.screen, "Hilfe/Erklärung", self.NORMAL_TEXT, self.WIDTH - 10, 10, rect_place="oben_rechts", color=AUSWAHL_TEXT_SELECTED)
+        else:
+            return_dict["Hilfe"] = self.draw_text(self.screen, "Hilfe/Erklärung", self.NORMAL_TEXT, self.WIDTH - 10, 10, rect_place="oben_rechts", color=AUSWAHL_TEXT_COLOR)
 
         # Titel
         if self.game_status == PLAYER_DIED:
@@ -238,40 +287,71 @@ class Game:
         pygame.draw.line(self.screen, AUSWAHL_TEXT_COLOR, (int(self.WIDTH * (1 / 6)), int(self.HEIGHT * 0.38)), (int(self.WIDTH * (5 / 6)), int(self.HEIGHT * 0.38)), 5)
         for schwierigkeitsstufe in range(1, 6):
             if self.schwierigkeit == schwierigkeitsstufe and not loading:
-                return_dict["Schwierigkeit_" + str(schwierigkeitsstufe)] = pygame.draw.circle(self.screen, AUSWAHL_TEXT_GREEN, (int(self.WIDTH * (schwierigkeitsstufe / 6)), int(self.HEIGHT * 0.38)), circle_size, 0)
+                if cursor_pos[0] == 1 and (cursor_pos[1] == schwierigkeitsstufe - 1 or schwierigkeitsstufe == 5 and cursor_pos[1] > 4):
+                    return_dict["Schwierigkeit_" + str(schwierigkeitsstufe)] = pygame.draw.circle(self.screen, AUSWAHL_TEXT_GREEN_SELECTED, (int(self.WIDTH * (schwierigkeitsstufe / 6)), int(self.HEIGHT * 0.38)), circle_size, 0)
+                else:
+                    return_dict["Schwierigkeit_" + str(schwierigkeitsstufe)] = pygame.draw.circle(self.screen, AUSWAHL_TEXT_GREEN, (int(self.WIDTH * (schwierigkeitsstufe / 6)), int(self.HEIGHT * 0.38)), circle_size, 0)
+            elif cursor_pos[0] == 1 and (cursor_pos[1] == schwierigkeitsstufe - 1 or schwierigkeitsstufe == 5 and cursor_pos[1] > 4):
+                return_dict["Schwierigkeit_" + str(schwierigkeitsstufe)] = pygame.draw.circle(self.screen, AUSWAHL_TEXT_SELECTED, (int(self.WIDTH * (schwierigkeitsstufe / 6)), int(self.HEIGHT * 0.38)), circle_size, 0)
             else:
                 return_dict["Schwierigkeit_" + str(schwierigkeitsstufe)] = pygame.draw.circle(self.screen, AUSWAHL_TEXT_COLOR, (int(self.WIDTH * (schwierigkeitsstufe / 6)), int(self.HEIGHT * 0.38)), circle_size, 0)
             self.draw_text(self.screen, str(schwierigkeitsstufe), int(circle_size * 1.3), int(self.WIDTH * (schwierigkeitsstufe / 6)), int(self.HEIGHT * 0.38), color=BLACK, rect_place="mitte")
 
         # Spielmodus
         self.draw_text(self.screen, "SPIELMODUS", int(self.BIG_TEXT * 1.2), int(self.WIDTH / 2), int(self.HEIGHT * 0.47), color=AUSWAHL_TEXT_COLOR)
-        if self.spielmodus != MAP_MODUS or loading:
+        if self.spielmodus == MAP_MODUS and not loading:
+            if cursor_pos[0] == 2 and cursor_pos[1] > int(max([len(MAP_NAMES) - 1, 4]) / 2):
+                spielmodus_rect = self.draw_text(self.screen, "Zombie Map", self.NORMAL_TEXT, int(self.WIDTH * 2 / 3), int(self.HEIGHT * 0.57), color=AUSWAHL_TEXT_GREEN_SELECTED, rect_place="mitte")
+            else:
+                spielmodus_rect = self.draw_text(self.screen, "Zombie Map", self.NORMAL_TEXT, int(self.WIDTH * 2 / 3), int(self.HEIGHT * 0.57), color=AUSWAHL_TEXT_GREEN, rect_place="mitte")
+            return_dict[MAP_MODUS] = spielmodus_rect
+        elif cursor_pos[0] == 2 and cursor_pos[1] > int(max([len(MAP_NAMES) - 1, 4]) / 2):
+            rect = self.draw_text(self.screen, "Zombie Map", self.NORMAL_TEXT, int(self.WIDTH * 2 / 3), int(self.HEIGHT * 0.57), color=AUSWAHL_TEXT_SELECTED, rect_place="mitte")
+            return_dict[MAP_MODUS] = rect
+        elif self.spielmodus != MAP_MODUS or loading:
             return_dict[MAP_MODUS] = self.draw_text(self.screen, "Zombie Map", self.NORMAL_TEXT, int(self.WIDTH * 2 / 3), int(self.HEIGHT * 0.57), color=AUSWAHL_TEXT_COLOR, rect_place="mitte")
             if loading and self.spielmodus == MAP_MODUS:
                 spielmodus_rect = return_dict[MAP_MODUS]
-        elif self.spielmodus == MAP_MODUS:
-            spielmodus_rect = self.draw_text(self.screen, "Zombie Map", self.NORMAL_TEXT, int(self.WIDTH * 2 / 3), int(self.HEIGHT * 0.57), color=AUSWAHL_TEXT_GREEN, rect_place="mitte")
-            return_dict[MAP_MODUS] = spielmodus_rect
-        if self.spielmodus != ARENA_MODUS or loading:
+        if self.spielmodus == ARENA_MODUS and not loading:
+            if cursor_pos[0] == 2 and cursor_pos[1] <= int(max([len(MAP_NAMES) - 1, 4]) / 2):
+                spielmodus_rect = self.draw_text(self.screen, "Arena Modus", self.NORMAL_TEXT, int(self.WIDTH * 1 / 3), int(self.HEIGHT * 0.57), color=AUSWAHL_TEXT_GREEN_SELECTED, rect_place="mitte")
+            else:
+                spielmodus_rect = self.draw_text(self.screen, "Arena Modus", self.NORMAL_TEXT, int(self.WIDTH * 1 / 3), int(self.HEIGHT * 0.57), color=AUSWAHL_TEXT_GREEN, rect_place="mitte")
+            return_dict[ARENA_MODUS] = spielmodus_rect
+        elif cursor_pos[0] == 2 and cursor_pos[1] <= int(max([len(MAP_NAMES) - 1, 4]) / 2):
+            rect = self.draw_text(self.screen, "Arena Modus", self.NORMAL_TEXT, int(self.WIDTH * 1 / 3), int(self.HEIGHT * 0.57), color=AUSWAHL_TEXT_SELECTED, rect_place="mitte")
+            return_dict[ARENA_MODUS] = rect
+        elif self.spielmodus != ARENA_MODUS or loading:
             return_dict[ARENA_MODUS] = self.draw_text(self.screen, "Arena Modus", self.NORMAL_TEXT, int(self.WIDTH * 1 / 3), int(self.HEIGHT * 0.57), color=AUSWAHL_TEXT_COLOR, rect_place="mitte")
             if loading and self.spielmodus == ARENA_MODUS:
                 spielmodus_rect = return_dict[ARENA_MODUS]
-        elif self.spielmodus == ARENA_MODUS:
-            spielmodus_rect = self.draw_text(self.screen, "Arena Modus", self.NORMAL_TEXT, int(self.WIDTH * 1 / 3), int(self.HEIGHT * 0.57), color=AUSWAHL_TEXT_GREEN, rect_place="mitte")
-            return_dict[ARENA_MODUS] = spielmodus_rect
         # weitere Spielmodus einstellung
         if self.spielmodus == MAP_MODUS:
             pygame.draw.line(self.screen, AUSWAHL_TEXT_COLOR, spielmodus_rect.midbottom, (int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62)), 3)
             pygame.draw.line(self.screen, AUSWAHL_TEXT_COLOR, spielmodus_rect.midbottom, (int(self.WIDTH * 3 / 4), int(self.HEIGHT * 0.62)), 3)
             if self.genauerer_spielmodus == AFTER_TIME and not loading:
-                return_dict[AFTER_TIME + "0"] = self.draw_text(self.screen, "Gewonnen nach", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_GREEN, rect_place="oben_mitte")
-                return_dict[AFTER_TIME + "1"] = self.draw_text(self.screen, "Zeit", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_GREEN, rect_place="oben_mitte")
+                if cursor_pos[0] == 3 and cursor_pos[1] <= int(max([len(MAP_NAMES) - 1, 4]) / 2):
+                    return_dict[AFTER_TIME + "0"] = self.draw_text(self.screen, "Gewonnen nach", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_GREEN_SELECTED, rect_place="oben_mitte")
+                    return_dict[AFTER_TIME + "1"] = self.draw_text(self.screen, "Zeit", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_GREEN_SELECTED, rect_place="oben_mitte")
+                else:
+                    return_dict[AFTER_TIME + "0"] = self.draw_text(self.screen, "Gewonnen nach", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_GREEN, rect_place="oben_mitte")
+                    return_dict[AFTER_TIME + "1"] = self.draw_text(self.screen, "Zeit", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_GREEN, rect_place="oben_mitte")
+            elif cursor_pos[0] == 3 and cursor_pos[1] <= int(max([len(MAP_NAMES) - 1, 4]) / 2):
+                return_dict[AFTER_TIME + "0"] = self.draw_text(self.screen, "Gewonnen nach", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_SELECTED, rect_place="oben_mitte")
+                return_dict[AFTER_TIME + "1"] = self.draw_text(self.screen, "Zeit", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_SELECTED, rect_place="oben_mitte")
             else:
                 return_dict[AFTER_TIME + "0"] = self.draw_text(self.screen, "Gewonnen nach", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_COLOR, rect_place="oben_mitte")
                 return_dict[AFTER_TIME + "1"] = self.draw_text(self.screen, "Zeit", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_COLOR, rect_place="oben_mitte")
             if self.genauerer_spielmodus == AFTER_KILLED and not loading:
-                return_dict[AFTER_KILLED + "0"] = self.draw_text(self.screen, "Gewonnen nach", self.NORMAL_TEXT, int(self.WIDTH * 3 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_GREEN, rect_place="oben_mitte")
-                return_dict[AFTER_KILLED + "1"] = self.draw_text(self.screen, "töten aller Zombies", self.NORMAL_TEXT, int(self.WIDTH * 3 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_GREEN, rect_place="oben_mitte")
+                if cursor_pos[0] == 3 and cursor_pos[1] > int(max([len(MAP_NAMES) - 1, 4]) / 2):
+                    return_dict[AFTER_KILLED + "0"] = self.draw_text(self.screen, "Gewonnen nach", self.NORMAL_TEXT, int(self.WIDTH * 3 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_GREEN_SELECTED, rect_place="oben_mitte")
+                    return_dict[AFTER_KILLED + "1"] = self.draw_text(self.screen, "töten aller Zombies", self.NORMAL_TEXT, int(self.WIDTH * 3 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_GREEN_SELECTED, rect_place="oben_mitte")
+                else:
+                    return_dict[AFTER_KILLED + "0"] = self.draw_text(self.screen, "Gewonnen nach", self.NORMAL_TEXT, int(self.WIDTH * 3 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_GREEN, rect_place="oben_mitte")
+                    return_dict[AFTER_KILLED + "1"] = self.draw_text(self.screen, "töten aller Zombies", self.NORMAL_TEXT, int(self.WIDTH * 3 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_GREEN, rect_place="oben_mitte")
+            elif cursor_pos[0] == 3 and cursor_pos[1] > int(max([len(MAP_NAMES) - 1, 4]) / 2):
+                return_dict[AFTER_KILLED + "0"] = self.draw_text(self.screen, "Gewonnen nach", self.NORMAL_TEXT, int(self.WIDTH * 3 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_SELECTED, rect_place="oben_mitte")
+                return_dict[AFTER_KILLED + "1"] = self.draw_text(self.screen, "töten aller Zombies", self.NORMAL_TEXT, int(self.WIDTH * 3 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_SELECTED, rect_place="oben_mitte")
             else:
                 return_dict[AFTER_KILLED + "0"] = self.draw_text(self.screen, "Gewonnen nach", self.NORMAL_TEXT, int(self.WIDTH * 3 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_COLOR, rect_place="oben_mitte")
                 return_dict[AFTER_KILLED + "1"] = self.draw_text(self.screen, "töten aller Zombies", self.NORMAL_TEXT, int(self.WIDTH * 3 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_COLOR, rect_place="oben_mitte")
@@ -279,14 +359,28 @@ class Game:
             pygame.draw.line(self.screen, AUSWAHL_TEXT_COLOR, spielmodus_rect.midbottom, (int(self.WIDTH * 1 / 4), int(self.HEIGHT * 0.62)), 3)
             pygame.draw.line(self.screen, AUSWAHL_TEXT_COLOR, spielmodus_rect.midbottom, (int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62)), 3)
             if self.genauerer_spielmodus == AFTER_TIME:
-                return_dict[AFTER_TIME + "0"] = self.draw_text(self.screen, "Zombiewelle nach", self.NORMAL_TEXT, int(self.WIDTH * 1 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_GREEN, rect_place="oben_mitte")
-                return_dict[AFTER_TIME + "1"] = self.draw_text(self.screen, "Zeit", self.NORMAL_TEXT, int(self.WIDTH * 1 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_GREEN, rect_place="oben_mitte")
+                if cursor_pos[0] == 3 and cursor_pos[1] <= int(max([len(MAP_NAMES) - 1, 4]) / 2):
+                    return_dict[AFTER_TIME + "0"] = self.draw_text(self.screen, "Zombiewelle nach", self.NORMAL_TEXT, int(self.WIDTH * 1 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_GREEN_SELECTED, rect_place="oben_mitte")
+                    return_dict[AFTER_TIME + "1"] = self.draw_text(self.screen, "Zeit", self.NORMAL_TEXT, int(self.WIDTH * 1 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_GREEN_SELECTED, rect_place="oben_mitte")
+                else:
+                    return_dict[AFTER_TIME + "0"] = self.draw_text(self.screen, "Zombiewelle nach", self.NORMAL_TEXT, int(self.WIDTH * 1 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_GREEN, rect_place="oben_mitte")
+                    return_dict[AFTER_TIME + "1"] = self.draw_text(self.screen, "Zeit", self.NORMAL_TEXT, int(self.WIDTH * 1 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_GREEN, rect_place="oben_mitte")
+            elif cursor_pos[0] == 3 and cursor_pos[1] <= int(max([len(MAP_NAMES) - 1, 4]) / 2):
+                return_dict[AFTER_TIME + "0"] = self.draw_text(self.screen, "Zombiewelle nach", self.NORMAL_TEXT, int(self.WIDTH * 1 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_SELECTED, rect_place="oben_mitte")
+                return_dict[AFTER_TIME + "1"] = self.draw_text(self.screen, "Zeit", self.NORMAL_TEXT, int(self.WIDTH * 1 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_SELECTED, rect_place="oben_mitte")
             else:
                 return_dict[AFTER_TIME + "0"] = self.draw_text(self.screen, "Zombiewelle nach", self.NORMAL_TEXT, int(self.WIDTH * 1 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_COLOR, rect_place="oben_mitte")
                 return_dict[AFTER_TIME + "1"] = self.draw_text(self.screen, "Zeit", self.NORMAL_TEXT, int(self.WIDTH * 1 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_COLOR, rect_place="oben_mitte")
             if self.genauerer_spielmodus == AFTER_KILLED:
-                return_dict[AFTER_KILLED + "0"] = self.draw_text(self.screen, "Zombiewelle nach", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_GREEN, rect_place="oben_mitte")
-                return_dict[AFTER_KILLED + "1"] = self.draw_text(self.screen, "töten aller Zombies", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_GREEN, rect_place="oben_mitte")
+                if cursor_pos[0] == 3 and cursor_pos[1] > int(max([len(MAP_NAMES) - 1, 4]) / 2):
+                    return_dict[AFTER_KILLED + "0"] = self.draw_text(self.screen, "Zombiewelle nach", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_GREEN_SELECTED, rect_place="oben_mitte")
+                    return_dict[AFTER_KILLED + "1"] = self.draw_text(self.screen, "töten aller Zombies", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_GREEN_SELECTED, rect_place="oben_mitte")
+                else:
+                    return_dict[AFTER_KILLED + "0"] = self.draw_text(self.screen, "Zombiewelle nach", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_GREEN, rect_place="oben_mitte")
+                    return_dict[AFTER_KILLED + "1"] = self.draw_text(self.screen, "töten aller Zombies", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_GREEN, rect_place="oben_mitte")
+            elif cursor_pos[0] == 3 and cursor_pos[1] > int(max([len(MAP_NAMES) - 1, 4]) / 2):
+                return_dict[AFTER_KILLED + "0"] = self.draw_text(self.screen, "Zombiewelle nach", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_SELECTED, rect_place="oben_mitte")
+                return_dict[AFTER_KILLED + "1"] = self.draw_text(self.screen, "töten aller Zombies", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_SELECTED, rect_place="oben_mitte")
             else:
                 return_dict[AFTER_KILLED + "0"] = self.draw_text(self.screen, "Zombiewelle nach", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62), color=AUSWAHL_TEXT_COLOR, rect_place="oben_mitte")
                 return_dict[AFTER_KILLED + "1"] = self.draw_text(self.screen, "töten aller Zombies", self.NORMAL_TEXT, int(self.WIDTH * 2 / 4), int(self.HEIGHT * 0.62) + self.NORMAL_TEXT + 5, color=AUSWAHL_TEXT_COLOR, rect_place="oben_mitte")
@@ -295,7 +389,12 @@ class Game:
         self.draw_text(self.screen, "KARTE", int(self.BIG_TEXT * 1.2), int(self.WIDTH / 2), int(self.HEIGHT * 0.74), color=AUSWAHL_TEXT_COLOR)
         for map_count, karten_name in enumerate(MAP_NAMES):
             if self.map_name == karten_name and not loading:
-                return_dict["Map" + str(map_count)] = self.draw_text(self.screen, karten_name, self.NORMAL_TEXT, int(self.WIDTH * (map_count + 1) / (len(MAP_NAMES) + 1)), int(self.HEIGHT * 0.84), color=AUSWAHL_TEXT_GREEN, rect_place="mitte")
+                if cursor_pos[0] == 4 and (cursor_pos[1] == map_count or map_count == len(MAP_NAMES) - 1 and cursor_pos[1] > len(MAP_NAMES) - 1):
+                    return_dict["Map" + str(map_count)] = self.draw_text(self.screen, karten_name, self.NORMAL_TEXT, int(self.WIDTH * (map_count + 1) / (len(MAP_NAMES) + 1)), int(self.HEIGHT * 0.84), color=AUSWAHL_TEXT_GREEN_SELECTED, rect_place="mitte")
+                else:
+                    return_dict["Map" + str(map_count)] = self.draw_text(self.screen, karten_name, self.NORMAL_TEXT, int(self.WIDTH * (map_count + 1) / (len(MAP_NAMES) + 1)), int(self.HEIGHT * 0.84), color=AUSWAHL_TEXT_GREEN, rect_place="mitte")
+            elif cursor_pos[0] == 4 and (cursor_pos[1] == map_count or map_count == len(MAP_NAMES) - 1 and cursor_pos[1] > len(MAP_NAMES) - 1):
+                return_dict["Map" + str(map_count)] = self.draw_text(self.screen, karten_name, self.NORMAL_TEXT, int(self.WIDTH * (map_count + 1) / (len(MAP_NAMES) + 1)), int(self.HEIGHT * 0.84), color=AUSWAHL_TEXT_SELECTED, rect_place="mitte")
             else:
                 return_dict["Map" + str(map_count)] = self.draw_text(self.screen, karten_name, self.NORMAL_TEXT, int(self.WIDTH * (map_count + 1) / (len(MAP_NAMES) + 1)), int(self.HEIGHT * 0.84), color=AUSWAHL_TEXT_COLOR, rect_place="mitte")
 
@@ -308,66 +407,106 @@ class Game:
         return return_dict
 
     def make_start_game_selection(self):
+        cursor_pos = [1, 0]
+        time_last_cursor_change = time()
         while True:
             self.clock.tick(FPS)
-            maus_rects = self.draw_start_game_screen()
+            maus_rects = self.draw_start_game_screen(cursor_pos)
 
-            pressed = self.check_key_or_mouse_pressed([pygame.K_RETURN])
+            pressed = self.check_key_or_mouse_pressed([pygame.K_SPACE, pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_s, pygame.K_d])
 
-            if MAUS_LEFT in pressed:
-                if self.check_maus_pos_on_rect(pressed[MAUS_LEFT], maus_rects["Grafik"]):
-                    if self.schoene_grafik:
-                        self.schoene_grafik = False
-                    else:
-                        self.schoene_grafik = True
-
-                if self.check_maus_pos_on_rect(pressed[MAUS_LEFT], maus_rects["Maus"]):
-                    if self.with_maussteuerung:
-                        self.with_maussteuerung = False
-                    else:
-                        self.with_maussteuerung = True
-
-                if self.check_maus_pos_on_rect(pressed[MAUS_LEFT], maus_rects["Hilfe"]):
+            if MAUS_LEFT in pressed["Tastatur"]:
+                if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects["Hilfe"]):
                     self.make_spielerklaerung()
 
+                if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects["Einstellungen"]):
+                    self.make_einstellungen()
+
                 for schwierigkeitsstufe in range(1, 6):
-                    if self.check_maus_pos_on_rect(pressed[MAUS_LEFT], maus_rects["Schwierigkeit_" + str(schwierigkeitsstufe)]):
+                    if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects["Schwierigkeit_" + str(schwierigkeitsstufe)]):
                         self.schwierigkeit = schwierigkeitsstufe
 
-                if self.check_maus_pos_on_rect(pressed[MAUS_LEFT], maus_rects[MAP_MODUS]):
+                if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects[MAP_MODUS]):
                     self.spielmodus = MAP_MODUS
 
-                if self.check_maus_pos_on_rect(pressed[MAUS_LEFT], maus_rects[ARENA_MODUS]):
+                if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects[ARENA_MODUS]):
                     self.spielmodus = ARENA_MODUS
 
-                if self.check_maus_pos_on_rect(pressed[MAUS_LEFT], maus_rects[AFTER_TIME + "0"]) or self.check_maus_pos_on_rect(pressed[MAUS_LEFT], maus_rects[AFTER_TIME + "1"]):
+                if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects[AFTER_TIME + "0"]) or self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects[AFTER_TIME + "1"]):
                     self.genauerer_spielmodus = AFTER_TIME
 
-                if self.check_maus_pos_on_rect(pressed[MAUS_LEFT], maus_rects[AFTER_KILLED + "0"]) or self.check_maus_pos_on_rect(pressed[MAUS_LEFT], maus_rects[AFTER_KILLED + "1"]):
+                if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects[AFTER_KILLED + "0"]) or self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects[AFTER_KILLED + "1"]):
                     self.genauerer_spielmodus = AFTER_KILLED
 
                 for map_count, karten_name in enumerate(MAP_NAMES):
-                    if self.check_maus_pos_on_rect(pressed[MAUS_LEFT], maus_rects["Map" + str(map_count)]):
+                    if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects["Map" + str(map_count)]):
                         self.map_name = karten_name
 
-            if MAUS_ROLL_UP in pressed:
+            if self.check_key_in_pressed(MAUS_ROLL_UP, pressed) and time() - time_last_cursor_change > 0.8:
+                time_last_cursor_change = time()
                 self.schwierigkeit += 1
                 if self.schwierigkeit > 5:
                     self.schwierigkeit = 5
 
-            if MAUS_ROLL_DOWN in pressed:
+            if self.check_key_in_pressed(MAUS_ROLL_DOWN, pressed) and time() - time_last_cursor_change > 0.8:
+                time_last_cursor_change = time()
                 self.schwierigkeit -= 1
                 if self.schwierigkeit < 1:
                     self.schwierigkeit = 1
 
-            if (MAUS_LEFT in pressed and self.check_maus_pos_on_rect(pressed[MAUS_LEFT], maus_rects["Spielen"])) or pressed[pg.K_RETURN]:
+            if self.check_key_in_pressed(pygame.K_UP, pressed) and time() - time_last_cursor_change > 0.8:
+                time_last_cursor_change = time()
+                cursor_pos[0] = max([cursor_pos[0] - 1, 0])
+
+            if self.check_key_in_pressed(pygame.K_DOWN, pressed) and time() - time_last_cursor_change > 0.8:
+                time_last_cursor_change = time()
+                cursor_pos[0] = min([cursor_pos[0] + 1, 4])
+
+            if self.check_key_in_pressed(pygame.K_LEFT, pressed) and time() - time_last_cursor_change > 0.8:
+                time_last_cursor_change = time()
+                if cursor_pos[0] == 0 or cursor_pos[0] == 2 or cursor_pos[0] == 3:
+                    cursor_pos[1] = 0
+                else:
+                    cursor_pos[1] = max([cursor_pos[1] - 1, 0])
+
+            if self.check_key_in_pressed(pygame.K_RIGHT, pressed) and time() - time_last_cursor_change > 0.8:
+                time_last_cursor_change = time()
+                if cursor_pos[0] == 0 or cursor_pos[0] == 2 or cursor_pos[0] == 3:
+                    cursor_pos[1] = max([len(MAP_NAMES) - 1, 4])
+                else:
+                    cursor_pos[1] = min([cursor_pos[1] + 1, max([len(MAP_NAMES) - 1, 4])])
+
+            if self.check_key_in_pressed(pygame.K_s, pressed) or self.check_key_in_pressed(pygame.K_d, pressed) and time() - time_last_cursor_change > 0.8:
+                time_last_cursor_change = time()
+                if cursor_pos[0] == 0:
+                    if cursor_pos[1] > int(max([len(MAP_NAMES) - 1, 4]) / 2):
+                        self.make_spielerklaerung()
+                    else:
+                        self.make_einstellungen()
+                if cursor_pos[0] == 1:
+                    self.schwierigkeit = min([cursor_pos[1] + 1, 5])
+                if cursor_pos[0] == 2:
+                    if cursor_pos[1] > int(max([len(MAP_NAMES) - 1, 4]) / 2):
+                        self.spielmodus = MAP_MODUS
+                    else:
+                        self.spielmodus = ARENA_MODUS
+                if cursor_pos[0] == 3:
+                    if cursor_pos[1] > int(max([len(MAP_NAMES) - 1, 4]) / 2):
+                        self.genauerer_spielmodus = AFTER_KILLED
+                    else:
+                        self.genauerer_spielmodus = AFTER_TIME
+                if cursor_pos[0] == 4:
+                    self.map_name = MAP_NAMES[min([cursor_pos[1], len(MAP_NAMES) - 1])]
+
+            if (MAUS_LEFT in pressed["Tastatur"] and self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects["Spielen"])) or self.check_key_in_pressed(pg.K_SPACE, pressed):
                 for player_num in range(len(self.players)):
                     self.paused[player_num] = False
-                self.draw_start_game_screen(loading=True)
+                self.draw_start_game_screen([0, 0], loading=True)
                 if self.map_name == "Toturial":
                     self.spielmodus = TUTORIAL
                 break
 
+    # Lehrerauswahl
     def make_lehrer_selection_pictures(self):
         if self.multiplayer:
             lehrer_asuwahl_breite = int(self.WIDTH / self.num_players_in_multiplayer)
@@ -606,17 +745,16 @@ class Game:
         self.draw_lehrer_selection(surf, None, player_num)
         alter_lehrer = self.players[player_num].lehrer_name
         selected_lehrer_num = list(LEHRER).index(alter_lehrer)
-        last_selected_lehrer_num = selected_lehrer_num
         self.draw_lehrer_selection(surf, list(LEHRER)[selected_lehrer_num], player_num)
         last_selection_change = time()
         such_text = ""
         while True:
             lehrer_y_positions = self.draw_lehrer_selection(surf, list(LEHRER)[selected_lehrer_num], player_num, such_text)
 
-            pressed = self.check_key_or_mouse_pressed([pygame.K_RETURN, pygame.K_DOWN, pygame.K_UP, pygame.K_BACKSPACE, "text"])
+            pressed = self.check_key_or_mouse_pressed([pygame.K_RETURN, pygame.K_s, pygame.K_d, pygame.K_a, pygame.K_DOWN, pygame.K_UP, pygame.K_BACKSPACE, "text"])
 
             # Auswahl aendern
-            if (pressed[pygame.K_UP] or MAUS_ROLL_UP in pressed) and time() - last_selection_change > 0.2 and lehrer_y_positions != []:
+            if (self.check_key_in_pressed(pygame.K_UP, pressed) or MAUS_ROLL_UP in pressed["Tastatur"]) and time() - last_selection_change > 0.2 and lehrer_y_positions != []:
                 # Lehrer auswahl aendern, dabei darauf achten das Lehrer schon freigeschaltet ist und noch nicht von anderen Spielern ausgewaehlt wurde
                 last_selection_change = time()
                 if selected_lehrer_num > 0:
@@ -644,7 +782,7 @@ class Game:
                         else:
                             selected_lehrer_num = len(LEHRER_NAMEN) - 1
 
-            if (pressed[pygame.K_DOWN] or MAUS_ROLL_DOWN in pressed) and time() - last_selection_change > 0.2 and lehrer_y_positions != []:
+            if (self.check_key_in_pressed(pygame.K_DOWN, pressed) or MAUS_ROLL_DOWN in pressed["Tastatur"]) and time() - last_selection_change > 0.2 and lehrer_y_positions != []:
                 # Lehrer auswahl aendern, dabei darauf chaten das Lehrer schon freigeschaltet ist und noch nicht von anderen Spielern ausgewaehlt wurde
                 last_selection_change = time()
                 if selected_lehrer_num < len(list(LEHRER)) - 1:
@@ -673,21 +811,25 @@ class Game:
                             selected_lehrer_num = 0
 
             # Nach Lehrer suchen durch Text eingeben
-            if pressed["text"] != False:
-                such_text += pressed["text"]
-            if pressed[pygame.K_BACKSPACE]:
+            if pressed["Tastatur"]["text"] != False:
+                such_text += pressed["Tastatur"]["text"]
+            if pressed["Tastatur"][pygame.K_BACKSPACE]:
                 such_text = such_text[:-2]
 
             # Auswaehlen
-            if MAUS_LEFT in pressed:
+            if MAUS_LEFT in pressed["Tastatur"]:
                 for lehrer_y_position in lehrer_y_positions:
-                    if pressed[MAUS_LEFT][1] < lehrer_y_position[1] and pressed[MAUS_LEFT][1] > lehrer_y_position[0]:
+                    if pressed["Tastatur"][MAUS_LEFT][1] < lehrer_y_position[1] and pressed["Tastatur"][MAUS_LEFT][1] > lehrer_y_position[0]:
                         self.change_to_other_lehrer(lehrer_y_positions[lehrer_y_position], alter_lehrer, self.players[player_num])
                         self.paused[player_num] = False
                         return
+            elif self.check_key_in_pressed(pygame.K_s, pressed) or self.check_key_in_pressed(pygame.K_d, pressed):
+                self.change_to_other_lehrer(LEHRER_NAMEN[selected_lehrer_num], alter_lehrer, self.players[player_num])
+                self.paused[player_num] = False
+                return
 
             # Zurueck
-            if pressed[pygame.K_RETURN]:
+            if self.check_key_in_pressed(pygame.K_a, pressed):
                 self.paused[player_num] = False
                 return
 
@@ -709,6 +851,248 @@ class Game:
         self.update_live_bar_image(player, self.players.index(player))
         self.update_forground_text_img()
 
+    # Einstellungen
+    def draw_einstellungen(self, cursor_pos):
+        return_dict = {}
+
+        self.screen.blit(self.background, (0, 0))
+
+        # Einstellungen
+        self.draw_text(self.screen, "Einstellungen", self.GIANT_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * 0.13), rect_place="mitte", color=AUSWAHL_TEXT_COLOR)
+
+        # Schoene oder fluessige Grafik
+        if self.schoene_grafik:
+            if cursor_pos[0] == 0:
+                return_dict["Grafik"] = self.draw_text(self.screen, "schöne Grafik", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * 0.25), rect_place="oben_mitte", color=AUSWAHL_TEXT_SELECTED)
+            else:
+                return_dict["Grafik"] = self.draw_text(self.screen, "schöne Grafik", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * 0.25), rect_place="oben_mitte", color=AUSWAHL_TEXT_COLOR)
+        else:
+            if cursor_pos[0] == 0:
+                return_dict["Grafik"] = self.draw_text(self.screen, "flüssige Grafik", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * 0.25), rect_place="oben_mitte", color=AUSWAHL_TEXT_SELECTED)
+            else:
+                return_dict["Grafik"] = self.draw_text(self.screen, "flüssige Grafik", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * 0.25), rect_place="oben_mitte", color=AUSWAHL_TEXT_COLOR)
+
+        # Lautsaerke
+        self.draw_text(self.screen, "Musik             ", self.NORMAL_TEXT, int(self.WIDTH / 4), int(self.HEIGHT * 0.38), rect_place="mitte_rechts", color=AUSWAHL_TEXT_COLOR)
+        pygame.draw.line(self.screen, AUSWAHL_TEXT_COLOR, (int(self.WIDTH/4), int(self.HEIGHT*0.38)), (int(self.WIDTH*(3/4)),int(self.HEIGHT*0.38)), 5)
+        pygame.draw.circle(self.screen,AUSWAHL_TEXT_GREEN,(int(self.WIDTH/4+(self.WIDTH/2)*self.music_volume),int(self.HEIGHT * 0.38)),10)
+        self.draw_text(self.screen, "Sounds             ", self.NORMAL_TEXT, int(self.WIDTH / 4), int(self.HEIGHT * 0.43), rect_place="mitte_rechts", color=AUSWAHL_TEXT_COLOR)
+        pygame.draw.line(self.screen, AUSWAHL_TEXT_COLOR, (int(self.WIDTH/4), int(self.HEIGHT*0.43)), (int(self.WIDTH*(3/4)),int(self.HEIGHT*0.43)), 5)
+        pygame.draw.circle(self.screen,AUSWAHL_TEXT_GREEN,(int(self.WIDTH/4+(self.WIDTH/2)*self.sound_volume),int(self.HEIGHT * 0.43)),10)
+        if cursor_pos[0] == 1 and cursor_pos[1] == 0:
+            return_dict["Musik -"] = self.draw_text(self.screen, "-    ", self.NORMAL_TEXT, int(self.WIDTH / 4), int(self.HEIGHT * 0.38), rect_place="mitte_rechts", color=AUSWAHL_TEXT_SELECTED)
+        else:
+            return_dict["Musik -"] = self.draw_text(self.screen, "-    ", self.NORMAL_TEXT, int(self.WIDTH / 4), int(self.HEIGHT * 0.38), rect_place="mitte_rechts", color=AUSWAHL_TEXT_COLOR)
+        if cursor_pos[0] == 1 and cursor_pos[1] == 1:
+            return_dict["Musik +"] = self.draw_text(self.screen, "    +", self.NORMAL_TEXT, int(self.WIDTH*(3/4)), int(self.HEIGHT * 0.38), rect_place="mitte_links", color=AUSWAHL_TEXT_SELECTED)
+        else:
+            return_dict["Musik +"] = self.draw_text(self.screen, "    +", self.NORMAL_TEXT, int(self.WIDTH*(3/4)), int(self.HEIGHT * 0.38), rect_place="mitte_links", color=AUSWAHL_TEXT_COLOR)
+
+        if cursor_pos[0] == 2 and cursor_pos[1] == 0:
+            return_dict["Sounds -"] = self.draw_text(self.screen, "-    ", self.NORMAL_TEXT, int(self.WIDTH / 4), int(self.HEIGHT * 0.43), rect_place="mitte_rechts", color=AUSWAHL_TEXT_SELECTED)
+        else:
+            return_dict["Sounds -"] = self.draw_text(self.screen, "-    ", self.NORMAL_TEXT, int(self.WIDTH / 4), int(self.HEIGHT * 0.43), rect_place="mitte_rechts", color=AUSWAHL_TEXT_COLOR)
+        if cursor_pos[0] == 2 and cursor_pos[1] == 1:
+            return_dict["Sounds +"] = self.draw_text(self.screen, "    +", self.NORMAL_TEXT, int(self.WIDTH*(3/4)), int(self.HEIGHT * 0.43), rect_place="mitte_links", color=AUSWAHL_TEXT_SELECTED)
+        else:
+            return_dict["Sounds +"] = self.draw_text(self.screen, "    +", self.NORMAL_TEXT, int(self.WIDTH*(3/4)), int(self.HEIGHT * 0.43), rect_place="mitte_links", color=AUSWAHL_TEXT_COLOR)
+
+        # Tastatur und Maus
+        if self.use_tastatur:
+            if cursor_pos[0] == 3 and cursor_pos[1] == 0:
+                return_dict["Tastatur"] = self.draw_text(self.screen, "Tastatur ", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * 0.55), rect_place="oben_rechts", color=AUSWAHL_TEXT_GREEN_SELECTED)
+            else:
+                return_dict["Tastatur"] = self.draw_text(self.screen, "Tastatur ", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * 0.55), rect_place="oben_rechts", color=AUSWAHL_TEXT_GREEN)
+        else:
+            if cursor_pos[0] == 3 and cursor_pos[1] == 0:
+                return_dict["Tastatur"] = self.draw_text(self.screen, "Tastatur ", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * 0.55), rect_place="oben_rechts", color=AUSWAHL_TEXT_SELECTED)
+            else:
+                return_dict["Tastatur"] = self.draw_text(self.screen, "Tastatur ", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * 0.55), rect_place="oben_rechts", color=AUSWAHL_TEXT_COLOR)
+        if self.with_maussteuerung:
+            if cursor_pos[0] == 3 and cursor_pos[1] == 1:
+                return_dict["Maus"] = self.draw_text(self.screen, "  Maussteuerung", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * 0.55), rect_place="oben_links", color=AUSWAHL_TEXT_SELECTED)
+            else:
+                return_dict["Maus"] = self.draw_text(self.screen, "  Maussteuerung", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * 0.55), rect_place="oben_links", color=AUSWAHL_TEXT_COLOR)
+        else:
+            if cursor_pos[0] == 3 and cursor_pos[1] == 1:
+                return_dict["Maus"] = self.draw_text(self.screen, "  Tastatursteuerung", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * 0.55), rect_place="oben_links", color=AUSWAHL_TEXT_SELECTED)
+            else:
+                return_dict["Maus"] = self.draw_text(self.screen, "  Tastatursteuerung", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * 0.55), rect_place="oben_links", color=AUSWAHL_TEXT_COLOR)
+
+        # Joysticks
+        return_dict["Joystick"] = []
+        for count, joystick in enumerate(self.all_joysticks):
+            if joystick in self.used_joysticks:
+                if cursor_pos[0] - 4 == count:
+                    return_dict["Joystick"].append(self.draw_text(self.screen, joystick.get_name(), self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * 0.55 + (count + 1) * (self.NORMAL_TEXT + 12)), rect_place="oben_mitte", color=AUSWAHL_TEXT_GREEN_SELECTED))
+                else:
+                    return_dict["Joystick"].append(self.draw_text(self.screen, joystick.get_name(), self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * 0.55 + (count + 1) * (self.NORMAL_TEXT + 12)), rect_place="oben_mitte", color=AUSWAHL_TEXT_GREEN))
+            elif cursor_pos[0] - 4 == count:
+                return_dict["Joystick"].append(self.draw_text(self.screen, joystick.get_name(), self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * 0.55 + (count + 1) * (self.NORMAL_TEXT + 12)), rect_place="oben_mitte", color=AUSWAHL_TEXT_SELECTED))
+            else:
+                return_dict["Joystick"].append(self.draw_text(self.screen, joystick.get_name(), self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * 0.55 + (count + 1) * (self.NORMAL_TEXT + 12)), rect_place="oben_mitte", color=AUSWAHL_TEXT_COLOR))
+
+        # Fentergroesse anpassen
+        if cursor_pos[0] == len(self.all_joysticks) + 4:
+            return_dict["Fenstergroesse"] = self.draw_text(self.screen, "Fenstergröße an Anzahl der Spieler anpassen", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT - 2 * self.NORMAL_TEXT - 20), rect_place="unten_mitte", color=AUSWAHL_TEXT_GREEN)
+        else:
+            return_dict["Fenstergroesse"] = self.draw_text(self.screen, "Fenstergröße an Anzahl der Spieler anpassen", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT - 2 * self.NORMAL_TEXT - 20), rect_place="unten_mitte", color=AUSWAHL_TEXT_COLOR)
+
+        # zurueck
+        return_dict["zurueck"] = self.draw_text(self.screen, "zurück", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT - self.NORMAL_TEXT), rect_place="unten_mitte", color=AUSWAHL_TEXT_COLOR)
+
+        pygame.display.flip()
+
+        return return_dict
+
+    def make_einstellungen(self):
+        def change_sound_volume(volume):
+            for sound_name in WEAPON_WAVS:
+                WEAPON_WAVS[sound_name].set_volume(volume)
+            LEVEL_START_WAV.set_volume(volume)
+            for sound in ZOMBIE_WAVS:
+                sound.set_volume(volume)
+            for sound in ZOMBIE_HIT_WAVS:
+                sound.set_volume(volume)
+            for sound in PLAYER_HIT_WAVS:
+                sound.set_volume(volume)
+        cursor_pos = [0, 0]
+        time_last_cursor_change = time()
+        while True:
+            self.clock.tick(FPS)
+            maus_rects = self.draw_einstellungen(cursor_pos)
+
+            pressed = self.check_key_or_mouse_pressed([pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN, pygame.K_RETURN, pygame.K_a, pygame.K_s, pygame.K_d])
+
+            if MAUS_LEFT in pressed["Tastatur"]:
+                if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects["Grafik"]):
+                    if self.schoene_grafik:
+                        self.schoene_grafik = False
+                    else:
+                        self.schoene_grafik = True
+
+                if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects["Musik +"]):
+                    self.music_volume = round(min([self.music_volume + 0.1, 1]), 1)
+                    pygame.mixer.music.set_volume(self.music_volume)
+                if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects["Musik -"]):
+                    self.music_volume = round(max([self.music_volume - 0.1, 0]), 1)
+                    pygame.mixer.music.set_volume(self.music_volume)
+                if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects["Sounds +"]):
+                    self.sound_volume = round(min([self.sound_volume + 0.1, 1]), 1)
+                    change_sound_volume(self.sound_volume)
+                if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects["Sounds -"]):
+                    self.sound_volume = round(max([self.sound_volume - 0.1, 0]), 1)
+                    change_sound_volume(self.sound_volume)
+                if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects["Tastatur"]):
+                    if self.use_tastatur:
+                        self.use_tastatur = False
+                    else:
+                        self.use_tastatur = True
+
+                if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects["Maus"]):
+                    if self.with_maussteuerung:
+                        self.with_maussteuerung = False
+                    else:
+                        self.with_maussteuerung = True
+
+                for count, joystick in enumerate(maus_rects["Joystick"]):
+                    if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], joystick):
+                        if self.all_joysticks[count] in self.used_joysticks:
+                            del self.used_joysticks[self.used_joysticks.index(self.all_joysticks[count])]
+                        else:
+                            self.used_joysticks.append(self.all_joysticks[count])
+
+                if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects["Fenstergroesse"]):
+                    anz_players = len(self.used_joysticks)
+                    if self.use_tastatur:
+                        anz_players += 1
+                    if anz_players >= 1:
+                        self.window_resize(anz_players * 960, 640)
+
+                if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects["zurueck"]):
+                    if self.use_tastatur or len(self.used_joysticks) >= 1:
+                        anz_players = len(self.used_joysticks)
+                        if self.use_tastatur:
+                            anz_players += 1
+                        if anz_players > 1:
+                            self.multiplayer = True
+                            self.num_players_in_multiplayer = anz_players
+                        else:
+                            self.multiplayer = False
+                        break
+
+            if self.check_key_in_pressed(pygame.K_UP, pressed) and time() - time_last_cursor_change > 0.4:
+                time_last_cursor_change = time()
+                cursor_pos[0] = max([cursor_pos[0] - 1, 0])
+
+            if self.check_key_in_pressed(pygame.K_DOWN, pressed) and time() - time_last_cursor_change > 0.4:
+                time_last_cursor_change = time()
+                cursor_pos[0] = min([cursor_pos[0] + 1, len(self.all_joysticks) + 4])
+
+            if self.check_key_in_pressed(pygame.K_LEFT, pressed) and time() - time_last_cursor_change > 0.4:
+                time_last_cursor_change = time()
+                cursor_pos[1] = max([cursor_pos[1] - 1, 0])
+
+            if self.check_key_in_pressed(pygame.K_RIGHT, pressed) and time() - time_last_cursor_change > 0.4:
+                time_last_cursor_change = time()
+                cursor_pos[1] = min([cursor_pos[1] + 1, 1])
+
+            if (self.check_key_in_pressed(pygame.K_s, pressed) or self.check_key_in_pressed(pygame.K_d, pressed)) and time() - time_last_cursor_change > 0.4:
+                time_last_cursor_change = time()
+                if cursor_pos[0] == 0:
+                    if self.schoene_grafik:
+                        self.schoene_grafik = False
+                    else:
+                        self.schoene_grafik = True
+                elif cursor_pos[0] == 1:
+                    if cursor_pos[1] == 0:
+                        self.music_volume = round(max([self.music_volume - 0.1,0]),1)
+                    else:
+                        self.music_volume = round(min([self.music_volume + 0.1, 1]),1)
+                    pygame.mixer.music.set_volume(self.music_volume)
+                elif cursor_pos[0] == 2:
+                    if cursor_pos[1] == 0:
+                        self.sound_volume = round(max([self.sound_volume - 0.1, 0]), 1)
+                    else:
+                        self.sound_volume = round(min([self.sound_volume + 0.1, 1]), 1)
+                    change_sound_volume(self.sound_volume)
+                elif cursor_pos[0] == 3:
+                    if cursor_pos[1] == 0:
+                        if self.use_tastatur:
+                            self.use_tastatur = False
+                        else:
+                            self.use_tastatur = True
+                    if cursor_pos[1] == 1:
+                        if self.with_maussteuerung:
+                            self.with_maussteuerung = False
+                        else:
+                            self.with_maussteuerung = True
+                elif cursor_pos[0] == len(self.all_joysticks) + 4:
+                    anz_players = len(self.used_joysticks)
+                    if self.use_tastatur:
+                        anz_players += 1
+                    if 1 <= anz_players <= 4:
+                        if self.WIDTH != [960, 1300, 2200, 3500, 4000][anz_players - 1] or self.HEIGHT != 640:
+                            self.window_resize([960, 1500, 2800, 4500, 7000][anz_players - 1], 640)
+                else:
+                    if self.all_joysticks[cursor_pos[0] - 4] in self.used_joysticks:
+                        del self.used_joysticks[self.used_joysticks.index(self.all_joysticks[cursor_pos[0] - 4])]
+                    else:
+                        self.used_joysticks.append(self.all_joysticks[cursor_pos[0] - 4])
+
+            if self.check_key_in_pressed(pygame.K_RETURN, pressed) or self.check_key_in_pressed(pygame.K_a, pressed):
+                if self.use_tastatur or len(self.used_joysticks) >= 1:
+                    anz_players = len(self.used_joysticks)
+                    if self.use_tastatur:
+                        anz_players += 1
+                    if anz_players > 1:
+                        self.multiplayer = True
+                        self.num_players_in_multiplayer = anz_players
+                    else:
+                        self.multiplayer = False
+                    break
+
+    # Spielerklaerung
     def make_spielerklaerung(self):
 
         while True:
@@ -728,17 +1112,24 @@ class Game:
             pygame.display.flip()
 
             self.clock.tick(FPS)
-            pressed = self.check_key_or_mouse_pressed([pygame.K_ESCAPE])
+            pressed = self.check_key_or_mouse_pressed([pygame.K_RETURN, pygame.K_a])
 
-            if MAUS_LEFT in pressed:
-                if self.check_maus_pos_on_rect(pressed[MAUS_LEFT], pygame.Rect((int(pos[0] + (width / 2) - (0.3 * width)), int(pos[1] + height - 0.3 * height)), (int(0.6 * width), int(0.6 * height)))):
+            if self.check_key_in_pressed(pygame.K_RETURN, pressed) or self.check_key_in_pressed(pygame.K_a, pressed):
+                break
+            if MAUS_LEFT in pressed["Tastatur"]:
+                if self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], pygame.Rect((int(pos[0] + (width / 2) - (0.3 * width)), int(pos[1] + height - 0.3 * height)), (int(0.6 * width), int(0.6 * height)))):
+                    break
+            for joystick in self.all_joysticks:
+                if joystick.get_A() or joystick.get_Y() or joystick.get_select() or joystick.get_start() or joystick.get_shoulder_left() or joystick.get_shoulder_right() or joystick.get_axis_left() or joystick.get_axis_right():
                     break
 
+    # Zeitmessung
     def make_time_measure(self):
         if self.measure_times:
             return round(time() * 1000, 2)
         return None
 
+    # Größen von Bildern, Texten und dem Bildschirm
     def calculate_fit_size(self, max_width_faktor, max_height_faktor):
         size = max_width_faktor * self.WIDTH
         if size / self.HEIGHT > max_height_faktor:
@@ -830,7 +1221,7 @@ class Game:
             else:
                 self.game_status = PLAYING
             if self.players != []:
-                # Die gleichen Lehrer wie im letzen Spiuel solange diese auch direkt freigeschaltet sind
+                # Die gleichen Lehrer wie im letzen Spiel solange diese auch direkt freigeschaltet sind
                 if not self.multiplayer:
                     if LEHRER[self.players[0].lehrer_name]["bedingungen_fuer_unlock"] == None:
                         self.new([self.players[0].lehrer_name])
@@ -855,6 +1246,22 @@ class Game:
                                 unlocked = False
                                 for count, playerrr in enumerate(self.players):
                                     if playerrr.lehrer_name == LEHRER_NAMEN[i] and count != player_num:
+                                        anderer_spieler_hat_schon_diese_person = True
+                                if LEHRER[LEHRER_NAMEN[i]]["bedingungen_fuer_unlock"] == None:
+                                    unlocked = True
+                                if anderer_spieler_hat_schon_diese_person == False and unlocked == True:
+                                    lehrer_namen.append(LEHRER_NAMEN[i])
+                                    namen_gefunden = True
+                                i += 1
+                    if len(lehrer_namen) != self.num_players_in_multiplayer:
+                        for added_player_num in range(self.num_players_in_multiplayer - len(lehrer_namen)):
+                            i = 0
+                            namen_gefunden = False
+                            while not namen_gefunden and i < len(LEHRER_NAMEN):
+                                anderer_spieler_hat_schon_diese_person = False
+                                unlocked = False
+                                for playerrr in lehrer_namen:
+                                    if playerrr == LEHRER_NAMEN[i]:
                                         anderer_spieler_hat_schon_diese_person = True
                                 if LEHRER[LEHRER_NAMEN[i]]["bedingungen_fuer_unlock"] == None:
                                     unlocked = True
@@ -895,7 +1302,7 @@ class Game:
             while self.game_status == PLAYING or self.game_status == COLLECTING_AT_END or (self.spielmodus == TUTORIAL and self.game_status != PLAYER_DIED):
                 self.dt = self.clock.tick(FPS) / 1000.0
 
-                pressed = self.check_key_or_mouse_pressed([pygame.K_BACKSPACE, pygame.K_RETURN, pygame.K_y, pygame.K_x, pygame.K_c, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN])
+                pressed = self.check_key_or_mouse_pressed([pygame.K_BACKSPACE, pygame.K_SPACE, pygame.K_RETURN, pygame.K_y, pygame.K_x, pygame.K_c, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN])
 
                 time1 = self.make_time_measure()
                 # Alle Spielaktionen hier ausfuehren
@@ -903,8 +1310,14 @@ class Game:
                     # alle sprites updaten
                     if (self.spielmodus == TUTORIAL and (self.game_status == TUTORIAL_POWER_UP or self.game_status == TUTORIAL_SHOOT)) or self.spielmodus != TUTORIAL:
                         for player in self.players:
-                            if pygame.mouse.get_pressed()[0] or pygame.key.get_pressed()[pygame.K_SPACE]:
-                                player.shoot()
+                            if player.joystick == "Tastatur":
+                                if pygame.mouse.get_pressed()[0] or pygame.key.get_pressed()[pygame.K_SPACE]:
+                                    player.shoot()
+                            else:
+                                for joystick in self.used_joysticks:
+                                    if joystick.get_name() == player.joystick:
+                                        if joystick.get_B():
+                                            player.shoot()
                     self.all_sprites.update()
                     for count, camera in enumerate(self.camera):
                         camera.update(self.players[count])
@@ -926,8 +1339,12 @@ class Game:
                     if self.spielmodus == TUTORIAL:
                         if self.game_status == TUTORIAL_WALK and time() - self.werte_since_last_lehrer_change[self.players[0]]["time_lehrer_change"] > 8:
                             self.game_status = TUTORIAL_COLLECT
-                        elif self.game_status == TUTORIAL_COLLECT and self.werte_since_last_lehrer_change[self.players[0]]["collected_objects"] >= 4:
-                            self.game_status = TUTORIAL_SHOOT
+                        elif self.game_status == TUTORIAL_COLLECT:
+                            total_collected = 0
+                            for player in self.players:
+                                total_collected += self.werte_since_last_lehrer_change[player]["collected_objects"]
+                            if total_collected >= 4:
+                                self.game_status = TUTORIAL_SHOOT
                         elif self.game_status == TUTORIAL_SHOOT and len(self.zombies) == 0:
                             self.game_status = TUTORIAL_POWER_UP
                             self.make_new_zombie_wave()
@@ -940,7 +1357,7 @@ class Game:
                     # Power-Up benutzen
                     if (self.spielmodus == TUTORIAL and self.game_status == TUTORIAL_POWER_UP) or self.spielmodus != TUTORIAL:
                         for count, player in enumerate(self.players):
-                            if MAUS_RIGHT in pressed or pressed[pygame.K_y] or pressed[pygame.K_x] or pressed[pygame.K_c]:
+                            if MAUS_RIGHT in pressed[player.joystick] or pressed[player.joystick][pygame.K_y] or pressed[player.joystick][pygame.K_x] or pressed[player.joystick][pygame.K_c]:
                                 if time() * 1000 - self.last_power_up_use_time[count] >= LEHRER[player.lehrer_name]["power_up_time"]:
                                     eval("lehrer_funktionen.power_up_" + player.lehrer_name.replace(" ", "_") + "(self,player)")
                                     self.werte_since_last_lehrer_change[player]["num_power_ups"] += 1
@@ -952,17 +1369,31 @@ class Game:
                 # Pause druecken (Lehrerauswahl)
                 if self.spielmodus != TUTORIAL:
                     for player_num in range(len(self.players)):
-                        if pressed[pygame.K_RETURN]:
+                        if self.players[player_num].joystick == "Tastatur":
+                            if pressed["Tastatur"][pygame.K_RETURN]:
+                                self.paused[player_num] = True
+                                self.make_lehrer_selection(self.screen, player_num)
+                                self.clock.tick(FPS)
+                        elif pressed[self.players[player_num].joystick][pygame.K_SPACE]:
                             self.paused[player_num] = True
                             self.make_lehrer_selection(self.screen, player_num)
                             self.clock.tick(FPS)
 
                 # Spiel abbrechen
-                if pressed[pygame.K_BACKSPACE]:
-                    if self.spielmodus == TUTORIAL:
-                        self.spielmodus = MAP_MODUS
-                        self.map_name = MAP_NAMES[0]
-                    self.game_status = BEFORE_FIRST_GAME
+                for player in self.players:
+                    if player.joystick == "Tastatur":
+                        if pressed["Tastatur"][pygame.K_BACKSPACE]:
+                            if self.spielmodus == TUTORIAL:
+                                self.spielmodus = MAP_MODUS
+                                self.map_name = MAP_NAMES[0]
+                            self.game_status = BEFORE_FIRST_GAME
+                    else:
+                        if pressed[player.joystick][pygame.K_RETURN]:
+                            if self.spielmodus == TUTORIAL:
+                                self.spielmodus = MAP_MODUS
+                                self.map_name = MAP_NAMES[0]
+                            self.game_status = BEFORE_FIRST_GAME
+
                 # Spiel gewonnen?
                 if ((self.spielmodus == MAP_MODUS and (len(self.zombies) == 0 or (self.genauerer_spielmodus == AFTER_TIME and time() - self.level_start_time >= TIME_MAP_LEVEL))) or (self.spielmodus == ARENA_MODUS and self.num_zombie_wave == 3 and not self.end_gegner.alive)) and self.game_status == PLAYING:
                     self.game_status = COLLECTING_AT_END
@@ -1066,13 +1497,24 @@ class Game:
             if tile_object.name == 'player':
                 self.player_pos = obj_center
                 if self.multiplayer:
-                    for i in range(self.num_players_in_multiplayer):
-                        player = Player(self, obj_center.x, obj_center.y, lehrer_namen[i], i)
+                    if self.use_tastatur:
+                        player = Player(self, obj_center.x, obj_center.y, lehrer_namen[0], 0, "Tastatur")
+                        self.players.append(player)
+                        self.weapon_upgrade_unlock_times.append(0)
+                        self.werte_since_last_lehrer_change[player] = {"shoots": 0, "treffer": 0, "collected_objects": 0, "num_obstacles_stept_on": 0, "time_lehrer_change": time(), "zombies_killed": 0, "collected_health_packs": 0, "num_power_ups": 0}
+                    for i, joystick in enumerate(self.used_joysticks):
+                        if self.use_tastatur:
+                            player = Player(self, obj_center.x, obj_center.y, lehrer_namen[i + 1], i + 1, joystick.get_name())
+                        else:
+                            player = Player(self, obj_center.x, obj_center.y, lehrer_namen[i], i, joystick.get_name())
                         self.players.append(player)
                         self.weapon_upgrade_unlock_times.append(0)
                         self.werte_since_last_lehrer_change[player] = {"shoots": 0, "treffer": 0, "collected_objects": 0, "num_obstacles_stept_on": 0, "time_lehrer_change": time(), "zombies_killed": 0, "collected_health_packs": 0, "num_power_ups": 0}
                 else:
-                    player = Player(self, obj_center.x, obj_center.y, lehrer_namen[0], 0)
+                    if self.use_tastatur:
+                        player = Player(self, obj_center.x, obj_center.y, lehrer_namen[0], 0, "Tastatur")
+                    else:
+                        player = Player(self, obj_center.x, obj_center.y, lehrer_namen[0], 0, self.used_joysticks[0].get_name())
                     self.players.append(player)
                     self.weapon_upgrade_unlock_times.append(0)
                     self.werte_since_last_lehrer_change[player] = {"shoots": 0, "treffer": 0, "collected_objects": 0, "num_obstacles_stept_on": 0, "time_lehrer_change": time(), "zombies_killed": 0, "collected_health_packs": 0, "num_power_ups": 0}
@@ -1278,15 +1720,16 @@ class Game:
 
     def draw_display(self):
         pygame.display.set_caption("{:.2f} - {}".format(self.clock.get_fps(), version))
-        # Zeichnen
+        # Karte
         time1 = self.make_time_measure()
+        # Pro Spieler zeichnen
         for count, camera in enumerate(self.camera):
             # Karte
             try:
                 shown_part_of_map = self.map_img.subsurface((camera.inverted.x, camera.inverted.y, int(self.WIDTH / len(self.players)), self.HEIGHT))
             except ValueError:
                 # Screen size bigger than map
-                self.window_resize(self.map_img.get_width(), self.map_img.get_height())
+                self.window_resize(min([self.map_img.get_width(), self.WIDTH * len(self.players)]), min([self.map_img.get_height(), self.HEIGHT]))
                 shown_part_of_map = self.map_img.subsurface((camera.inverted.x, camera.inverted.y, int(self.WIDTH / len(self.players)), self.HEIGHT))
             self.screen.blit(shown_part_of_map, (int(self.WIDTH / len(self.players) * count), 0))
 
@@ -1364,7 +1807,7 @@ class Game:
         # Levelfortschritt
         self.draw_level_fortschritts_balken()
         time5 = self.make_time_measure()
-        # Texte
+        # Texte: anz Zombies und gesammelte Objekte
         for count, digit in enumerate(str(len(self.zombies))):
             self.screen.blit(self.number_surfaces[int(digit)], (self.num_zombies_text_pos[0] + count * self.bigest_num_length, self.num_zombies_text_pos[1]))
         for count, pos in enumerate(self.personen_item_text_pos):
@@ -1380,14 +1823,17 @@ class Game:
         if self.spielmodus != TUTORIAL:
             for count, player in enumerate(self.players):
                 if player.weapon_upgrade_unlocked and time() - self.weapon_upgrade_unlock_times[count] < 4.5:
-                    self.draw_text(self.screen, LEHRER[player.lehrer_name]["weapon_upgrade"]["upgraded_weapon_name"] + " " + " freigeschaltet", self.BIG_TEXT, int(self.WIDTH / 2), int(self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 10 - 15), rect_place="unten_mitte", color=LEHRER_UNLOCKED_TEXT_COLOR)
+                    self.draw_text(self.screen, LEHRER[player.lehrer_name]["weapon_upgrade"]["upgraded_weapon_name"] + " " + " freigeschaltet", self.BIG_TEXT, int((self.WIDTH / len(self.players)) * count + self.WIDTH / len(self.players) / 2), int(self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 10 - 15), rect_place="unten_mitte", color=LEHRER_UNLOCKED_TEXT_COLOR)
                 elif time() - self.werte_since_last_lehrer_change[player]["time_lehrer_change"] < 5:
-                    if self.get_text_rect(LEHRER[player.lehrer_name]["weapon_upgrade"]["unlock_text"], self.BIG_TEXT).width > self.WIDTH:
-                        text = LEHRER[player.lehrer_name]["weapon_upgrade"]["unlock_text"]
-                        self.draw_text(self.screen, text[:int(len(text) / 2)], self.BIG_TEXT, int(self.WIDTH / 2), int(self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 10 - 15 - self.BIG_TEXT - 5), rect_place="unten_mitte", color=LEHRER_UNLOCKED_TEXT_COLOR)
-                        self.draw_text(self.screen, text[int(len(text) / 2):], self.BIG_TEXT, int(self.WIDTH / 2), int(self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 10 - 15), rect_place="unten_mitte", color=LEHRER_UNLOCKED_TEXT_COLOR)
-                    else:
-                        self.draw_text(self.screen, LEHRER[player.lehrer_name]["weapon_upgrade"]["unlock_text"], self.BIG_TEXT, int(self.WIDTH / 2), int(self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 10 - 15), rect_place="unten_mitte", color=LEHRER_UNLOCKED_TEXT_COLOR)
+                    anz_lines = ceil(self.get_text_rect(LEHRER[player.lehrer_name]["weapon_upgrade"]["unlock_text"], self.BIG_TEXT).width / (self.WIDTH / len(self.players) - 30))
+                    letter_per_line = int(len(LEHRER[player.lehrer_name]["weapon_upgrade"]["unlock_text"]) / anz_lines)
+                    for line in range(anz_lines):
+                        if line == anz_lines - 1:
+                            self.draw_text(self.screen, LEHRER[player.lehrer_name]["weapon_upgrade"]["unlock_text"][letter_per_line * line:], self.BIG_TEXT, int((self.WIDTH / len(self.players)) * count + self.WIDTH / len(self.players) / 2), int(self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 10 - 15 - (self.BIG_TEXT + 5) * (anz_lines - line)), rect_place="unten_mitte",
+                                           color=LEHRER_UNLOCKED_TEXT_COLOR)
+                        else:
+                            self.draw_text(self.screen, LEHRER[player.lehrer_name]["weapon_upgrade"]["unlock_text"][letter_per_line * line:letter_per_line * (line + 1)], self.BIG_TEXT, int((self.WIDTH / len(self.players)) * count + self.WIDTH / len(self.players) / 2), int(self.HEIGHT - 20 - self.HEIGHT * 0.02 - 3 - self.BIG_TEXT - 10 - 15 - (self.BIG_TEXT + 5) * (anz_lines - line)),
+                                           rect_place="unten_mitte", color=LEHRER_UNLOCKED_TEXT_COLOR)
         # Countdown vor Zombiewelle
         if self.spielmodus == ARENA_MODUS:
             if time() - self.countdown_start_time <= 5:
@@ -1398,20 +1844,20 @@ class Game:
             if self.game_status == TUTORIAL_WALK:
                 if self.with_maussteuerung:
                     self.draw_text(self.screen, "Bewege dich mit der Maus und halte Shift zum Schleichen und rückwärts Gehen", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * (1 / 3)))
-                    self.screen.blit(MAUS_IMG, (int(self.WIDTH / 2), 20))
+                    self.screen.blit(MAUS_IMG, (int(self.WIDTH / 2), 50))
                 else:
                     self.draw_text(self.screen, "Bewege dich mit den Pfeiltasten", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * (1 / 3)))
-                    self.screen.blit(PFEILTASTE_IMG, (int(self.WIDTH / 2 - PFEILTASTE_IMG.get_rect().w / 2), 20))
+                    self.screen.blit(PFEILTASTE_IMG, (int(self.WIDTH / 2 - PFEILTASTE_IMG.get_rect().w / 2), 50))
             elif self.game_status == TUTORIAL_COLLECT:
                 self.draw_text(self.screen, "Sammel die Objekte ohne auf die Hindernisse zu treten", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * (1 / 3)))
             elif self.game_status == TUTORIAL_SHOOT:
                 self.draw_text(self.screen, "Schieße mit Leertaste oder linker Maustaste auf die Zombies", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * (1 / 3)))
-                self.screen.blit(MAUS_LINKS_IMG, (int(self.WIDTH / 2 - MAUS_LINKS_IMG.get_rect().w / 2), 20))
-                self.screen.blit(LEERTASTE_IMG, (int(self.WIDTH / 2 - LEERTASTE_IMG.get_rect().w / 2), 40 + MAUS_LINKS_IMG.get_rect().h))
+                self.screen.blit(MAUS_LINKS_IMG, (int(self.WIDTH / 2 - MAUS_LINKS_IMG.get_rect().w / 2), 50))
+                self.screen.blit(LEERTASTE_IMG, (int(self.WIDTH / 2 - LEERTASTE_IMG.get_rect().w / 2), 70 + MAUS_LINKS_IMG.get_rect().h))
             elif self.game_status == TUTORIAL_POWER_UP:
                 self.draw_text(self.screen, "Benutzte mit X oder rechter Maustaste dein Power-Up", self.NORMAL_TEXT, int(self.WIDTH / 2), int(self.HEIGHT * (1 / 3)))
-                self.screen.blit(MAUS_RECHTS_IMG, (int(self.WIDTH / 2 - MAUS_RECHTS_IMG.get_rect().w / 2), 20))
-                self.screen.blit(X_Y_IMG, (int(self.WIDTH / 2 - X_Y_IMG.get_rect().w / 2), 40 + MAUS_LINKS_IMG.get_rect().h))
+                self.screen.blit(MAUS_RECHTS_IMG, (int(self.WIDTH / 2 - MAUS_RECHTS_IMG.get_rect().w / 2), 50))
+                self.screen.blit(X_Y_IMG, (int(self.WIDTH / 2 - X_Y_IMG.get_rect().w / 2), 70 + MAUS_LINKS_IMG.get_rect().h))
 
         if self.measure_times:
             self.measured_times[4].append(time6 - time1)
@@ -1427,8 +1873,8 @@ class Game:
         self.personen_item_text_pos = []
         # Texte
         if self.multiplayer:
-            rect = self.draw_text(surface, 'Zombies: ', self.BIG_TEXT, int(self.WIDTH / 2 - (3 * self.bigest_num_length) / 2), 10, rect_place="oben_mitte")
-            self.num_zombies_text_pos = (int(self.WIDTH / 2 - (3 * self.bigest_num_length) / 2 + rect.width / 2), 10)
+            rect = self.draw_text(surface, 'Zombies: ', self.BIG_TEXT, int(self.WIDTH / 2 - (3 * self.bigest_num_length) / 2), 0, rect_place="oben_mitte")
+            self.num_zombies_text_pos = (int(self.WIDTH / 2 - (3 * self.bigest_num_length) / 2 + rect.width / 2), 0)
             for count, player in enumerate(self.players):
                 if count >= self.num_players_in_multiplayer / 2:
                     rect = self.draw_text(surface, LEHRER[player.lehrer_name]["personen_item_text"] + ": ", self.BIG_TEXT, int(self.WIDTH - ((self.WIDTH / self.num_players_in_multiplayer) * (self.num_players_in_multiplayer - count - 1)) - 10 - 2 * self.bigest_num_length), int(self.HEIGHT - 30 - self.HEIGHT * 0.02), rect_place="unten_rechts")
@@ -1437,8 +1883,8 @@ class Game:
                     rect = self.draw_text(surface, LEHRER[player.lehrer_name]["personen_item_text"] + ": ", self.BIG_TEXT, int(10 + ((self.WIDTH / self.num_players_in_multiplayer) * (count))), int(self.HEIGHT - 30 - self.HEIGHT * 0.02), rect_place="unten_links")
                     self.personen_item_text_pos.append((10 + ((int(self.WIDTH / self.num_players_in_multiplayer) * (count)) + rect.width), int(self.HEIGHT - 30 - self.HEIGHT * 0.02)))
         else:
-            rect = self.draw_text(surface, 'Zombies: ', self.BIG_TEXT, self.WIDTH - 10 - 3 * self.bigest_num_length, 10, rect_place="oben_rechts")
-            self.num_zombies_text_pos = (self.WIDTH - 10 - 3 * self.bigest_num_length, 10)
+            rect = self.draw_text(surface, 'Zombies: ', self.BIG_TEXT, self.WIDTH - 10 - 3 * self.bigest_num_length, 0, rect_place="oben_rechts")
+            self.num_zombies_text_pos = (self.WIDTH - 10 - 3 * self.bigest_num_length, 0)
             rect = self.draw_text(surface, LEHRER[self.players[0].lehrer_name]["personen_item_text"] + ": ", self.BIG_TEXT, self.WIDTH - 10 - 2 * self.bigest_num_length, self.HEIGHT - 20, rect_place="unten_rechts")
             self.personen_item_text_pos = [(self.WIDTH - 10 - 2 * self.bigest_num_length, self.HEIGHT - 20)]
         if self.spielmodus == ARENA_MODUS:
@@ -1529,7 +1975,7 @@ class Game:
         else:
             pct = player.health / LEHRER[player.lehrer_name]["player_health"]
         if self.multiplayer and player_num >= self.num_players_in_multiplayer / 2:
-            fill_rect = pygame.Rect(int(self.WIDTH - ((int(self.WIDTH / self.num_players_in_multiplayer) * (self.num_players_in_multiplayer - player_num - 1)) - int(BAR_LENGTH) - int(0.031 * self.live_bar_img_width))), int(0.0426829 * self.live_bar_img_height), int(pct * BAR_LENGTH), int(BAR_HEIGHT))
+            fill_rect = pygame.Rect(int(self.WIDTH - (int(self.WIDTH / self.num_players_in_multiplayer) * (self.num_players_in_multiplayer - player_num - 1)) - int(BAR_LENGTH) - int(0.031 * self.live_bar_img_width)), int(0.0426829 * self.live_bar_img_height), int(pct * BAR_LENGTH), int(BAR_HEIGHT))
         else:
             fill_rect = pygame.Rect(int((0.031 * self.live_bar_img_width) + ((self.WIDTH / self.num_players_in_multiplayer) * (player_num))), int(0.0426829 * self.live_bar_img_height), int(pct * BAR_LENGTH), int(BAR_HEIGHT))
         # Farbe

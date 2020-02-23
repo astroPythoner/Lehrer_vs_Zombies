@@ -41,13 +41,14 @@ def collide_with_obstacles(sprite, group, dir):
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, lehrer_name, player_num):
+    def __init__(self, game, x, y, lehrer_name, player_num, joystick):
         self._layer = PLAYER_LAYER
         self.groups = game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.name = "Player"
         self.lehrer_name = lehrer_name
         self.game = game
+        self.joystick = joystick
         self.player_num = player_num
         self.orig_image = PLAYER_IMGES[self.lehrer_name]
         self.image = self.orig_image
@@ -72,7 +73,7 @@ class Player(pygame.sprite.Sprite):
         self.in_image_on_player = False
 
     def move_player(self):
-        if self.game.with_maussteuerung:
+        if self.joystick == "Tastatur" and self.game.with_maussteuerung:
             maus_pos = pygame.mouse.get_pos()
             mitte = vec(self.pos.x - self.game.camera[self.player_num].inverted.x, self.pos.y - self.game.camera[self.player_num].inverted.y)
 
@@ -117,7 +118,7 @@ class Player(pygame.sprite.Sprite):
                 if not distance < self.game.maussteuerung_circle_radius / 4:
                     self.pos += self.vel * self.game.dt
 
-        else:
+        elif self.joystick == "Tastatur":
             self.rot_speed = 0
             self.vel = vec(0, 0)
             if pygame.key.get_pressed()[pygame.K_LEFT]:
@@ -127,6 +128,22 @@ class Player(pygame.sprite.Sprite):
             if pygame.key.get_pressed()[pygame.K_UP]:
                 self.vel = vec(LEHRER[self.lehrer_name]["player_speed"], 0).rotate(-self.rot)
             if pygame.key.get_pressed()[pygame.K_DOWN]:
+                self.vel = vec((-LEHRER[self.lehrer_name]["player_speed"]) / 2, 0).rotate(-self.rot)
+
+            self.rot = (self.rot + self.rot_speed * self.game.dt) % 360
+
+            self.pos += self.vel * self.game.dt
+
+        else:
+            self.rot_speed = 0
+            self.vel = vec(0, 0)
+            if self.game.check_key_or_mouse_pressed([pygame.K_LEFT])[self.joystick][pygame.K_LEFT]:
+                self.rot_speed = LEHRER[self.lehrer_name]["player_rot_speed"]
+            if self.game.check_key_or_mouse_pressed([pygame.K_RIGHT])[self.joystick][pygame.K_RIGHT]:
+                self.rot_speed = -LEHRER[self.lehrer_name]["player_rot_speed"]
+            if self.game.check_key_or_mouse_pressed([pygame.K_UP])[self.joystick][pygame.K_UP]:
+                self.vel = vec(LEHRER[self.lehrer_name]["player_speed"], 0).rotate(-self.rot)
+            if self.game.check_key_or_mouse_pressed([pygame.K_DOWN])[self.joystick][pygame.K_DOWN]:
                 self.vel = vec((-LEHRER[self.lehrer_name]["player_speed"]) / 2, 0).rotate(-self.rot)
 
             self.rot = (self.rot + self.rot_speed * self.game.dt) % 360
@@ -164,7 +181,7 @@ class Player(pygame.sprite.Sprite):
         self.damaged = True
         self.damage_alpha = chain(DAMAGE_ALPHA * 4)
 
-    def update(self):
+    def update(self,):
         self.move_player()
         self.image = pygame.transform.rotate(self.orig_image, self.rot)
         if self.damaged:

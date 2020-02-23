@@ -4,11 +4,11 @@ import json
 
 vec = pygame.math.Vector2
 
-version = "2.2.1"
+version = "3.0.0"
 
 # Bildschrimgroesse
-start_width = 480 * 2  # 1600
-start_height = 320 * 2  # 1000
+start_width = 960
+start_height = 640
 FPS = 60
 
 # Pygame initialisieren und Fenster aufmachen
@@ -59,6 +59,8 @@ TEXT_COLOR = (170, 0, 0)  # sollte gut vor dem Hintergrund zu lesen sein
 AUSWAHL_TEXT_COLOR = (215, 200, 200)
 AUSWAHL_TEXT_RED = (255, 80, 80)
 AUSWAHL_TEXT_GREEN = (50, 200, 50)
+AUSWAHL_TEXT_SELECTED = (120, 120, 200)
+AUSWAHL_TEXT_GREEN_SELECTED = (50, 200, 180)
 LEHRER_UNLOCKED_TEXT_COLOR = (135, 120, 120)
 LEBENSANZEIGE_GRUEN = (0, 200, 0)
 LEBENSANZEIGE_ROT = (200, 0, 0)
