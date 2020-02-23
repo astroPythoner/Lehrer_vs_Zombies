@@ -1381,8 +1381,6 @@ class Game:
                 for player_num in range(len(self.players)):
                     if self.players[player_num].joystick == "Tastatur":
                         if pressed["Tastatur"][pygame.K_RETURN]:
-                            while True:
-                                pass
                             self.paused[player_num] = True
                             self.make_lehrer_selection(self.screen, player_num)
                             self.clock.tick(FPS)
