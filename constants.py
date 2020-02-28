@@ -4,7 +4,7 @@ import json
 
 vec = pygame.math.Vector2
 
-version = "3.1.0"
+version = "3.1.1"
 
 # Bildschrimgroesse
 start_width = 960

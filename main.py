@@ -12,7 +12,7 @@ import __init__
 
 multiplayer_possible = True
 try:
-    from joystickpins import JoystickPins
+    from joystickpins import JoystickPins, KeyboardStick
 except Exception:
     multiplayer_possible = False
 
@@ -46,7 +46,7 @@ class Game:
         self.background_rect = self.background.get_rect()
 
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.RESIZABLE)
-        pygame.display.set_caption("Tilmap Zombie! - " + version)
+        pygame.display.set_caption("Lehrer vs Zombies! - " + version)
         self.clock = pygame.time.Clock()
 
         self.update_text_sizes()
@@ -501,7 +501,9 @@ class Game:
             if (MAUS_LEFT in pressed["Tastatur"] and self.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects["Spielen"])) or self.check_key_in_pressed(pg.K_SPACE, pressed):
                 for player_num in range(len(self.players)):
                     self.paused[player_num] = False
-                self.draw_start_game_screen([0, 0], loading=True)
+                self.clock.tick(FPS)
+                self.draw_start_game_screen([-1,-1],True)
+                self.check_key_or_mouse_pressed()
                 if self.map_name == "Toturial":
                     self.spielmodus = TUTORIAL
                 break
@@ -1206,20 +1208,13 @@ class Game:
         self.game_status = BEFORE_FIRST_GAME
         self.make_start_game_selection()
 
-        if self.multiplayer:
-            self.small_map_size = self.calculate_fit_size(0.23, 0.23)
-        else:
-            self.small_map_size = self.calculate_fit_size(0.3, 0.3)
-        self.small_map_circle_sizes = [int(self.small_map_size * 0.3), int(self.small_map_size * 0.25), int(self.small_map_size * 0.25)]
-        self.small_map_sichtweite = self.small_map_sichtweite
-        self.make_lehrer_selection_pictures()
-
         while True:
             # Spiel beginnen
             if self.spielmodus == TUTORIAL:
                 self.game_status = TUTORIAL_WALK
             else:
                 self.game_status = PLAYING
+            # für jeden Spieler unterschiedlichen Lehrer finden, die keine Bedingung am Anfang haben
             if self.players != []:
                 # Die gleichen Lehrer wie im letzen Spiel solange diese auch direkt freigeschaltet sind
                 if not self.multiplayer:
@@ -1290,13 +1285,8 @@ class Game:
                             namen_gefunden = True
                         i += 1
                 self.new(lehrer_namen)
-            for count, player in enumerate(self.players):
-                self.update_live_bar_image(player, count)
+
             self.clock.tick(FPS)
-            self.level_start_time = time()
-            self.last_zombie_wave_time = time()
-            self.level_start_num_zombies = len(self.zombies)
-            self.update_forground_text_img()
 
             ## eigentliches Spiel starten
             self.game_loop()
@@ -1561,12 +1551,7 @@ class Game:
             if tile_object.name == 'endgegner_after_kill_point':
                 self.endgegner_after_kill_respawn_point.append(obj_center)
 
-        # Fehler abfangen: Spieler nicht auf der Karte, zu wenig joysticks fuer alle Spieler
-        # for count,player in enumerate(self.players):
-        #    try:
-        #        self.all_joysticks[count]
-        #    except IndexError:
-        #        self.all_joysticks.append(JoystickPins(KeyboardStick()))
+        # Fehler abfangen: Spieler nicht auf der Karte, keine Zombies
         if len(self.players) == 0:
             raise Exception("No place to put player in loaded map")
         if len(self.zombies) == 0:
@@ -1602,6 +1587,25 @@ class Game:
             self.last_power_up_use_time.append(round(time() * 1000))
             self.collected_person_objects.append(0)
             self.live_bar_images.append(False)
+
+        # Bilder die nur einmal berechnet werden
+        for count, player in enumerate(self.players):
+            self.update_live_bar_image(player, count)
+        self.make_lehrer_selection_pictures()
+        self.update_forground_text_img()
+
+        # Zeiten
+        self.level_start_time = time()
+        self.last_zombie_wave_time = time()
+        self.level_start_num_zombies = len(self.zombies)
+
+        # Mini Map
+        if self.multiplayer:
+            self.small_map_size = self.calculate_fit_size(0.23, 0.23)
+        else:
+            self.small_map_size = self.calculate_fit_size(0.3, 0.3)
+        self.small_map_circle_sizes = [int(self.small_map_size * 0.3), int(self.small_map_size * 0.25), int(self.small_map_size * 0.25)]
+        self.small_map_sichtweite = self.small_map_sichtweite
 
         if self.spielmodus != TUTORIAL:
             LEVEL_START_WAV.play()
