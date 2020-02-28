@@ -10,28 +10,47 @@ python3 main.py
 - pygame
 - pytmx
 - pytweening
+- Für Multiplayer: [joystickpins](https://github.com/astroPythoner/joystickpins) (Mehr dazu weiter unten)
 
 ***
 
 # Das Spiel
-## So spielst du:
+### So spielst du
 Wenn du die Datei main.py ausführst startet das Spiel. Im Menu das du jetzt siehst kannst du die Schwierigkeit und den Spielmodus auswählen. Unten kannst du noch eine Karte auswählen. Oben rechts ist eine Hilfe, oben links kannst du noch zwischen schöner und flüssiger Grafik auswählen. Und die Steuerungsart auswählen:
 
-### Spielmodi:
+## Ziel des Spiels
+Versuche die Zombies mit deinem PowerUp und deiner Waffe zu töten. Sammle die Healthpacks um dein Leben wieder aufzufüllen.
+Trete nicht auf die Hindernisse und sammle die Objekte deiner Person. Ist der Balken unten voll musst du nurnoch die Butter finden.
+
+## Spielmodi
 Im Arena Modus musst du drei Zombie Wellen überleben, in der dritten erwartet dich ein Endgegner. Du kannst auswählen ob die nächste Zombiewelle nach einer gewissen Zeit oder nach töten aller Zombies kommen soll. 
 
 Im Zombie Map Modus musst je nach Einstellung lang genug auf der Karte überleben oder alle Zombies töten. Am Ende des Spiels gilt es immer die Butter zu finden.
 
-### Steuerungen:
-Bei der Steuerung mit der Maus läuft der Spieler der Maus hinterher. Schießen kannst du mit der linken Maustaste oder der Leertaste. Das PowerUp benutzt du mit der rechten Maustaste oder mit X bzw. Y
+## Steuerungen
 
-Bei der Tastatursteuerung bewegst du den Spieler mit den Pfeiltasten. Vor und zurück zum bewegen und links und rechts zum drehen. Wie bei der Maussteuerung schießt du mit Leertaste und benutzt dein PowerUp mit X bzw. Y
+#### Tastatursteuerung mit Maus
+Bei der Steuerung mit der Maus läuft der Spieler der Maus hinterher. Schießen kannst du mit der linken Maustaste oder der Leertaste. Das PowerUp benutzt du mit der rechten Maustaste oder mit X bzw. Y
 
 Mit der Entertaste kommst du in die Spielerauswahl scrollen kannst du mit dem Mausrad oder den Pfeiltasten. Klicke mit der Maus auf den Spieler mit dem du spielen willst. Mit der Löschtaste kommst du zurück ins Hauptmenü und mit escape beendest du das Spiel.
 
-### Im Spiel
-Versuche die Zombies mit deinem PowerUp und deiner Waffe zu töten. Sammle die Healthpacks um dein Leben wieder aufzufüllen.
-Trete nicht auf die Hindernisse und sammle die Objekte deiner Person. Ist der Balken unten voll musst du nornuch die Butter finden.
+#### Tastatursteureung mit Pfeiltasten
+Bei der Tastatursteuerung bewegst du den Spieler mit den Pfeiltasten. Vor und zurück zum bewegen und links und rechts zum drehen. Wie bei der Maussteuerung schießt du mit Leertaste und benutzt dein PowerUp mit X bzw. Y
+
+Genau wie bei der Maussteureung kannst du mit Enter in die Lehrerauswahl gelangen, mit der Löschtaste zum Hauptmenü und mit Escape beendest du das Spiel.
+
+#### Kontrollersteurung
+
+Die Kontrollersteurung ist ähnlich wie die Steuerung mit Pfeiltasten. Mit den links/rechts Tasten oder dem Joystick (je nach Kontroller) drehst du dich und mit vor und zurück bewegst du dich. Du schießt mit A oder dem Kreuz (je nach Kontroller). Mit B oder dem Kreis benutzt du dein Power-Up. In die Lehrerauswahl kommst du mit Select, in der du mit A oder Kreuz dein Lehrer auswählst. Mit start kommst du zurück ins Hauptmenü. In den Menüs kannst du mit dem Joystick oder links/rechts/hoch/runter Tasten den in blau gezeichneten Menupunkt bewegen und mit A oder Kreuz auswählen.
+
+## Multiplayer
+
+Um das Spiel im Multiplayer zu Spielen musst du mein [joystickpins projekt](https://github.com/astroPythoner/joystickpins) runterladen. Schließe dann ein Kontroller an (wenn er nicht aufgenommen ist lese dir das Erstellen neuer Kontrollermappings in dem joystickspins Projekt durch) und aktiviere ihn in den Einstellungen.
+Der Multiplayer ist in einem Splitscreen gemacht, die beiden Spieler spielen also nebeneinander, es ist daher empfehlenswert das Fanster etwas breiter zu ziehen.
+
+## Einstellungen
+
+Drücke im Hauptmenü auf Einstellungen. Hier kannst du oben die Grafikeinstellungen zwischen schöner und flüssiger Grafik wechseln. Darunter kannst du die Musik und Sound Lautstärke ändern, in dem du auf das Plus und Minus neben den Balken klickst. Ganz unten kannst du auswählen welche Kontroller mitspielen sollen und bei der Tastatur zusätzlich auswählen ob per Maus oder Pfeiltasten gesteuert werden soll.
 
 ![Image could not be loaded](https://raw.githubusercontent.com/astroPythoner/Lehrer_vs_Zombies/master/img/erklaerung_mit_hintergrund.png)
 
