@@ -623,7 +623,7 @@ def make_einstellungen(game):
                 if game.use_tastatur:
                     anz_players += 1
                 if anz_players >= 1:
-                    game.window_resize(anz_players * 960, 640)
+                    resize_window(game,anz_players * 960, 640)
 
             if game.check_maus_pos_on_rect(pressed["Tastatur"][MAUS_LEFT], maus_rects["zurueck"]):
                 if game.use_tastatur or len(game.used_joysticks) >= 1:
@@ -689,7 +689,7 @@ def make_einstellungen(game):
                     anz_players += 1
                 if 1 <= anz_players <= 4:
                     if game.WIDTH != [960, 1300, 2200, 3500, 4000][anz_players - 1] or game.HEIGHT != 640:
-                        game.window_resize([960, 1500, 2800, 4500, 7000][anz_players - 1], 640)
+                        resize_window(game,[960, 1500, 2800, 4500, 7000][anz_players - 1], 640)
             else:
                 if game.all_joysticks[cursor_pos[0] - 4] in game.used_joysticks:
                     del game.used_joysticks[game.used_joysticks.index(game.all_joysticks[cursor_pos[0] - 4])]

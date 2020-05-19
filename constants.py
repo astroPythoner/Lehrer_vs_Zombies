@@ -101,7 +101,7 @@ game_sound_volume = 0.5
 
 AUTOMATISCH = "automatisch"
 
-with open('players.json', encoding='utf-8') as json_data:
+with open(path.join(path.dirname(path.realpath(__file__)),'players.json'), encoding='utf-8') as json_data:
     LEHRER = json.load(json_data)
     json_data.close()
 

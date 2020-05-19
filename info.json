@@ -1,0 +1,8 @@
+{
+  "name": "Lehrer vs Zombies",
+  "description": "Spiele als Lehrer gegen die Zombies und besiege mächtige Endgegner. Im Multi- oder Singleplayer spielst du einen 2D-shooter ohne Grenzen. Wie du eingene Charaktere und Maps erstellen kannst findest du unter https://github.com/astroPythoner/Lehrer_vs_Zombies/wiki",
+  "type": "2D-Shooter",
+  "author": "AstroPythoner",
+  "players": "1 to 4",
+  "playable with": ["Controller","Tastatur","Maus und Tastatur"]
+}

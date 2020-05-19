@@ -12,8 +12,12 @@ multiplayer_possible = True
 try:
     from joystickpins import JoystickPins, KeyboardStick
 except Exception:
-    multiplayer_possible = False
-
+    try:
+        from joystickpins import joystickpins
+        JoystickPins = joystickpins.JoystickPins
+        KeyboardStick = joystickpins.KeyboardStick
+    except Exception:
+        multiplayer_possible = False
 
 class Game:
     def __init__(self):
@@ -174,7 +178,7 @@ class Game:
                     return_dict["Tastatur"][MAUS_ROLL_DOWN] = event.pos
 
             if event.type == pygame.VIDEORESIZE:
-                resize_window(event.w, event.h)
+                resize_window(self, event.w, event.h)
 
         for joystick in self.all_joysticks:
             keys = {pygame.K_UP: joystick.get_axis_up, pygame.K_DOWN: joystick.get_axis_down, pygame.K_LEFT: joystick.get_axis_left, pygame.K_RIGHT: joystick.get_axis_right, pygame.K_RETURN: joystick.get_start, pygame.K_SPACE: joystick.get_select, pygame.K_a: joystick.get_Y, pygame.K_w: joystick.get_X, pygame.K_s: joystick.get_B, pygame.K_d: joystick.get_A, pygame.K_c: joystick.get_A}
