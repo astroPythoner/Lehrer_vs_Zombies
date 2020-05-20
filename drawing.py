@@ -1,5 +1,5 @@
 from constants import *
-from sprites import *
+from Flappy_Plane.sprites import *
 from math import ceil, pi
 
 # Texte zeichnen

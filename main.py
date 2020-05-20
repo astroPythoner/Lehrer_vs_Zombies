@@ -1,13 +1,11 @@
-import pygame
 import sys
 from random import choice
 from time import time
-from sprites import *
+from Flappy_Plane.sprites import *
 from tilemap import *
 from menus import *
 from drawing import *
-import lehrer_funktionen
-import __init__
+
 multiplayer_possible = True
 try:
     from joystickpins import JoystickPins, KeyboardStick
