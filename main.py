@@ -1,10 +1,11 @@
 import sys
 from random import choice
 from time import time
-from Flappy_Plane.sprites import *
+from sprites import *
 from tilemap import *
 from menus import *
 from drawing import *
+import lehrer_funktionen
 
 multiplayer_possible = True
 try:
