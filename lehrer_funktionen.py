@@ -1,6 +1,7 @@
 # Diese Funktioen werden aufgerufen, wenn das entsprechende Eregniss im Spiel passiert.
 # Sollte beim hinzufuegen eines neuen Lehrers vergessen werden die Funktionen in dieser Datei hinzuzufuegen werden sie in constants.py automatisch erstellt
 from constants import *
+from sprites import *
 
 
 def is_zombie_close_to_player(zombie, player_pos, area_radius=250):
